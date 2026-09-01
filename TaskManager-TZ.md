@@ -108,8 +108,8 @@
 ## 4. План задач
 
 ### Этап 1. Каркас
-- [ ] Solution из 4 проектов (Core, Infrastructure, App (MAUI), Tests) и ссылки между ними
-- [ ] `.gitignore`, `.editorconfig`, Nullable, анализаторы
+- [x] Solution из 4 проектов (Core, Infrastructure, App (MAUI), Tests) и ссылки между ними
+- [x] `.gitignore`, `.editorconfig`, Nullable, анализаторы
 - [ ] DI в `MauiProgram` + настройки (`IOptions<T>`) + Serilog
 
 ### Этап 2. Домен
