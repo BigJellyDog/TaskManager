@@ -113,8 +113,8 @@
 - [ ] DI в `MauiProgram` + настройки (`IOptions<T>`) + Serilog
 
 ### Этап 2. Домен
-- [ ] Сущности: `TaskItem`, `Tag`, `TaskDependency`, `RecurrenceRule`, `TaskHistoryEntry`
-- [ ] Enum `Priority`, `TaskStatus`
+- [x] Сущности: `TaskItem`, `Tag`, `TaskDependency`, `RecurrenceRule`, `TaskHistoryEntry`
+- [x] Enum `Priority`, `TaskStatus`
 - [ ] Класс `TaskStateMachine` с таблицей разрешённых переходов
 - [ ] Валидация в доменных методах, а не в интерфейсе
 
