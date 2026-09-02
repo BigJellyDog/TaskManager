@@ -15,5 +15,16 @@ public class TaskDependencyConfiguration : IEntityTypeConfiguration<TaskDependen
         // Составной ключ: одна и та же зависимость не может быть добавлена дважды.
         builder.HasKey(d => new { d.TaskId, d.DependsOnTaskId });
         builder.HasIndex(d => d.DependsOnTaskId);
+
+        // Самосвязь через промежуточную таблицу: у задачи есть список "от чего зависит" и "кто зависит от неё".
+        builder.HasOne(d => d.Task)
+            .WithMany(t => t.Dependencies)
+            .HasForeignKey(d => d.TaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(d => d.DependsOnTask)
+            .WithMany(t => t.Dependents)
+            .HasForeignKey(d => d.DependsOnTaskId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -13,8 +13,11 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         builder.ToTable("Tags");
         builder.HasKey(t => t.Id);
 
-        // NOCASE: "Работа" и "работа" для SQLite один и тот же тег.
-        builder.Property(t => t.Name).IsRequired().HasMaxLength(Tag.MaxNameLength).UseCollation("NOCASE");
-        builder.HasIndex(t => t.Name).IsUnique();
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(Tag.MaxNameLength);
+
+        // Уникальность по NormalizedName: "Работа" и "работа" это один тег.
+        // Коллация NOCASE в SQLite различает регистр кириллицы, поэтому она тут не подходит.
+        builder.Property(t => t.NormalizedName).IsRequired().HasMaxLength(Tag.MaxNameLength);
+        builder.HasIndex(t => t.NormalizedName).IsUnique();
     }
 }
