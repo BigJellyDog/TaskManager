@@ -116,7 +116,7 @@
 - [x] Сущности: `TaskItem`, `Tag`, `TaskDependency`, `RecurrenceRule`, `TaskHistoryEntry`
 - [x] Enum `Priority`, `TaskStatus`
 - [x] Класс `TaskStateMachine` с таблицей разрешённых переходов
-- [ ] Валидация в доменных методах, а не в интерфейсе
+- [x] Валидация в доменных методах, а не в интерфейсе
 
 ### Этап 3. База данных
 - [ ] EF Core + SQLite, `DbContext`, конфигурации сущностей (Fluent API)

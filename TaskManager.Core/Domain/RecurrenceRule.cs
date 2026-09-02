@@ -5,6 +5,21 @@ public class RecurrenceRule
 {
     public RecurrenceRule(RecurrenceFrequency frequency, int interval, RecurrenceMode mode, WeekDays weekDays = WeekDays.None)
     {
+        if (interval < 1)
+        {
+            throw new DomainValidationException("Шаг повторения должен быть не меньше 1.");
+        }
+
+        if (frequency == RecurrenceFrequency.Weekly && weekDays == WeekDays.None)
+        {
+            throw new DomainValidationException("Для еженедельного повторения выберите хотя бы один день недели.");
+        }
+
+        if (frequency != RecurrenceFrequency.Weekly && weekDays != WeekDays.None)
+        {
+            throw new DomainValidationException("Дни недели можно выбирать только для еженедельного повторения.");
+        }
+
         Frequency = frequency;
         Interval = interval;
         Mode = mode;
