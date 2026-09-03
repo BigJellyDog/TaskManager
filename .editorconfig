@@ -395,3 +395,7 @@ dotnet_diagnostic.CA1873.severity = none
 
 [TaskManager.Tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
+
+# EF migrations are generated, do not analyze them
+[**/Migrations/*.cs]
+generated_code = true

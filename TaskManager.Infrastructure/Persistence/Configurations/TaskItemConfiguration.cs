@@ -13,6 +13,10 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.ToTable("Tasks");
         builder.HasKey(t => t.Id);
 
+        // Глобальный фильтр мягкого удаления: удалённые задачи не попадают ни в один запрос.
+        // Чтобы увидеть их (корзина, восстановление), нужен .IgnoreQueryFilters().
+        builder.HasQueryFilter(t => !t.IsDeleted);
+
         // Токен конкурентности: EF добавляет "WHERE RowVersion = <прочитанное значение>" в каждый UPDATE и DELETE.
         // Если строку уже изменили, обновлено 0 строк и EF бросает DbUpdateConcurrencyException.
         builder.Property(t => t.RowVersion).IsConcurrencyToken();

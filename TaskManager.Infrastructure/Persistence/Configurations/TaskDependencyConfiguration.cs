@@ -12,6 +12,10 @@ public class TaskDependencyConfiguration : IEntityTypeConfiguration<TaskDependen
 
         builder.ToTable("TaskDependencies");
 
+        // Зависимость, у которой любая из задач удалена, скрыта вместе с ней (иначе удалённая задача продолжала бы
+        // блокировать живые). После восстановления задачи зависимость снова появляется.
+        builder.HasQueryFilter(d => !d.Task!.IsDeleted && !d.DependsOnTask!.IsDeleted);
+
         // Составной ключ: одна и та же зависимость не может быть добавлена дважды.
         builder.HasKey(d => new { d.TaskId, d.DependsOnTaskId });
         builder.HasIndex(d => d.DependsOnTaskId);
