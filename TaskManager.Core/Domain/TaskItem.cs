@@ -24,6 +24,12 @@ public class TaskItem
 
     public int Id { get; private set; }
 
+    /// <summary>
+    /// Версия строки для оптимистичной блокировки. Увеличивается инфраструктурой при каждом сохранении.
+    /// Если задачу успели изменить между чтением и сохранением, версии не совпадут и сохранение будет отклонено.
+    /// </summary>
+    public long RowVersion { get; private set; }
+
     public string Title { get; private set; }
 
     public string? Description { get; private set; }

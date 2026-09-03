@@ -13,6 +13,10 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.ToTable("Tasks");
         builder.HasKey(t => t.Id);
 
+        // Токен конкурентности: EF добавляет "WHERE RowVersion = <прочитанное значение>" в каждый UPDATE и DELETE.
+        // Если строку уже изменили, обновлено 0 строк и EF бросает DbUpdateConcurrencyException.
+        builder.Property(t => t.RowVersion).IsConcurrencyToken();
+
         builder.Property(t => t.Title).IsRequired().HasMaxLength(TaskItem.MaxTitleLength);
         builder.Property(t => t.Description).HasMaxLength(4000);
         builder.Property(t => t.Priority).IsRequired();

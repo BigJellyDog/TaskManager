@@ -18,6 +18,49 @@ public class TaskManagerDbContext : DbContext
 
     public DbSet<TaskHistoryEntry> HistoryEntries => Set<TaskHistoryEntry>();
 
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        BumpRowVersions();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        BumpRowVersions();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    /// <summary>
+    /// SQLite сам не ведёт версию строки (в отличие от SQL Server), поэтому увеличиваем её вручную:
+    /// у каждой изменяемой задачи RowVersion становится на единицу больше прочитанного значения.
+    /// </summary>
+    private void BumpRowVersions()
+    {
+        ChangeTracker.DetectChanges();
+
+        // Правило повторения хранится в той же строке, но для EF это отдельный вложенный объект.
+        // Если изменился (добавлен, заменён или удалён) только он, сама задача остаётся Unchanged,
+        // поэтому собираем Id задач-владельцев изменённых правил и поднимаем им версию вручную.
+        var ownersWithChangedRecurrence = ChangeTracker.Entries<RecurrenceRule>()
+            .Where(e => e.State != EntityState.Unchanged)
+            .Select(e => e.Property(e.Metadata.FindOwnership()!.Properties[0].Name).CurrentValue)
+            .OfType<int>()
+            .ToHashSet();
+
+        foreach (var entry in ChangeTracker.Entries<TaskItem>().ToList())
+        {
+            var isModified = entry.State == EntityState.Modified;
+            var isUnchangedWithNewRecurrence = entry.State == EntityState.Unchanged
+                && ownersWithChangedRecurrence.Contains(entry.Entity.Id);
+
+            if (isModified || isUnchangedWithNewRecurrence)
+            {
+                var version = entry.Property(t => t.RowVersion);
+                version.CurrentValue = (long)version.OriginalValue! + 1;
+            }
+        }
+    }
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         ArgumentNullException.ThrowIfNull(configurationBuilder);
