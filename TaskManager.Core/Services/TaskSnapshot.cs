@@ -15,7 +15,8 @@ internal sealed record TaskSnapshot(
     TaskStatus Status,
     DateTimeOffset? Deadline,
     string Tags,
-    string? Recurrence)
+    string? Recurrence,
+    int? ParentId)
 {
     public static TaskSnapshot From(TaskItem task)
     {
@@ -28,7 +29,8 @@ internal sealed record TaskSnapshot(
             task.Status,
             task.Deadline,
             tags,
-            Describe(task.Recurrence));
+            Describe(task.Recurrence),
+            task.ParentId);
     }
 
     /// <summary>Поля, значение которых отличается. Пустой список значит, что менять нечего.</summary>
@@ -43,6 +45,7 @@ internal sealed record TaskSnapshot(
         Add(changes, nameof(Deadline), Format(before.Deadline), Format(after.Deadline));
         Add(changes, nameof(Tags), NullIfEmpty(before.Tags), NullIfEmpty(after.Tags));
         Add(changes, nameof(Recurrence), before.Recurrence, after.Recurrence);
+        Add(changes, nameof(ParentId), before.ParentId?.ToString(CultureInfo.InvariantCulture), after.ParentId?.ToString(CultureInfo.InvariantCulture));
 
         return changes;
     }

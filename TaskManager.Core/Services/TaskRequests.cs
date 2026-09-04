@@ -9,7 +9,8 @@ public sealed record CreateTaskRequest(
     string? Description = null,
     DateTimeOffset? Deadline = null,
     IReadOnlyCollection<string>? Tags = null,
-    RecurrenceRule? Recurrence = null);
+    RecurrenceRule? Recurrence = null,
+    int? ParentId = null);
 
 /// <summary>
 /// Данные для редактирования: форма целиком, как её отправляет интерфейс.

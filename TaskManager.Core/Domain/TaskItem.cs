@@ -9,6 +9,9 @@ public class TaskItem
 {
     public const int MaxTitleLength = 200;
 
+    /// <summary>Максимальная вложенность: задача верхнего уровня это уровень 1.</summary>
+    public const int MaxDepth = 3;
+
     private TaskItem(string title, Priority priority, DateTimeOffset createdAt)
     {
         Title = title;
@@ -150,6 +153,11 @@ public class TaskItem
         EnsureNotDeleted();
         TaskStateMachine.EnsureTransition(Status, to);
 
+        if (to == TaskStatus.Done)
+        {
+            EnsureSubtasksCompleted();
+        }
+
         Status = to;
         CompletedAt = to == TaskStatus.Done ? clock.GetUtcNow() : null;
     }
@@ -158,8 +166,58 @@ public class TaskItem
     public void Reopen()
     {
         EnsureNotDeleted();
-        Status = TaskStateMachine.EnsureReopen(Status);
+        var target = TaskStateMachine.EnsureReopen(Status);
+
+        if (Parent is { IsDeleted: false, Status: TaskStatus.Done })
+        {
+            throw new DomainValidationException(
+                "Нельзя переоткрыть подзадачу, пока выполнена родительская задача. Сначала переоткройте родителя.");
+        }
+
+        Status = target;
         CompletedAt = null;
+    }
+
+    /// <summary>
+    /// Прогресс по подзадачам: считаются прямые дети без отменённых и удалённых.
+    /// Дети должны быть загружены (<see cref="Children"/>).
+    /// </summary>
+    public TaskProgress GetProgress()
+    {
+        var counted = Children.Where(c => !c.IsDeleted && c.Status != TaskStatus.Cancelled).ToList();
+        return new TaskProgress(counted.Count(c => c.Status == TaskStatus.Done), counted.Count);
+    }
+
+    /// <summary>
+    /// Привязывает задачу к родителю (или делает её задачей верхнего уровня при null).
+    /// Здесь проверяются правила, которые видны из самих объектов. Глубину вложенности и циклы
+    /// проверяет <c>TaskService</c>, потому что для этого нужно ходить по дереву в БД.
+    /// </summary>
+    public void SetParent(TaskItem? parent)
+    {
+        EnsureNotDeleted();
+
+        if (parent is not null)
+        {
+            if (ReferenceEquals(parent, this))
+            {
+                throw new DomainValidationException("Задача не может быть подзадачей самой себя.");
+            }
+
+            if (parent.IsDeleted)
+            {
+                throw new DomainValidationException("Нельзя добавить подзадачу к удалённой задаче.");
+            }
+
+            if (parent.Status == TaskStatus.Done && Status is not (TaskStatus.Done or TaskStatus.Cancelled))
+            {
+                throw new DomainValidationException(
+                    "Нельзя добавить невыполненную подзадачу к выполненной задаче. Сначала переоткройте родителя.");
+            }
+        }
+
+        Parent = parent;
+        ParentId = parent?.Id;
     }
 
     public void Delete()
@@ -180,6 +238,17 @@ public class TaskItem
         }
 
         IsDeleted = false;
+    }
+
+    private void EnsureSubtasksCompleted()
+    {
+        var progress = GetProgress();
+
+        if (!progress.IsComplete)
+        {
+            throw new DomainValidationException(
+                $"Нельзя завершить задачу: не завершены подзадачи ({progress}).");
+        }
     }
 
     private void EnsureNotDeleted()
