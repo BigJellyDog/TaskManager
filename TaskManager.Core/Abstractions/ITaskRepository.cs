@@ -14,6 +14,9 @@ public interface ITaskRepository
     /// <summary>Задача вместе с родителем, подзадачами, тегами и зависимостями в обе стороны.</summary>
     Task<TaskItem?> GetWithDetailsAsync(int id, CancellationToken cancellationToken = default);
 
+    /// <summary>Задачи по списку Id. Удалённые по умолчанию не возвращаются.</summary>
+    Task<IReadOnlyList<TaskItem>> GetByIdsAsync(IReadOnlyCollection<int> ids, bool includeDeleted = false, CancellationToken cancellationToken = default);
+
     /// <summary>Прямые подзадачи (удалённые не возвращаются).</summary>
     Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default);
 

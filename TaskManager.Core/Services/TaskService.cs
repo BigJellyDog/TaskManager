@@ -18,6 +18,10 @@ public class TaskService
     public const string DeleteCommand = "delete";
     public const string RestoreCommand = "restore";
     public const string MoveCommand = "move";
+    public const string AddDependencyCommand = "depend";
+    public const string RemoveDependencyCommand = "undepend";
+    public const string AutoBlockCommand = "auto-block";
+    public const string AutoUnblockCommand = "auto-unblock";
 
     private readonly ITaskRepository _tasks;
     private readonly ITagRepository _tags;
@@ -96,9 +100,18 @@ public class TaskService
         var task = await GetAsync(id, cancellationToken);
         var before = TaskSnapshot.From(task);
 
+        // В Todo, InProgress и Done можно перейти только когда все зависимости выполнены.
+        // Blocked и Cancelled доступны всегда.
+        if (newStatus is TaskStatus.Todo or TaskStatus.InProgress or TaskStatus.Done)
+        {
+            await EnsureDependenciesDoneAsync(task, newStatus, cancellationToken);
+        }
+
         task.ChangeStatus(newStatus, _clock);
 
-        await SaveWithHistoryAsync(task, before, ChangeStatusCommand, cancellationToken);
+        var entries = BuildEntries(task, before, ChangeStatusCommand);
+        await ReconcileAfterStatusChangeAsync(task, before.Status, entries, cancellationToken);
+        await CommitAsync(entries, cancellationToken);
         return task;
     }
 
@@ -110,7 +123,9 @@ public class TaskService
 
         task.Reopen();
 
-        await SaveWithHistoryAsync(task, before, ReopenCommand, cancellationToken);
+        var entries = BuildEntries(task, before, ReopenCommand);
+        await ReconcileAfterStatusChangeAsync(task, before.Status, entries, cancellationToken);
+        await CommitAsync(entries, cancellationToken);
         return task;
     }
 
@@ -156,14 +171,18 @@ public class TaskService
             ?? throw new TaskNotFoundException(id);
 
         var entries = new List<TaskHistoryEntry>();
+        var deletedIds = new List<int>();
         foreach (var item in await CollectSubtreeAsync(task, cancellationToken))
         {
             item.Delete();
+            deletedIds.Add(item.Id);
             entries.Add(NewEntry(item.Id, DeleteCommand, "IsDeleted", "False", "True"));
         }
 
-        await _tasks.AddHistoryAsync(entries, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        // Удалённая задача больше не блокирует тех, кто от неё зависел.
+        await ReconcileAsync(await GetDependentIdsAsync(deletedIds, cancellationToken), entries, cancellationToken);
+
+        await CommitAsync(entries, cancellationToken);
     }
 
     /// <summary>Восстанавливает одну задачу. Её подзадачи остаются в корзине и восстанавливаются по отдельности.</summary>
@@ -191,25 +210,237 @@ public class TaskService
 
         task.Restore();
 
-        await _tasks.AddHistoryAsync([NewEntry(task.Id, RestoreCommand, "IsDeleted", "True", "False")], cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var entries = new List<TaskHistoryEntry> { NewEntry(task.Id, RestoreCommand, "IsDeleted", "True", "False") };
+
+        // Вернувшаяся задача может снова блокировать зависимых и сама может оказаться заблокированной.
+        var affected = (await GetDependentIdsAsync([task.Id], cancellationToken)).Append(task.Id).ToList();
+        await ReconcileAsync(affected, entries, cancellationToken);
+
+        await CommitAsync(entries, cancellationToken);
+    }
+
+    // ---- Зависимости ----
+
+    /// <summary>Добавляет зависимость "<paramref name="taskId"/> нельзя начать, пока <paramref name="dependsOnTaskId"/> не Done".</summary>
+    public Task AddDependencyAsync(int taskId, int dependsOnTaskId, CancellationToken cancellationToken = default) =>
+        _unitOfWork.ExecuteInTransactionAsync(
+            async ct =>
+            {
+                var task = await _tasks.GetByIdAsync(taskId, includeDeleted: false, ct)
+                    ?? throw new TaskNotFoundException(taskId);
+                var target = await _tasks.GetByIdAsync(dependsOnTaskId, includeDeleted: false, ct)
+                    ?? throw new TaskNotFoundException(dependsOnTaskId);
+
+                if (task.Status is TaskStatus.Done or TaskStatus.Cancelled)
+                {
+                    throw new DomainValidationException("Нельзя добавить зависимость выполненной или отменённой задаче.");
+                }
+
+                if (target.Status == TaskStatus.Cancelled)
+                {
+                    throw new DomainValidationException(
+                        "Нельзя зависеть от отменённой задачи: она никогда не будет выполнена.");
+                }
+
+                var edges = await _tasks.GetDependencyGraphAsync(ct);
+
+                if (edges.Contains((taskId, dependsOnTaskId)))
+                {
+                    throw new DomainValidationException("Такая зависимость уже есть.");
+                }
+
+                var cycle = DependencyGraph.FindCyclePath(edges, taskId, dependsOnTaskId);
+                if (cycle is not null)
+                {
+                    throw new DomainValidationException(
+                        $"Нельзя добавить зависимость: она создаёт цикл ({string.Join(" → ", cycle.Select(i => $"#{i}"))}).");
+                }
+
+                await _tasks.AddDependencyAsync(new TaskDependency(taskId, dependsOnTaskId), ct);
+                await _unitOfWork.SaveChangesAsync(ct);
+
+                // Зависимость уже в БД, теперь можно пересчитать блокировку и записать историю одним сохранением.
+                var entries = new List<TaskHistoryEntry>
+                {
+                    NewEntry(taskId, AddDependencyCommand, "DependsOn", null, Describe(target)),
+                };
+                await ReconcileAsync([taskId], entries, ct);
+                await CommitAsync(entries, ct);
+            },
+            cancellationToken);
+
+    public Task RemoveDependencyAsync(int taskId, int dependsOnTaskId, CancellationToken cancellationToken = default) =>
+        _unitOfWork.ExecuteInTransactionAsync(
+            async ct =>
+            {
+                var dependency = await _tasks.GetDependencyAsync(taskId, dependsOnTaskId, ct)
+                    ?? throw new DomainValidationException("Такой зависимости нет.");
+                var target = await _tasks.GetByIdAsync(dependsOnTaskId, includeDeleted: false, ct);
+
+                _tasks.RemoveDependency(dependency);
+                await _unitOfWork.SaveChangesAsync(ct);
+
+                var entries = new List<TaskHistoryEntry>
+                {
+                    NewEntry(taskId, RemoveDependencyCommand, "DependsOn", target is null ? $"#{dependsOnTaskId}" : Describe(target), null),
+                };
+                await ReconcileAsync([taskId], entries, ct);
+                await CommitAsync(entries, ct);
+            },
+            cancellationToken);
+
+    /// <summary>Невыполненные зависимости задачи (удалённые задачи не считаются).</summary>
+    public async Task<IReadOnlyList<TaskItem>> GetUnmetDependenciesAsync(int taskId, CancellationToken cancellationToken = default)
+    {
+        var edges = await _tasks.GetDependencyGraphAsync(cancellationToken);
+        var ids = edges.Where(e => e.TaskId == taskId).Select(e => e.DependsOnTaskId).ToList();
+
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        var dependencies = await _tasks.GetByIdsAsync(ids, includeDeleted: false, cancellationToken);
+        return dependencies.Where(d => !d.IsDeleted && d.Status != TaskStatus.Done).OrderBy(d => d.Id).ToList();
+    }
+
+    /// <summary>Дерево зависимостей задачи: от чего она зависит, и так далее вглубь.</summary>
+    public async Task<DependencyNode> GetDependencyTreeAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var edges = await _tasks.GetDependencyGraphAsync(cancellationToken);
+        var root = await _tasks.GetByIdAsync(id, includeDeleted: false, cancellationToken)
+            ?? throw new TaskNotFoundException(id);
+
+        var ids = new HashSet<int> { id };
+        var queue = new Queue<int>([id]);
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            foreach (var edge in edges.Where(e => e.TaskId == current))
+            {
+                if (ids.Add(edge.DependsOnTaskId))
+                {
+                    queue.Enqueue(edge.DependsOnTaskId);
+                }
+            }
+        }
+
+        var tasks = (await _tasks.GetByIdsAsync(ids.ToList(), includeDeleted: false, cancellationToken))
+            .ToDictionary(t => t.Id);
+
+        // Граф без циклов (их не пускаем при добавлении), поэтому рекурсия конечна.
+        // Одна и та же задача может встретиться в дереве несколько раз: это "ромб", он допустим.
+        DependencyNode Build(TaskItem task) => new(
+            task,
+            edges.Where(e => e.TaskId == task.Id && tasks.ContainsKey(e.DependsOnTaskId))
+                .Select(e => Build(tasks[e.DependsOnTaskId]))
+                .OrderBy(n => n.Task.Id)
+                .ToList());
+
+        return Build(root);
     }
 
     public Task<IReadOnlyList<TaskHistoryEntry>> GetHistoryAsync(int id, CancellationToken cancellationToken = default) =>
         _tasks.GetHistoryAsync(id, cancellationToken);
 
-    private async Task SaveWithHistoryAsync(TaskItem task, TaskSnapshot before, string command, CancellationToken cancellationToken)
-    {
-        var changes = TaskSnapshot.Diff(before, TaskSnapshot.From(task));
+    private Task SaveWithHistoryAsync(TaskItem task, TaskSnapshot before, string command, CancellationToken cancellationToken) =>
+        CommitAsync(BuildEntries(task, before, command), cancellationToken);
 
-        if (changes.Count == 0)
+    /// <summary>Записи истории по тому, что изменилось в задаче с момента слепка.</summary>
+    private List<TaskHistoryEntry> BuildEntries(TaskItem task, TaskSnapshot before, string command) =>
+        TaskSnapshot.Diff(before, TaskSnapshot.From(task))
+            .Select(c => NewEntry(task.Id, command, c.Field, c.OldValue, c.NewValue))
+            .ToList();
+
+    /// <summary>Сохраняет все накопленные изменения вместе с записями истории одним сохранением.</summary>
+    private async Task CommitAsync(List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
+    {
+        if (entries.Count == 0)
         {
             return;
         }
 
-        var entries = changes.Select(c => NewEntry(task.Id, command, c.Field, c.OldValue, c.NewValue));
         await _tasks.AddHistoryAsync(entries, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    private static string Describe(TaskItem task) => $"#{task.Id} {task.Title}";
+
+    private async Task EnsureDependenciesDoneAsync(TaskItem task, TaskStatus target, CancellationToken cancellationToken)
+    {
+        var unmet = await GetUnmetDependenciesAsync(task.Id, cancellationToken);
+
+        if (unmet.Count > 0)
+        {
+            throw new DomainValidationException(
+                $"Нельзя перевести задачу в {target}: не выполнены зависимости: {string.Join(", ", unmet.Select(Describe))}.");
+        }
+    }
+
+    private async Task<List<int>> GetDependentIdsAsync(List<int> taskIds, CancellationToken cancellationToken)
+    {
+        var edges = await _tasks.GetDependencyGraphAsync(cancellationToken);
+        return edges.Where(e => taskIds.Contains(e.DependsOnTaskId)).Select(e => e.TaskId).Distinct().ToList();
+    }
+
+    /// <summary>
+    /// Если задача перешла в Done или вышла из Done, зависимые от неё задачи могут разблокироваться или заблокироваться.
+    /// Переоткрытая отменённая задача сама может оказаться заблокированной.
+    /// </summary>
+    private async Task ReconcileAfterStatusChangeAsync(
+        TaskItem task,
+        TaskStatus previousStatus,
+        List<TaskHistoryEntry> entries,
+        CancellationToken cancellationToken)
+    {
+        var affected = new List<int> { task.Id };
+
+        if ((previousStatus == TaskStatus.Done) != (task.Status == TaskStatus.Done))
+        {
+            affected.AddRange(await GetDependentIdsAsync([task.Id], cancellationToken));
+        }
+
+        await ReconcileAsync(affected, entries, cancellationToken);
+    }
+
+    /// <summary>
+    /// Приводит статус к зависимостям: Todo с невыполненной зависимостью становится Blocked,
+    /// Blocked без невыполненных зависимостей возвращается в Todo. InProgress не трогаем: работа уже идёт.
+    /// Блокировку, поставленную вручную, пересчёт тоже снимет, если у задачи нет невыполненных зависимостей.
+    /// </summary>
+    private async Task ReconcileAsync(List<int> taskIds, List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
+    {
+        if (taskIds.Count == 0)
+        {
+            return;
+        }
+
+        var edges = await _tasks.GetDependencyGraphAsync(cancellationToken);
+        var targets = await _tasks.GetByIdsAsync(taskIds, includeDeleted: false, cancellationToken);
+        var dependencyIds = edges.Where(e => taskIds.Contains(e.TaskId)).Select(e => e.DependsOnTaskId).Distinct().ToList();
+        var dependencies = (await _tasks.GetByIdsAsync(dependencyIds, includeDeleted: false, cancellationToken))
+            .ToDictionary(t => t.Id);
+
+        foreach (var target in targets.Where(t => !t.IsDeleted))
+        {
+            // Удалённые задачи в dependencies могли попасть из БД до сохранения, поэтому проверяем флаг в памяти.
+            var hasUnmet = edges.Any(e =>
+                e.TaskId == target.Id
+                && dependencies.TryGetValue(e.DependsOnTaskId, out var dependency)
+                && !dependency.IsDeleted
+                && dependency.Status != TaskStatus.Done);
+
+            if (target.Status == TaskStatus.Todo && hasUnmet)
+            {
+                target.ChangeStatus(TaskStatus.Blocked, _clock);
+                entries.Add(NewEntry(target.Id, AutoBlockCommand, "Status", nameof(TaskStatus.Todo), nameof(TaskStatus.Blocked)));
+            }
+            else if (target.Status == TaskStatus.Blocked && !hasUnmet)
+            {
+                target.ChangeStatus(TaskStatus.Todo, _clock);
+                entries.Add(NewEntry(target.Id, AutoUnblockCommand, "Status", nameof(TaskStatus.Blocked), nameof(TaskStatus.Todo)));
+            }
+        }
     }
 
     /// <summary>Приводит набор тегов задачи к списку имён: лишние снимает, недостающие берёт из БД или создаёт.</summary>

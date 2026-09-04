@@ -30,6 +30,12 @@ public class TaskRepository : ITaskRepository
             .AsSplitQuery()
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
+    public async Task<IReadOnlyList<TaskItem>> GetByIdsAsync(IReadOnlyCollection<int> ids, bool includeDeleted = false, CancellationToken cancellationToken = default)
+    {
+        var query = includeDeleted ? _context.Tasks.IgnoreQueryFilters() : _context.Tasks;
+        return await query.Where(t => ids.Contains(t.Id)).ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default) =>
         await _context.Tasks
             .Where(t => t.ParentId == parentId)
