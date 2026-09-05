@@ -1,4 +1,5 @@
 using TaskManager.Core.Domain;
+using TaskManager.Core.Querying;
 
 namespace TaskManager.Core.Abstractions;
 
@@ -13,6 +14,12 @@ public interface ITaskRepository
 
     /// <summary>Задача вместе с родителем, подзадачами, тегами и зависимостями в обе стороны.</summary>
     Task<TaskItem?> GetWithDetailsAsync(int id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Страница задач по фильтру и сортировке. Фильтрация, сортировка и постраничность выполняются в БД.
+    /// Задачи приходят вместе с тегами и подзадачами (для списка с прогрессом).
+    /// </summary>
+    Task<PagedResult<TaskItem>> ListAsync(TaskQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>Задачи по списку Id. Удалённые по умолчанию не возвращаются.</summary>
     Task<IReadOnlyList<TaskItem>> GetByIdsAsync(IReadOnlyCollection<int> ids, bool includeDeleted = false, CancellationToken cancellationToken = default);

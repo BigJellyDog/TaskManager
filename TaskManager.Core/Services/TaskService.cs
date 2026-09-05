@@ -1,5 +1,6 @@
 using TaskManager.Core.Abstractions;
 using TaskManager.Core.Domain;
+using TaskManager.Core.Querying;
 using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Core.Services;
@@ -38,6 +39,10 @@ public class TaskService
 
     public async Task<TaskItem> GetAsync(int id, CancellationToken cancellationToken = default) =>
         await _tasks.GetWithDetailsAsync(id, cancellationToken) ?? throw new TaskNotFoundException(id);
+
+    /// <summary>Страница задач по фильтру и сортировке.</summary>
+    public Task<PagedResult<TaskItem>> ListAsync(TaskQuery query, CancellationToken cancellationToken = default) =>
+        _tasks.ListAsync(query, cancellationToken);
 
     public Task<TaskItem> CreateAsync(CreateTaskRequest request, CancellationToken cancellationToken = default)
     {

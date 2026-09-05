@@ -1,6 +1,8 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Abstractions;
 using TaskManager.Core.Domain;
+using TaskManager.Core.Querying;
 using TaskManager.Infrastructure.Persistence;
 
 namespace TaskManager.Infrastructure.Repositories;
@@ -30,6 +32,24 @@ public class TaskRepository : ITaskRepository
             .AsSplitQuery()
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
+    public async Task<PagedResult<TaskItem>> ListAsync(TaskQuery query, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+
+        var filtered = _context.Tasks.Where(query.Filter.ToExpression());
+        var total = await filtered.CountAsync(cancellationToken);
+
+        var items = await ApplySort(filtered, query.Sort)
+            .Include(t => t.Tags)
+            .Include(t => t.Children)
+            .AsSplitQuery()
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<TaskItem>(items, total, query.Page, query.PageSize);
+    }
+
     public async Task<IReadOnlyList<TaskItem>> GetByIdsAsync(IReadOnlyCollection<int> ids, bool includeDeleted = false, CancellationToken cancellationToken = default)
     {
         var query = includeDeleted ? _context.Tasks.IgnoreQueryFilters() : _context.Tasks;
@@ -48,6 +68,50 @@ public class TaskRepository : ITaskRepository
             .Where(t => t.IsDeleted)
             .OrderBy(t => t.Id)
             .ToListAsync(cancellationToken);
+
+    /// <summary>
+    /// Строит ORDER BY из списка правил: первое правило через OrderBy, остальные через ThenBy.
+    /// В конце всегда добавляется Id: без однозначного порядка страницы могли бы пересекаться или терять записи.
+    /// </summary>
+    private static IOrderedQueryable<TaskItem> ApplySort(IQueryable<TaskItem> source, IReadOnlyList<TaskSort> sorts)
+    {
+        IOrderedQueryable<TaskItem>? ordered = null;
+
+        foreach (var sort in sorts.DistinctBy(s => s.Field))
+        {
+            ordered = sort.Field switch
+            {
+                TaskSortField.Priority => Order(source, ordered, t => t.Priority, sort.Descending),
+                TaskSortField.CreatedAt => Order(source, ordered, t => t.CreatedAt, sort.Descending),
+                TaskSortField.Status => Order(source, ordered, t => t.Status, sort.Descending),
+
+                // SearchText начинается с названия в верхнем регистре, а SQLite не умеет сортировать кириллицу
+                // без учёта регистра, поэтому сортируем по нему. Перевод строки в тексте идёт раньше любой буквы,
+                // так что "АБ" по-прежнему раньше "АБВ".
+                TaskSortField.Title => Order(source, ordered, t => t.SearchText, sort.Descending),
+
+                // Задачи без дедлайна в конце при любом направлении: сначала ключ "дедлайна нет" (false раньше true).
+                TaskSortField.Deadline => Order(source, Order(source, ordered, t => t.Deadline == null, false), t => t.Deadline, sort.Descending),
+                _ => throw new ArgumentOutOfRangeException(nameof(sorts), sort.Field, "Неизвестное поле сортировки."),
+            };
+        }
+
+        return Order(source, ordered, t => t.Id, false);
+    }
+
+    private static IOrderedQueryable<TaskItem> Order<TKey>(
+        IQueryable<TaskItem> source,
+        IOrderedQueryable<TaskItem>? ordered,
+        Expression<Func<TaskItem, TKey>> key,
+        bool descending)
+    {
+        if (ordered is null)
+        {
+            return descending ? source.OrderByDescending(key) : source.OrderBy(key);
+        }
+
+        return descending ? ordered.ThenByDescending(key) : ordered.ThenBy(key);
+    }
 
     public async Task AddAsync(TaskItem task, CancellationToken cancellationToken = default) =>
         await _context.Tasks.AddAsync(task, cancellationToken);
