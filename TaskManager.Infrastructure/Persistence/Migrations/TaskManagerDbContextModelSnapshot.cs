@@ -139,6 +139,11 @@ namespace TaskManager.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("SearchText")
+                        .IsRequired()
+                        .HasMaxLength(4201)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 

@@ -37,6 +37,12 @@ public class TaskItem
 
     public string? Description { get; private set; }
 
+    /// <summary>
+    /// Название и описание в верхнем регистре, по ним работает поиск. SQLite не умеет менять регистр кириллицы
+    /// (UPPER и LIKE работают только с латиницей), поэтому нормализуем в C# и сохраняем рядом с данными.
+    /// </summary>
+    public string SearchText { get; private set; } = string.Empty;
+
     public Priority Priority { get; private set; }
 
     public TaskStatus Status { get; private set; } = TaskStatus.Todo;
@@ -93,6 +99,7 @@ public class TaskItem
             Description = NormalizeDescription(description),
             Deadline = deadline,
         };
+        task.RefreshSearchText();
 
         return task;
     }
@@ -101,12 +108,14 @@ public class TaskItem
     {
         EnsureNotDeleted();
         Title = NormalizeTitle(title);
+        RefreshSearchText();
     }
 
     public void SetDescription(string? description)
     {
         EnsureNotDeleted();
         Description = NormalizeDescription(description);
+        RefreshSearchText();
     }
 
     public void SetPriority(Priority priority)
@@ -239,6 +248,16 @@ public class TaskItem
 
         IsDeleted = false;
     }
+
+    /// <summary>Приводит текст к виду, в котором он хранится в <see cref="SearchText"/>. Запрос поиска нормализуется так же.</summary>
+    public static string NormalizeSearchText(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return text.Trim().ToUpperInvariant();
+    }
+
+    private void RefreshSearchText() =>
+        SearchText = NormalizeSearchText(Description is null ? Title : $"{Title}\n{Description}");
 
     private void EnsureSubtasksCompleted()
     {

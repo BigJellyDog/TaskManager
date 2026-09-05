@@ -23,6 +23,7 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 
         builder.Property(t => t.Title).IsRequired().HasMaxLength(TaskItem.MaxTitleLength);
         builder.Property(t => t.Description).HasMaxLength(4000);
+        builder.Property(t => t.SearchText).IsRequired().HasMaxLength(TaskItem.MaxTitleLength + 1 + 4000);
         builder.Property(t => t.Priority).IsRequired();
         builder.Property(t => t.Status).IsRequired();
         builder.Property(t => t.CreatedAt).IsRequired();
