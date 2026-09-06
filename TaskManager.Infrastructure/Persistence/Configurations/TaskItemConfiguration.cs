@@ -28,6 +28,7 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Property(t => t.Status).IsRequired();
         builder.Property(t => t.CreatedAt).IsRequired();
         builder.Property(t => t.IsDeleted).IsRequired();
+        builder.Property(t => t.SuccessorCreated).IsRequired();
 
         // Правило повторения лежит в тех же строках таблицы Tasks (колонки Recurrence_*).
         builder.OwnsOne(t => t.Recurrence, r =>

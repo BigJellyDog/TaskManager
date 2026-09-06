@@ -58,6 +58,7 @@ public class TaskRepository : ITaskRepository
 
     public async Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default) =>
         await _context.Tasks
+            .Include(t => t.Tags)
             .Where(t => t.ParentId == parentId)
             .OrderBy(t => t.Id)
             .ToListAsync(cancellationToken);

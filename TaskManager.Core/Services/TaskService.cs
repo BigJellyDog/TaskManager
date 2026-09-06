@@ -19,6 +19,7 @@ public class TaskService
     public const string DeleteCommand = "delete";
     public const string RestoreCommand = "restore";
     public const string MoveCommand = "move";
+    public const string RecurrenceCommand = "recurrence";
     public const string AddDependencyCommand = "depend";
     public const string RemoveDependencyCommand = "undepend";
     public const string AutoBlockCommand = "auto-block";
@@ -82,7 +83,7 @@ public class TaskService
 
                 if (request.Recurrence is not null)
                 {
-                    task.SetRecurrence(request.Recurrence);
+                    task.SetRecurrence(PrepareRule(request.Recurrence, request.Deadline, deadlineChanged: true));
                 }
 
                 await SyncTagsAsync(task, request.Tags ?? [], ct);
@@ -107,8 +108,21 @@ public class TaskService
         task.SetTitle(request.Title);
         task.SetDescription(request.Description);
         task.SetPriority(request.Priority);
-        task.SetDeadline(request.Deadline);
-        task.SetRecurrence(request.Recurrence);
+
+        // Дедлайн и правило повторения связаны (по календарю нужен дедлайн), поэтому порядок важен:
+        // правило снимаем до удаления дедлайна, а новое правило ставим после установки дедлайна.
+        var rule = PrepareRule(request.Recurrence, request.Deadline, deadlineChanged: request.Deadline != task.Deadline);
+        if (rule is null)
+        {
+            task.SetRecurrence(null);
+            task.SetDeadline(request.Deadline);
+        }
+        else
+        {
+            task.SetDeadline(request.Deadline);
+            task.SetRecurrence(rule);
+        }
+
         await SyncTagsAsync(task, request.Tags, cancellationToken);
 
         await SaveWithHistoryAsync(task, before, EditCommand, cancellationToken);
@@ -131,7 +145,22 @@ public class TaskService
 
         var entries = BuildEntries(task, before, ChangeStatusCommand);
         await ReconcileAfterStatusChangeAsync(task, before.Status, entries, cancellationToken);
-        await CommitAsync(entries, cancellationToken);
+
+        // Завершение повторяющейся задачи создаёт следующую копию. Для её записи в историю нужен Id,
+        // то есть несколько сохранений подряд, поэтому всё выполняется одной транзакцией.
+        await _unitOfWork.ExecuteInTransactionAsync(
+            async ct =>
+            {
+                var justCompleted = before.Status != TaskStatus.Done && task.Status == TaskStatus.Done;
+                if (justCompleted && task.Recurrence is not null && !task.SuccessorCreated)
+                {
+                    await SpawnSuccessorAsync(task, entries, ct);
+                }
+
+                await CommitAsync(entries, ct);
+            },
+            cancellationToken);
+
         return task;
     }
 
@@ -493,6 +522,100 @@ public class TaskService
             }
 
             task.AddTag(tag);
+        }
+    }
+
+    /// <summary>
+    /// Якорь правила берётся из дедлайна (локальные день и время первого срабатывания). Если дедлайн не менялся
+    /// и у правила уже есть якорь, он сохраняется: иначе после сдвига на 28 февраля мы забыли бы про 31-е.
+    /// </summary>
+    private RecurrenceRule? PrepareRule(RecurrenceRule? rule, DateTimeOffset? deadline, bool deadlineChanged)
+    {
+        if (rule is null || deadline is not { } d)
+        {
+            return rule;
+        }
+
+        if (rule.Anchor is not null && !deadlineChanged)
+        {
+            return rule;
+        }
+
+        return rule.WithAnchor(TimeZoneInfo.ConvertTime(d, _clock.LocalTimeZone).DateTime);
+    }
+
+    /// <summary>
+    /// Создаёт следующую копию повторяющейся задачи вместе с подзадачами. Сохраняет всё, чтобы получить Id,
+    /// и дописывает в <paramref name="entries"/> записи истории о созданных задачах.
+    /// </summary>
+    private async Task SpawnSuccessorAsync(TaskItem source, List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
+    {
+        var rule = source.Recurrence!;
+        var zone = _clock.LocalTimeZone;
+
+        // По календарю следующий срок считается от прошлого срока, после выполнения: от момента выполнения.
+        // Без дедлайна (возможно только "после выполнения") у копии тоже нет дедлайна.
+        DateTimeOffset? nextDeadline = null;
+        if (rule.Mode == RecurrenceMode.ByCalendar)
+        {
+            if (source.Deadline is not { } previous)
+            {
+                return;
+            }
+
+            nextDeadline = RecurrenceCalculator.GetNext(rule, previous, zone);
+        }
+        else if (source.Deadline is not null)
+        {
+            nextDeadline = RecurrenceCalculator.GetNext(rule, source.CompletedAt ?? _clock.GetUtcNow(), zone);
+        }
+
+        var anchor = rule.Anchor ?? (source.Deadline is { } d ? TimeZoneInfo.ConvertTime(d, zone).DateTime : (DateTime?)null);
+        var nextRule = anchor is { } a
+            ? rule.WithAnchor(a)
+            : new RecurrenceRule(rule.Frequency, rule.Interval, rule.Mode, rule.WeekDays);
+
+        var shift = nextDeadline is { } next && source.Deadline is { } old ? next - old : (TimeSpan?)null;
+
+        var copy = TaskItem.CreateSuccessor(source, nextDeadline, nextRule, _clock);
+        if (source.Parent is { IsDeleted: false, Status: not TaskStatus.Done } parent)
+        {
+            copy.SetParent(parent);
+        }
+
+        var created = new List<TaskItem> { copy };
+        await _tasks.AddAsync(copy, cancellationToken);
+        await CopySubtasksAsync(source, copy, shift, created, cancellationToken);
+
+        source.MarkSuccessorCreated();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        foreach (var item in created)
+        {
+            entries.Add(NewEntry(item.Id, RecurrenceCommand, "Created", null, item.Title));
+        }
+
+        entries.Add(NewEntry(source.Id, RecurrenceCommand, "NextOccurrence", null, Describe(copy)));
+    }
+
+    /// <summary>Копирует подзадачи (всех уровней) в новую копию: статус Todo, дедлайн сдвигается на ту же величину.</summary>
+    private async Task CopySubtasksAsync(
+        TaskItem sourceParent,
+        TaskItem copyParent,
+        TimeSpan? shift,
+        List<TaskItem> created,
+        CancellationToken cancellationToken)
+    {
+        foreach (var child in await _tasks.GetChildrenAsync(sourceParent.Id, cancellationToken))
+        {
+            DateTimeOffset? deadline = child.Deadline is { } d && shift is { } s ? d + s : null;
+
+            var childCopy = TaskItem.CreateSuccessor(child, deadline, null, _clock);
+            childCopy.SetParent(copyParent);
+            await _tasks.AddAsync(childCopy, cancellationToken);
+            created.Add(childCopy);
+
+            await CopySubtasksAsync(child, childCopy, shift, created, cancellationToken);
         }
     }
 

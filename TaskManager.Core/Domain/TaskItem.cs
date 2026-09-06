@@ -76,6 +76,12 @@ public class TaskItem
     public RecurrenceRule? Recurrence { get; private set; }
 
     /// <summary>
+    /// Следующая копия повторяющейся задачи уже создана (при завершении или по расписанию).
+    /// Нужна, чтобы не получить две копии одного срока.
+    /// </summary>
+    public bool SuccessorCreated { get; private set; }
+
+    /// <summary>
     /// Создаёт задачу. Дедлайн в прошлом проверяется только здесь, при создании:
     /// у уже существующей задачи дедлайн имеет право "протухнуть".
     /// </summary>
@@ -128,12 +134,14 @@ public class TaskItem
     public void SetDeadline(DateTimeOffset? deadline)
     {
         EnsureNotDeleted();
+        EnsureDeadlineForCalendarRecurrence(Recurrence, deadline);
         Deadline = deadline;
     }
 
     public void SetRecurrence(RecurrenceRule? rule)
     {
         EnsureNotDeleted();
+        EnsureDeadlineForCalendarRecurrence(rule, Deadline);
         Recurrence = rule;
     }
 
@@ -226,7 +234,41 @@ public class TaskItem
         }
 
         Parent = parent;
-        ParentId = parent?.Id;
+        // У ещё не сохранённого родителя Id пока 0: связь тогда установит EF по ссылке Parent при сохранении.
+        ParentId = parent is { Id: not 0 } ? parent.Id : null;
+    }
+
+    /// <summary>Помечает, что следующая копия повторяющейся задачи создана.</summary>
+    public void MarkSuccessorCreated() => SuccessorCreated = true;
+
+    /// <summary>
+    /// Создаёт следующую копию повторяющейся задачи: название, описание, приоритет и теги берутся у
+    /// <paramref name="source"/>, статус Todo. Дедлайн может быть в прошлом (задачу закрыли с опозданием),
+    /// поэтому правило "не в прошлом" здесь не применяется. Подзадачи копирует <c>TaskService</c>.
+    /// </summary>
+    public static TaskItem CreateSuccessor(TaskItem source, DateTimeOffset? deadline, RecurrenceRule? recurrence, TimeProvider clock)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(clock);
+
+        var task = new TaskItem(source.Title, source.Priority, clock.GetUtcNow())
+        {
+            Description = source.Description,
+            Deadline = deadline,
+        };
+        task.RefreshSearchText();
+
+        foreach (var tag in source.Tags)
+        {
+            task.Tags.Add(tag);
+        }
+
+        if (recurrence is not null)
+        {
+            task.SetRecurrence(recurrence);
+        }
+
+        return task;
     }
 
     public void Delete()
@@ -258,6 +300,14 @@ public class TaskItem
 
     private void RefreshSearchText() =>
         SearchText = NormalizeSearchText(Description is null ? Title : $"{Title}\n{Description}");
+
+    private static void EnsureDeadlineForCalendarRecurrence(RecurrenceRule? rule, DateTimeOffset? deadline)
+    {
+        if (rule is { Mode: RecurrenceMode.ByCalendar } && deadline is null)
+        {
+            throw new DomainValidationException("Для повторения по календарю нужен дедлайн.");
+        }
+    }
 
     private void EnsureSubtasksCompleted()
     {
