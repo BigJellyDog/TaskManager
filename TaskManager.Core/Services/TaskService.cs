@@ -44,6 +44,21 @@ public class TaskService
     public Task<PagedResult<TaskItem>> ListAsync(TaskQuery query, CancellationToken cancellationToken = default) =>
         _tasks.ListAsync(query, cancellationToken);
 
+    /// <summary>
+    /// Поиск по фильтрам пользователя: фильтры комбинируются через И, "просроченные", "на сегодня" и "на неделю"
+    /// считаются от текущего времени сервиса.
+    /// </summary>
+    public Task<PagedResult<TaskItem>> SearchAsync(
+        TaskFilter filter,
+        IReadOnlyList<TaskSort>? sort = null,
+        int page = 1,
+        int pageSize = TaskQuery.DefaultPageSize,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
+        return _tasks.ListAsync(new TaskQuery(filter.ToSpecification(_clock), sort, page, pageSize), cancellationToken);
+    }
+
     public Task<TaskItem> CreateAsync(CreateTaskRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
