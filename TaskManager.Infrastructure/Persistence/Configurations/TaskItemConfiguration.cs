@@ -36,6 +36,7 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             r.Property(x => x.Interval).HasColumnName("Recurrence_Interval");
             r.Property(x => x.Mode).HasColumnName("Recurrence_Mode");
             r.Property(x => x.WeekDays).HasColumnName("Recurrence_WeekDays");
+            r.Property(x => x.Anchor).HasColumnName("Recurrence_Anchor");
         });
 
         // Подзадачи: самосвязь. Restrict: родителя нельзя физически удалить, пока у него есть подзадачи
