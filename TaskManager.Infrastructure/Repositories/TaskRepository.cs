@@ -57,6 +57,12 @@ public class TaskRepository : ITaskRepository
         return await query.Where(t => ids.Contains(t.Id)).ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<TaskItem>> GetAllAsync(bool includeDeleted = false, CancellationToken cancellationToken = default)
+    {
+        var query = includeDeleted ? _context.Tasks.IgnoreQueryFilters() : _context.Tasks;
+        return await query.AsNoTracking().Include(t => t.Tags).OrderBy(t => t.Id).ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default) =>
         await _context.Tasks
             .Include(t => t.Tags)

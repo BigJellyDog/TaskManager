@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaskManager.Core.Abstractions;
+using TaskManager.Core.Export;
 using TaskManager.Core.Services;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Reminders;
@@ -34,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<TaskService>();
         services.AddScoped<ReminderChecker>();
         services.AddScoped<StatisticsService>();
+        services.AddScoped<ExportService>();
         services.AddOptions<ReminderOptions>();
         services.AddSingleton<ReminderService>();
 

@@ -24,6 +24,11 @@ public interface ITaskRepository
     /// <summary>Задачи по списку Id. Удалённые по умолчанию не возвращаются.</summary>
     Task<IReadOnlyList<TaskItem>> GetByIdsAsync(IReadOnlyCollection<int> ids, bool includeDeleted = false, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Все задачи по порядку Id вместе с тегами и правилом повторения, без отслеживания изменений (для экспорта).
+    /// </summary>
+    Task<IReadOnlyList<TaskItem>> GetAllAsync(bool includeDeleted = false, CancellationToken cancellationToken = default);
+
     /// <summary>Прямые подзадачи (удалённые не возвращаются).</summary>
     Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default);
 
