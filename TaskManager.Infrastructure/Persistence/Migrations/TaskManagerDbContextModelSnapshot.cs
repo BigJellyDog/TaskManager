@@ -32,6 +32,25 @@ namespace TaskManager.Infrastructure.Persistence.Migrations
                     b.ToTable("TaskTags", (string)null);
                 });
 
+            modelBuilder.Entity("TaskManager.Core.Domain.SentReminder", b =>
+                {
+                    b.Property<int>("TaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("Deadline")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("SentAt")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TaskId", "Kind", "Deadline");
+
+                    b.ToTable("SentReminders", (string)null);
+                });
+
             modelBuilder.Entity("TaskManager.Core.Domain.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -178,6 +197,15 @@ namespace TaskManager.Infrastructure.Persistence.Migrations
                     b.HasOne("TaskManager.Core.Domain.TaskItem", null)
                         .WithMany()
                         .HasForeignKey("TasksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TaskManager.Core.Domain.SentReminder", b =>
+                {
+                    b.HasOne("TaskManager.Core.Domain.TaskItem", null)
+                        .WithMany()
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

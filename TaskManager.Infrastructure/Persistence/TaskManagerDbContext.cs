@@ -18,6 +18,8 @@ public class TaskManagerDbContext : DbContext
 
     public DbSet<TaskHistoryEntry> HistoryEntries => Set<TaskHistoryEntry>();
 
+    public DbSet<SentReminder> SentReminders => Set<SentReminder>();
+
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
         BumpRowVersions();

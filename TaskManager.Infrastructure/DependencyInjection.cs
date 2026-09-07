@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaskManager.Core.Abstractions;
+using TaskManager.Core.Services;
 using TaskManager.Infrastructure.Persistence;
+using TaskManager.Infrastructure.Reminders;
 using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Infrastructure;
@@ -21,6 +24,16 @@ public static class DependencyInjection
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IReminderRepository, ReminderRepository>();
+
+        // Сервисы приложения. TimeProvider и IReminderNotifier регистрируются через TryAdd:
+        // приложение может заранее подставить свои (например, показ уведомлений в интерфейсе).
+        services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton<IReminderNotifier, LoggingReminderNotifier>();
+        services.AddScoped<TaskService>();
+        services.AddScoped<ReminderChecker>();
+        services.AddOptions<ReminderOptions>();
+        services.AddSingleton<ReminderService>();
 
         return services;
     }
