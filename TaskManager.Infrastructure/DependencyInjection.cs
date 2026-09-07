@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IReminderRepository, ReminderRepository>();
+        services.AddScoped<IStatisticsRepository, StatisticsRepository>();
 
         // Сервисы приложения. TimeProvider и IReminderNotifier регистрируются через TryAdd:
         // приложение может заранее подставить свои (например, показ уведомлений в интерфейсе).
@@ -32,6 +33,7 @@ public static class DependencyInjection
         services.TryAddSingleton<IReminderNotifier, LoggingReminderNotifier>();
         services.AddScoped<TaskService>();
         services.AddScoped<ReminderChecker>();
+        services.AddScoped<StatisticsService>();
         services.AddOptions<ReminderOptions>();
         services.AddSingleton<ReminderService>();
 
