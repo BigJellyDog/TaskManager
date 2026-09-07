@@ -27,6 +27,12 @@ public interface ITaskRepository
     /// <summary>Прямые подзадачи (удалённые не возвращаются).</summary>
     Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Повторяющиеся "по календарю" задачи, у которых следующая копия ещё не создана (отменённые и удалённые не включены).
+    /// Нужны для догона пропущенных периодов.
+    /// </summary>
+    Task<IReadOnlyList<TaskItem>> GetPendingCalendarRecurrencesAsync(CancellationToken cancellationToken = default);
+
     /// <summary>Удалённые задачи ("корзина").</summary>
     Task<IReadOnlyList<TaskItem>> GetDeletedAsync(CancellationToken cancellationToken = default);
 

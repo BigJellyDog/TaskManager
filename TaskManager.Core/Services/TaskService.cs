@@ -20,6 +20,9 @@ public class TaskService
     public const string RestoreCommand = "restore";
     public const string MoveCommand = "move";
     public const string RecurrenceCommand = "recurrence";
+
+    /// <summary>Сколько пропущенных копий одной серии создаётся за один вызов догона. Остаток создаст следующий вызов.</summary>
+    public const int MaxCatchUpOccurrences = 50;
     public const string AddDependencyCommand = "depend";
     public const string RemoveDependencyCommand = "undepend";
     public const string AutoBlockCommand = "auto-block";
@@ -492,6 +495,53 @@ public class TaskService
         }
     }
 
+    /// <summary>
+    /// Догон по календарю: для каждой повторяющейся "по календарю" задачи, у которой наступил срок следующего вхождения,
+    /// создаёт копию. Если пропущено несколько периодов, создаёт цепочку, пока ближайший срок не окажется в будущем
+    /// (но не больше <see cref="MaxCatchUpOccurrences"/> на серию за вызов). Пропущенные копии получают дедлайны в прошлом.
+    /// Серии отменённых и удалённых задач не продолжаются. Безопасно вызывать повторно: уже созданное не дублируется.
+    /// </summary>
+    /// <returns>Сколько копий создано (подзадачи не считаются).</returns>
+    public async Task<int> GenerateDueOccurrencesAsync(CancellationToken cancellationToken = default)
+    {
+        var now = _clock.GetUtcNow();
+        var zone = _clock.LocalTimeZone;
+        var total = 0;
+
+        foreach (var source in await _tasks.GetPendingCalendarRecurrencesAsync(cancellationToken))
+        {
+            // Каждая серия в своей транзакции: сбой одной не откатывает уже обработанные.
+            total += await _unitOfWork.ExecuteInTransactionAsync(
+                async ct =>
+                {
+                    var entries = new List<TaskHistoryEntry>();
+                    var created = 0;
+                    var current = source;
+
+                    while (created < MaxCatchUpOccurrences
+                        && current.Deadline is { } deadline
+                        && current.Recurrence is { Mode: RecurrenceMode.ByCalendar } rule
+                        && RecurrenceCalculator.GetNext(rule, deadline, zone) <= now)
+                    {
+                        var next = await SpawnSuccessorAsync(current, entries, ct);
+                        if (next is null)
+                        {
+                            break;
+                        }
+
+                        current = next;
+                        created++;
+                    }
+
+                    await CommitAsync(entries, ct);
+                    return created;
+                },
+                cancellationToken);
+        }
+
+        return total;
+    }
+
     /// <summary>Приводит набор тегов задачи к списку имён: лишние снимает, недостающие берёт из БД или создаёт.</summary>
     private async Task SyncTagsAsync(TaskItem task, IReadOnlyCollection<string> names, CancellationToken cancellationToken)
     {
@@ -548,7 +598,7 @@ public class TaskService
     /// Создаёт следующую копию повторяющейся задачи вместе с подзадачами. Сохраняет всё, чтобы получить Id,
     /// и дописывает в <paramref name="entries"/> записи истории о созданных задачах.
     /// </summary>
-    private async Task SpawnSuccessorAsync(TaskItem source, List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
+    private async Task<TaskItem?> SpawnSuccessorAsync(TaskItem source, List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
     {
         var rule = source.Recurrence!;
         var zone = _clock.LocalTimeZone;
@@ -560,7 +610,7 @@ public class TaskService
         {
             if (source.Deadline is not { } previous)
             {
-                return;
+                return null;
             }
 
             nextDeadline = RecurrenceCalculator.GetNext(rule, previous, zone);
@@ -596,6 +646,7 @@ public class TaskService
         }
 
         entries.Add(NewEntry(source.Id, RecurrenceCommand, "NextOccurrence", null, Describe(copy)));
+        return copy;
     }
 
     /// <summary>Копирует подзадачи (всех уровней) в новую копию: статус Todo, дедлайн сдвигается на ту же величину.</summary>

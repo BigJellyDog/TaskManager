@@ -4,6 +4,7 @@ using TaskManager.Core.Abstractions;
 using TaskManager.Core.Domain;
 using TaskManager.Core.Querying;
 using TaskManager.Infrastructure.Persistence;
+using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Infrastructure.Repositories;
 
@@ -60,6 +61,18 @@ public class TaskRepository : ITaskRepository
         await _context.Tasks
             .Include(t => t.Tags)
             .Where(t => t.ParentId == parentId)
+            .OrderBy(t => t.Id)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<TaskItem>> GetPendingCalendarRecurrencesAsync(CancellationToken cancellationToken = default) =>
+        await _context.Tasks
+            .Include(t => t.Tags)
+            .Include(t => t.Parent)
+            .Where(t => t.Recurrence != null
+                && t.Recurrence.Mode == RecurrenceMode.ByCalendar
+                && !t.SuccessorCreated
+                && t.Status != TaskStatus.Cancelled
+                && t.Deadline != null)
             .OrderBy(t => t.Id)
             .ToListAsync(cancellationToken);
 
