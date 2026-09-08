@@ -4,6 +4,7 @@ using Serilog;
 using TaskManager.App.Configuration;
 using TaskManager.App.Pages;
 using TaskManager.App.Services;
+using TaskManager.App.ViewModels;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Reminders;
 
@@ -54,6 +55,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<AppInitializer>();
 
 		// Страницы создаются через DI: так они получают модели представления в конструкторе.
+		builder.Services.AddTransient<TasksViewModel>();
 		builder.Services.AddTransient<TasksPage>();
 		builder.Services.AddTransient<StatisticsPage>();
 		builder.Services.AddTransient<DataPage>();

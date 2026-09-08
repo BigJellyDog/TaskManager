@@ -1,12 +1,168 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
              x:Class="TaskManager.App.Pages.TasksPage"
+             x:DataType="vm:TasksViewModel"
              Title="Задачи">
 
-    <Label Text="Список задач появится на следующем шаге"
-           VerticalOptions="Center"
-           HorizontalOptions="Center"
-           Style="{StaticResource SubHeadline}" />
+    <ContentPage.Resources>
+        <!-- Второстепенный текст: приглушённый цвет в обеих темах -->
+        <Style x:Key="SecondaryLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16,8,16,16" RowSpacing="8">
+
+        <!-- Строка 1: поиск, выпадающие фильтры, сортировка. FlexLayout переносит элементы на новую строку, если не хватает ширины. -->
+        <FlexLayout Grid.Row="0" Wrap="Wrap" AlignItems="Center">
+            <SearchBar Placeholder="Поиск по названию и описанию"
+                       Text="{Binding SearchText}"
+                       SearchCommand="{Binding SearchCommand}"
+                       WidthRequest="300"
+                       Margin="0,0,12,0" />
+            <Picker Title="Статус"
+                    ItemsSource="{Binding StatusOptions}"
+                    SelectedItem="{Binding SelectedStatus}"
+                    WidthRequest="150"
+                    Margin="0,0,12,0" />
+            <Picker Title="Приоритет"
+                    ItemsSource="{Binding PriorityOptions}"
+                    SelectedItem="{Binding SelectedPriority}"
+                    WidthRequest="175"
+                    Margin="0,0,12,0" />
+            <Picker Title="Тег"
+                    ItemsSource="{Binding TagOptions}"
+                    SelectedItem="{Binding SelectedTag}"
+                    WidthRequest="130"
+                    Margin="0,0,12,0" />
+            <Picker Title="Сортировка"
+                    ItemsSource="{Binding SortOptions}"
+                    SelectedItem="{Binding SelectedSort}"
+                    WidthRequest="245"
+                    Margin="0,0,0,0" />
+        </FlexLayout>
+
+        <!-- Строка 2: виды, диапазон дедлайнов, сброс -->
+        <FlexLayout Grid.Row="1" Wrap="Wrap" AlignItems="Center">
+            <HorizontalStackLayout Margin="0,0,16,4">
+                <CheckBox IsChecked="{Binding OnlyOverdue}" VerticalOptions="Center" />
+                <Label Text="Просроченные" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Margin="0,0,16,4">
+                <CheckBox IsChecked="{Binding DueToday}" VerticalOptions="Center" />
+                <Label Text="На сегодня" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Margin="0,0,24,4">
+                <CheckBox IsChecked="{Binding DueThisWeek}" VerticalOptions="Center" />
+                <Label Text="На неделю" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Margin="0,0,16,4" Spacing="4">
+                <CheckBox IsChecked="{Binding UseDeadlineFrom}" VerticalOptions="Center" />
+                <Label Text="Дедлайн с" VerticalOptions="Center" />
+                <DatePicker Date="{Binding DeadlineFrom}" IsEnabled="{Binding UseDeadlineFrom}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Margin="0,0,24,4" Spacing="4">
+                <CheckBox IsChecked="{Binding UseDeadlineTo}" VerticalOptions="Center" />
+                <Label Text="по" VerticalOptions="Center" />
+                <DatePicker Date="{Binding DeadlineTo}" IsEnabled="{Binding UseDeadlineTo}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Button Text="Сбросить" Command="{Binding ResetFiltersCommand}" Padding="14,4" Margin="0,0,0,4" />
+        </FlexLayout>
+
+        <!-- Список -->
+        <Grid Grid.Row="2">
+            <CollectionView x:Name="TasksList" ItemsSource="{Binding Tasks}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <Label Text="{Binding SummaryText}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Style="{StaticResource SubHeadline}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TaskRowViewModel">
+                        <Border StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                                Margin="0,0,0,8">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+
+                            <Grid ColumnDefinitions="6,*,Auto">
+                                <!-- Цветная полоса слева: приоритет -->
+                                <BoxView Grid.Column="0" Color="{Binding PriorityColor}" />
+
+                                <VerticalStackLayout Grid.Column="1" Padding="14,10" Spacing="4">
+                                    <Label Text="{Binding Title}"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           TextDecorations="{Binding TitleDecorations}" />
+
+                                    <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                        <Label Text="{Binding StatusText}"
+                                               TextColor="{Binding StatusColor}"
+                                               FontAttributes="Bold"
+                                               FontSize="13"
+                                               Margin="0,0,16,0" />
+                                        <Label Text="{Binding PriorityText, StringFormat='Приоритет: {0}'}"
+                                               Style="{StaticResource SecondaryLabel}"
+                                               Margin="0,0,16,0" />
+                                        <Label Text="{Binding DeadlineText}"
+                                               IsVisible="{Binding HasDeadline}"
+                                               Style="{StaticResource SecondaryLabel}"
+                                               Margin="0,0,16,0">
+                                            <Label.Triggers>
+                                                <!-- Просроченный дедлайн подсвечивается красным -->
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource Overdue}" />
+                                                    <Setter Property="FontAttributes" Value="Bold" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                        <Label Text="{Binding TagsText}"
+                                               IsVisible="{Binding HasTags}"
+                                               Style="{StaticResource SecondaryLabel}" />
+                                    </FlexLayout>
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="2"
+                                       Text="{Binding ProgressText}"
+                                       IsVisible="{Binding HasProgress}"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,16,0"
+                                       Style="{StaticResource SecondaryLabel}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               WidthRequest="40"
+                               HeightRequest="40" />
+        </Grid>
+
+        <!-- Низ: сколько найдено и переключение страниц -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
+            <HorizontalStackLayout Grid.Column="0" Spacing="16" VerticalOptions="Center">
+                <Label Text="{Binding SummaryText}" VerticalOptions="Center" Style="{StaticResource SecondaryLabel}" />
+                <Button Text="⟳ Обновить" Command="{Binding RefreshCommand}" Padding="12,2" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="1" Spacing="12">
+                <Button Text="◀ Назад" Command="{Binding PreviousPageCommand}" />
+                <Label Text="{Binding PageText}" VerticalOptions="Center" />
+                <Button Text="Вперёд ▶" Command="{Binding NextPageCommand}" />
+            </HorizontalStackLayout>
+        </Grid>
+    </Grid>
 
 </ContentPage>
