@@ -110,7 +110,7 @@
 ### Этап 1. Каркас
 - [x] Solution из 4 проектов (Core, Infrastructure, App (MAUI), Tests) и ссылки между ними
 - [x] `.gitignore`, `.editorconfig`, Nullable, анализаторы
-- [ ] DI в `MauiProgram` + настройки (`IOptions<T>`) + Serilog
+- [x] DI в `MauiProgram` + настройки (`IOptions<T>`) + Serilog
 
 ### Этап 2. Домен
 - [x] Сущности: `TaskItem`, `Tag`, `TaskDependency`, `RecurrenceRule`, `TaskHistoryEntry`
@@ -155,7 +155,7 @@
 - [x] Импорт из JSON с отчётом
 
 ### Этап 9. Интерфейс MAUI
-- [ ] Каркас: Shell-навигация, MVVM (CommunityToolkit.Mvvm), DI
+- [x] Каркас: Shell-навигация, MVVM (CommunityToolkit.Mvvm), DI
 - [ ] Список задач: фильтры, поиск, сортировка, постраничность
 - [ ] Карточка задачи: подзадачи деревом, зависимости, теги, история
 - [ ] Создание и редактирование, действия над статусами

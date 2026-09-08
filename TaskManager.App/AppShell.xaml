@@ -3,12 +3,24 @@
     x:Class="TaskManager.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:TaskManager.App"
-    Title="TaskManager.App">
+    xmlns:pages="clr-namespace:TaskManager.App.Pages"
+    Title="TaskManager"
+    FlyoutBehavior="Locked">
+
+    <!-- Постоянная боковая панель навигации. Страницы создаются через DI, поэтому принимают зависимости в конструкторе. -->
+    <ShellContent
+        Title="Задачи"
+        ContentTemplate="{DataTemplate pages:TasksPage}"
+        Route="tasks" />
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Title="Статистика"
+        ContentTemplate="{DataTemplate pages:StatisticsPage}"
+        Route="statistics" />
+
+    <ShellContent
+        Title="Данные"
+        ContentTemplate="{DataTemplate pages:DataPage}"
+        Route="data" />
 
 </Shell>

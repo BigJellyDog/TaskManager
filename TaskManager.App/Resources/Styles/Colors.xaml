@@ -27,6 +27,12 @@
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
 
+    <!-- Цвета приоритетов задач (FR-13) -->
+    <Color x:Key="PriorityLow">#7A8794</Color>
+    <Color x:Key="PriorityMedium">#2F7DD1</Color>
+    <Color x:Key="PriorityHigh">#E8890C</Color>
+    <Color x:Key="PriorityCritical">#D32F2F</Color>
+
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>

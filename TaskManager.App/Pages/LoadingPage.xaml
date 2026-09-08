@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TaskManager.App.Pages.LoadingPage"
+             Title="TaskManager">
+
+    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="32">
+        <ActivityIndicator x:Name="Indicator" IsRunning="True" WidthRequest="40" HeightRequest="40" />
+        <Label x:Name="StatusLabel"
+               Text="Запуск…"
+               HorizontalTextAlignment="Center"
+               Style="{StaticResource SubHeadline}" />
+    </VerticalStackLayout>
+
+</ContentPage>

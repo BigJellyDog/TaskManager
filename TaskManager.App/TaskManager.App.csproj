@@ -5,6 +5,10 @@
 		<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
 
 		<OutputType>Exe</OutputType>
+
+		<!-- MVVMTK0045: поля с [ObservableProperty] не подходят для AOT-публикации WinRT. AOT мы не используем,
+		     а генератор частичных свойств в CommunityToolkit.Mvvm 8.4.0 не работает с текущей версией C#. -->
+		<NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
 		<RootNamespace>TaskManager.App</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
@@ -57,6 +61,17 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.14" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Настройки приложения вшиваются в сборку и читаются при старте (MauiProgram) -->
+		<EmbeddedResource Include="appsettings.json" LogicalName="appsettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
