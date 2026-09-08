@@ -238,6 +238,49 @@ public class TaskItem
         ParentId = parent is { Id: not 0 } ? parent.Id : null;
     }
 
+    /// <summary>
+    /// Воссоздаёт задачу из внешних данных (импорт): статус и даты переносятся как есть, поэтому автомат статусов
+    /// и правило "дедлайн не в прошлом" не применяются. Остальные проверки полей действуют как обычно.
+    /// </summary>
+    public static TaskItem CreateImported(
+        string title,
+        Priority priority,
+        DateTimeOffset createdAt,
+        string? description,
+        DateTimeOffset? deadline,
+        TaskStatus status,
+        DateTimeOffset? completedAt,
+        bool successorCreated,
+        RecurrenceRule? recurrence)
+    {
+        if (!Enum.IsDefined(status))
+        {
+            throw new DomainValidationException("Неизвестный статус задачи.");
+        }
+
+        if (status == TaskStatus.Done && completedAt is null)
+        {
+            throw new DomainValidationException("У выполненной задачи нет даты выполнения.");
+        }
+
+        var task = new TaskItem(NormalizeTitle(title), EnsurePriority(priority), createdAt)
+        {
+            Description = NormalizeDescription(description),
+            Deadline = deadline,
+            Status = status,
+            CompletedAt = status == TaskStatus.Done ? completedAt : null,
+            SuccessorCreated = successorCreated,
+        };
+        task.RefreshSearchText();
+
+        if (recurrence is not null)
+        {
+            task.SetRecurrence(recurrence);
+        }
+
+        return task;
+    }
+
     /// <summary>Помечает, что следующая копия повторяющейся задачи создана.</summary>
     public void MarkSuccessorCreated() => SuccessorCreated = true;
 

@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<ReminderChecker>();
         services.AddScoped<StatisticsService>();
         services.AddScoped<ExportService>();
+        services.AddScoped<ImportService>();
         services.AddOptions<ReminderOptions>();
         services.AddSingleton<ReminderService>();
 
