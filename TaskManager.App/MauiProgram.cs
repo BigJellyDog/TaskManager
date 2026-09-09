@@ -62,6 +62,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<TaskEditPage>();
 		builder.Services.AddTransient<TaskDetailsViewModel>();
 		builder.Services.AddTransient<TaskDetailsPage>();
+		builder.Services.AddTransient<StatisticsViewModel>();
 		builder.Services.AddTransient<StatisticsPage>();
 		builder.Services.AddTransient<DataPage>();
 
