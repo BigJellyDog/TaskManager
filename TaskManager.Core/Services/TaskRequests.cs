@@ -15,6 +15,8 @@ public sealed record CreateTaskRequest(
 /// <summary>
 /// Данные для редактирования: форма целиком, как её отправляет интерфейс.
 /// Сервис сам сравнит с текущей задачей и запишет в историю только то, что реально изменилось.
+/// <paramref name="ExpectedRowVersion"/>: версия задачи (<see cref="TaskItem.RowVersion"/>), которую видела форма.
+/// Если с тех пор задачу изменили, сохранение отклоняется (оптимистичная блокировка, FR-10).
 /// </summary>
 public sealed record EditTaskRequest(
     int Id,
@@ -23,4 +25,5 @@ public sealed record EditTaskRequest(
     string? Description,
     DateTimeOffset? Deadline,
     IReadOnlyCollection<string> Tags,
-    RecurrenceRule? Recurrence);
+    RecurrenceRule? Recurrence,
+    long? ExpectedRowVersion = null);

@@ -52,11 +52,14 @@ public static class MauiProgram
 		// Сервисы интерфейса.
 		builder.Services.AddSingleton<ServiceRunner>();
 		builder.Services.AddSingleton<IDialogService, DialogService>();
+		builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
 		builder.Services.AddSingleton<AppInitializer>();
 
 		// Страницы создаются через DI: так они получают модели представления в конструкторе.
 		builder.Services.AddTransient<TasksViewModel>();
 		builder.Services.AddTransient<TasksPage>();
+		builder.Services.AddTransient<TaskEditViewModel>();
+		builder.Services.AddTransient<TaskEditPage>();
 		builder.Services.AddTransient<StatisticsPage>();
 		builder.Services.AddTransient<DataPage>();
 

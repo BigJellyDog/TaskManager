@@ -6,6 +6,10 @@
              x:DataType="vm:TasksViewModel"
              Title="Задачи">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="＋ Новая задача" Command="{Binding NewTaskCommand}" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Resources>
         <!-- Второстепенный текст: приглушённый цвет в обеих темах -->
         <Style x:Key="SecondaryLabel" TargetType="Label">
@@ -76,7 +80,7 @@
 
         <!-- Список -->
         <Grid Grid.Row="2">
-            <CollectionView x:Name="TasksList" ItemsSource="{Binding Tasks}" SelectionMode="None">
+            <CollectionView x:Name="TasksList" ItemsSource="{Binding Tasks}" SelectionMode="Single" SelectionChanged="OnTaskSelected">
                 <CollectionView.EmptyView>
                     <Label Text="{Binding SummaryText}"
                            HorizontalOptions="Center"

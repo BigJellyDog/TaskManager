@@ -9,14 +9,15 @@ namespace TaskManager.App.ViewModels;
 /// </summary>
 public abstract partial class ViewModelBase : ObservableObject
 {
-    private readonly IDialogService _dialogs;
     private readonly ILogger _logger;
 
     protected ViewModelBase(IDialogService dialogs, ILogger logger)
     {
-        _dialogs = dialogs;
+        Dialogs = dialogs;
         _logger = logger;
     }
+
+    protected IDialogService Dialogs { get; }
 
     /// <summary>Идёт операция: интерфейс может показать индикатор и заблокировать кнопки.</summary>
     [ObservableProperty]
@@ -57,7 +58,7 @@ public abstract partial class ViewModelBase : ObservableObject
                 _logger.LogError(ex, "Необработанная ошибка в модели представления {ViewModel}", GetType().Name);
             }
 
-            await _dialogs.AlertAsync(errorTitle, ErrorMessages.ToUserMessage(ex));
+            await Dialogs.AlertAsync(errorTitle, ErrorMessages.ToUserMessage(ex));
             return false;
         }
         finally

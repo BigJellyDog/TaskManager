@@ -21,6 +21,16 @@ public partial class TasksPage : ContentPage
         };
     }
 
+    // Клик по строке открывает задачу. Выбор сразу снимаем, иначе повторный клик по той же строке не сработал бы.
+    private async void OnTaskSelected(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection is [TaskRowViewModel row, ..])
+        {
+            TasksList.SelectedItem = null;
+            await _viewModel.OpenTaskAsync(row.Id);
+        }
+    }
+
     // async void допустим для обработчика события жизненного цикла. Ошибки загрузки обрабатывает сама модель.
     protected override async void OnAppearing()
     {

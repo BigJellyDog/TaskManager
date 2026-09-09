@@ -106,6 +106,13 @@ public class TaskService
         ArgumentNullException.ThrowIfNull(request);
 
         var task = await GetAsync(request.Id, cancellationToken);
+
+        // Форма редактирует то, что прочитала раньше. Если задачу успели изменить, затирать чужие правки нельзя.
+        if (request.ExpectedRowVersion is { } expected && expected != task.RowVersion)
+        {
+            throw new ConcurrencyConflictException();
+        }
+
         var before = TaskSnapshot.From(task);
 
         task.SetTitle(request.Title);

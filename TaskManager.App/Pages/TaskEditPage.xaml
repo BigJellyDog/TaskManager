@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             x:Class="TaskManager.App.Pages.TaskEditPage"
+             x:DataType="vm:TaskEditViewModel"
+             Title="{Binding PageTitle}">
+
+    <ContentPage.Resources>
+        <Style x:Key="FieldLabel" TargetType="Label">
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="Margin" Value="0,6,0,0" />
+        </Style>
+        <Style x:Key="HintLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="8" MaximumWidthRequest="760" HorizontalOptions="Start">
+
+            <Label Text="{Binding ParentText}" IsVisible="{Binding HasParent}" Style="{StaticResource HintLabel}" />
+
+            <Label Text="Название" Style="{StaticResource FieldLabel}" />
+            <Entry Text="{Binding Title}" Placeholder="Что нужно сделать" MaxLength="200" />
+
+            <Label Text="Описание" Style="{StaticResource FieldLabel}" />
+            <Editor Text="{Binding Description}" HeightRequest="110" AutoSize="Disabled" />
+
+            <Label Text="Приоритет" Style="{StaticResource FieldLabel}" />
+            <Picker ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriority}" WidthRequest="220" HorizontalOptions="Start" />
+
+            <Label Text="Дедлайн" Style="{StaticResource FieldLabel}" />
+            <HorizontalStackLayout Spacing="8">
+                <CheckBox IsChecked="{Binding HasDeadline}" VerticalOptions="Center" />
+                <Label Text="Есть дедлайн" VerticalOptions="Center" Margin="0,0,16,0" />
+                <DatePicker Date="{Binding DeadlineDate}" IsEnabled="{Binding HasDeadline}" VerticalOptions="Center" />
+                <TimePicker Time="{Binding DeadlineTime}" IsEnabled="{Binding HasDeadline}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Label Text="Теги" Style="{StaticResource FieldLabel}" />
+            <Entry Text="{Binding TagsText}" Placeholder="Через запятую: работа, дом" />
+            <Label Text="{Binding ExistingTagsHint}" Style="{StaticResource HintLabel}" />
+
+            <Label Text="Повторение" Style="{StaticResource FieldLabel}" />
+            <Picker ItemsSource="{Binding RecurrenceOptions}" SelectedItem="{Binding SelectedRecurrence}" WidthRequest="260" HorizontalOptions="Start" />
+
+            <VerticalStackLayout IsVisible="{Binding HasRecurrence}" Spacing="8">
+                <HorizontalStackLayout Spacing="12">
+                    <Stepper Minimum="1" Maximum="365" Increment="1" Value="{Binding IntervalValue}" VerticalOptions="Center" />
+                    <Label Text="{Binding IntervalText}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <!-- Дни недели нужны только для еженедельного повторения -->
+                <FlexLayout Wrap="Wrap" IsVisible="{Binding IsWeekly}" AlignItems="Center">
+                    <HorizontalStackLayout Margin="0,0,12,0"><CheckBox IsChecked="{Binding Monday}" /><Label Text="Пн" VerticalOptions="Center" /></HorizontalStackLayout>
+                    <HorizontalStackLayout Margin="0,0,12,0"><CheckBox IsChecked="{Binding Tuesday}" /><Label Text="Вт" VerticalOptions="Center" /></HorizontalStackLayout>
+                    <HorizontalStackLayout Margin="0,0,12,0"><CheckBox IsChecked="{Binding Wednesday}" /><Label Text="Ср" VerticalOptions="Center" /></HorizontalStackLayout>
+                    <HorizontalStackLayout Margin="0,0,12,0"><CheckBox IsChecked="{Binding Thursday}" /><Label Text="Чт" VerticalOptions="Center" /></HorizontalStackLayout>
+                    <HorizontalStackLayout Margin="0,0,12,0"><CheckBox IsChecked="{Binding Friday}" /><Label Text="Пт" VerticalOptions="Center" /></HorizontalStackLayout>
+                    <HorizontalStackLayout Margin="0,0,12,0"><CheckBox IsChecked="{Binding Saturday}" /><Label Text="Сб" VerticalOptions="Center" /></HorizontalStackLayout>
+                    <HorizontalStackLayout><CheckBox IsChecked="{Binding Sunday}" /><Label Text="Вс" VerticalOptions="Center" /></HorizontalStackLayout>
+                </FlexLayout>
+
+                <Picker ItemsSource="{Binding ModeOptions}" SelectedItem="{Binding SelectedMode}" WidthRequest="340" HorizontalOptions="Start" />
+                <Label Text="«По календарю» требует дедлайн: следующая задача создаётся по расписанию, даже если эта не закрыта."
+                       Style="{StaticResource HintLabel}" />
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Spacing="12" Margin="0,20,0,0">
+                <Button Text="Сохранить" Command="{Binding SaveCommand}" />
+                <Button Text="Отмена" Command="{Binding CancelCommand}" />
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

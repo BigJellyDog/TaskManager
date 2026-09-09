@@ -20,6 +20,7 @@ public sealed partial class TasksViewModel : ViewModelBase
 {
     private readonly ServiceRunner _runner;
     private readonly TimeProvider _clock;
+    private readonly INavigationService _navigation;
     private readonly int _pageSize;
 
     // Пока значения фильтров меняются программно (сброс, загрузка тегов), перезагрузку на каждое изменение не запускаем.
@@ -33,11 +34,13 @@ public sealed partial class TasksViewModel : ViewModelBase
         TimeProvider clock,
         IOptions<AppOptions> options,
         IDialogService dialogs,
+        INavigationService navigation,
         ILogger<TasksViewModel> logger)
         : base(dialogs, logger)
     {
         _runner = runner;
         _clock = clock;
+        _navigation = navigation;
         _pageSize = Math.Clamp(options.Value.DefaultPageSize, 1, TaskQuery.MaxPageSize);
 
         StatusOptions =
@@ -177,6 +180,12 @@ public sealed partial class TasksViewModel : ViewModelBase
             FilterChanged();
         }
     }
+
+    [RelayCommand]
+    private Task NewTaskAsync() => _navigation.GoToAsync("taskedit?id=0");
+
+    /// <summary>Открывает форму редактирования задачи.</summary>
+    public Task OpenTaskAsync(int id) => _navigation.GoToAsync($"taskedit?id={id}");
 
     [RelayCommand]
     private Task SearchAsync()
