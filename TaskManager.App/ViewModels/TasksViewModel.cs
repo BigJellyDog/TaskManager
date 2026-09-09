@@ -184,8 +184,8 @@ public sealed partial class TasksViewModel : ViewModelBase
     [RelayCommand]
     private Task NewTaskAsync() => _navigation.GoToAsync("taskedit?id=0");
 
-    /// <summary>Открывает форму редактирования задачи.</summary>
-    public Task OpenTaskAsync(int id) => _navigation.GoToAsync($"taskedit?id={id}");
+    /// <summary>Открывает карточку задачи.</summary>
+    public Task OpenTaskAsync(int id) => _navigation.GoToAsync($"taskdetails?id={id}");
 
     [RelayCommand]
     private Task SearchAsync()

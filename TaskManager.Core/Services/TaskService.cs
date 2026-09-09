@@ -107,11 +107,7 @@ public class TaskService
 
         var task = await GetAsync(request.Id, cancellationToken);
 
-        // Форма редактирует то, что прочитала раньше. Если задачу успели изменить, затирать чужие правки нельзя.
-        if (request.ExpectedRowVersion is { } expected && expected != task.RowVersion)
-        {
-            throw new ConcurrencyConflictException();
-        }
+        EnsureNotStale(task, request.ExpectedRowVersion);
 
         var before = TaskSnapshot.From(task);
 
@@ -139,9 +135,15 @@ public class TaskService
         return task;
     }
 
-    public async Task<TaskItem> ChangeStatusAsync(int id, TaskStatus newStatus, CancellationToken cancellationToken = default)
+    /// <param name="expectedRowVersion">Версия задачи, которую видел пользователь. Если задачу изменили, операция отклоняется.</param>
+    public async Task<TaskItem> ChangeStatusAsync(
+        int id,
+        TaskStatus newStatus,
+        long? expectedRowVersion = null,
+        CancellationToken cancellationToken = default)
     {
         var task = await GetAsync(id, cancellationToken);
+        EnsureNotStale(task, expectedRowVersion);
         var before = TaskSnapshot.From(task);
 
         // В Todo, InProgress и Done можно перейти только когда все зависимости выполнены.
@@ -175,9 +177,10 @@ public class TaskService
     }
 
     /// <summary>Переоткрывает выполненную или отменённую задачу.</summary>
-    public async Task<TaskItem> ReopenAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<TaskItem> ReopenAsync(int id, long? expectedRowVersion = null, CancellationToken cancellationToken = default)
     {
         var task = await GetAsync(id, cancellationToken);
+        EnsureNotStale(task, expectedRowVersion);
         var before = TaskSnapshot.From(task);
 
         task.Reopen();
@@ -186,6 +189,51 @@ public class TaskService
         await ReconcileAfterStatusChangeAsync(task, before.Status, entries, cancellationToken);
         await CommitAsync(entries, cancellationToken);
         return task;
+    }
+
+    /// <summary>
+    /// Все подзадачи задачи плоским списком в порядке обхода дерева (сначала подзадача, потом её подзадачи),
+    /// с уровнем вложенности и прогрессом каждого узла.
+    /// </summary>
+    public async Task<IReadOnlyList<SubtaskEntry>> GetSubtaskTreeAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var entries = new List<SubtaskEntry>();
+        await AddSubtaskLevelAsync(await _tasks.GetChildrenAsync(id, cancellationToken), 1, entries, cancellationToken);
+        return entries;
+    }
+
+    private async Task AddSubtaskLevelAsync(
+        IReadOnlyList<TaskItem> siblings,
+        int level,
+        List<SubtaskEntry> entries,
+        CancellationToken cancellationToken)
+    {
+        // Глубина ограничена правилом вложенности; запас в один уровень защищает от бесконечной рекурсии при битых данных.
+        if (level > TaskItem.MaxDepth + 1)
+        {
+            return;
+        }
+
+        foreach (var node in siblings)
+        {
+            var children = await _tasks.GetChildrenAsync(node.Id, cancellationToken);
+            var counted = children.Where(c => c.Status != TaskStatus.Cancelled).ToList();
+
+            entries.Add(new SubtaskEntry(node, level, new TaskProgress(counted.Count(c => c.Status == TaskStatus.Done), counted.Count)));
+            await AddSubtaskLevelAsync(children, level + 1, entries, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Пользователь действует над тем, что прочитал раньше. Если задачу успели изменить, молча перезаписывать
+    /// чужие правки нельзя (оптимистичная блокировка).
+    /// </summary>
+    private static void EnsureNotStale(TaskItem task, long? expectedRowVersion)
+    {
+        if (expectedRowVersion is { } expected && expected != task.RowVersion)
+        {
+            throw new ConcurrencyConflictException();
+        }
     }
 
     /// <summary>Прогресс подзадач задачи, например 3/5.</summary>
@@ -224,10 +272,11 @@ public class TaskService
     }
 
     /// <summary>Удаляет задачу вместе со всеми её подзадачами, чтобы подзадачи не остались без родителя.</summary>
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int id, long? expectedRowVersion = null, CancellationToken cancellationToken = default)
     {
         var task = await _tasks.GetByIdAsync(id, includeDeleted: false, cancellationToken)
             ?? throw new TaskNotFoundException(id);
+        EnsureNotStale(task, expectedRowVersion);
 
         var entries = new List<TaskHistoryEntry>();
         var deletedIds = new List<int>();

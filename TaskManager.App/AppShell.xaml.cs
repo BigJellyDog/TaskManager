@@ -8,5 +8,6 @@ public partial class AppShell : Shell
 
 		// Страницы, которые открываются поверх оболочки по маршруту (не из боковой панели).
 		Routing.RegisterRoute("taskedit", typeof(TaskManager.App.Pages.TaskEditPage));
+		Routing.RegisterRoute("taskdetails", typeof(TaskManager.App.Pages.TaskDetailsPage));
 	}
 }

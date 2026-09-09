@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             x:Class="TaskManager.App.Pages.TaskDetailsPage"
+             x:DataType="vm:TaskDetailsViewModel"
+             Title="Задача">
+
+    <ContentPage.Resources>
+        <Style x:Key="SectionTitle" TargetType="Label">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="Margin" Value="0,18,0,4" />
+        </Style>
+        <Style x:Key="SecondaryLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="6" MaximumWidthRequest="900" HorizontalOptions="Start">
+
+            <!-- Заголовок и сведения -->
+            <Label Text="{Binding Title}" FontSize="26" FontAttributes="Bold" />
+
+            <FlexLayout Wrap="Wrap" AlignItems="Center">
+                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontAttributes="Bold" Margin="0,0,18,0" />
+                <Label Text="{Binding PriorityText, StringFormat='Приоритет: {0}'}" TextColor="{Binding PriorityColor}" FontAttributes="Bold" Margin="0,0,18,0" />
+                <Label Text="{Binding DeadlineText}" Margin="0,0,18,0">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
+                            <Setter Property="TextColor" Value="{StaticResource Overdue}" />
+                            <Setter Property="FontAttributes" Value="Bold" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Label Text="{Binding TagsText}" IsVisible="{Binding HasTags}" Style="{StaticResource SecondaryLabel}" />
+            </FlexLayout>
+
+            <Label Text="{Binding ParentText}" IsVisible="{Binding HasParent}" TextColor="{StaticResource Primary}" TextDecorations="Underline">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenParentCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Label Text="{Binding Description}" IsVisible="{Binding HasDescription}" Margin="0,8,0,0" />
+            <Label Text="{Binding RecurrenceText}" IsVisible="{Binding HasRecurrence}" Style="{StaticResource SecondaryLabel}" />
+            <Label Text="{Binding ProgressText}" IsVisible="{Binding HasProgress}" Style="{StaticResource SecondaryLabel}" />
+
+            <!-- Действия над статусом: только то, что разрешает автомат -->
+            <FlexLayout Wrap="Wrap" BindableLayout.ItemsSource="{Binding StatusActions}" Margin="0,12,0,0">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:StatusActionViewModel">
+                        <Button Text="{Binding Title}" Command="{Binding Command}" Margin="0,0,8,8" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+            <FlexLayout Wrap="Wrap">
+                <Button Text="Изменить" Command="{Binding EditCommand}" Margin="0,0,8,8" />
+                <Button Text="＋ Подзадача" Command="{Binding AddSubtaskCommand}" Margin="0,0,8,8" />
+                <Button Text="Удалить" Command="{Binding DeleteCommand}" BackgroundColor="{StaticResource Overdue}" Margin="0,0,8,8" />
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
+            </FlexLayout>
+
+            <!-- Подзадачи деревом: отступ показывает уровень, клик открывает подзадачу -->
+            <VerticalStackLayout IsVisible="{Binding HasSubtasks}" Spacing="4">
+                <Label Text="Подзадачи" Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Subtasks}" Spacing="4">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SubtaskRowViewModel">
+                            <Border StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                    Margin="{Binding Indent}"
+                                    Padding="12,8">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="6" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenCommand}" />
+                                </Border.GestureRecognizers>
+                                <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                    <Label Text="{Binding Title}" TextDecorations="{Binding TitleDecorations}" FontAttributes="Bold" Margin="0,0,14,0" />
+                                    <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="13" Margin="0,0,14,0" />
+                                    <Label Text="{Binding ProgressText}" IsVisible="{Binding HasProgress}" Style="{StaticResource SecondaryLabel}" />
+                                </FlexLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Зависимости -->
+            <Label Text="Зависит от" Style="{StaticResource SectionTitle}" />
+            <Label Text="Эту задачу нельзя начать, пока все эти задачи не выполнены." Style="{StaticResource SecondaryLabel}" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding DependsOn}" Spacing="4">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DependencyRowViewModel">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <FlexLayout Grid.Column="0" Wrap="Wrap" AlignItems="Center">
+                                <FlexLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenCommand}" />
+                                </FlexLayout.GestureRecognizers>
+                                <Label Text="{Binding Title}" FontAttributes="Bold" Margin="0,0,14,0" />
+                                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="13" />
+                            </FlexLayout>
+                            <Button Grid.Column="1" Text="✕ Убрать" Command="{Binding RemoveCommand}" IsVisible="{Binding CanRemove}" Padding="10,2" />
+                        </Grid>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+            <Label Text="Зависимостей нет." IsVisible="{Binding HasNoDependsOn}" Style="{StaticResource SecondaryLabel}" />
+
+            <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                <Picker Title="Добавить зависимость…"
+                        ItemsSource="{Binding DependencyCandidates}"
+                        SelectedItem="{Binding SelectedCandidate}"
+                        WidthRequest="380" />
+                <Button Text="Добавить" Command="{Binding AddDependencyCommand}" />
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding HasBlocks}" Spacing="4">
+                <Label Text="Блокирует" Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Blocks}" Spacing="4">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DependencyRowViewModel">
+                            <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                <FlexLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenCommand}" />
+                                </FlexLayout.GestureRecognizers>
+                                <Label Text="{Binding Title}" FontAttributes="Bold" Margin="0,0,14,0" />
+                                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="13" />
+                            </FlexLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- История -->
+            <Label Text="История изменений" Style="{StaticResource SectionTitle}" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding History}" Spacing="3">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:HistoryRowViewModel">
+                        <FlexLayout Wrap="Wrap">
+                            <Label Text="{Binding When}" Style="{StaticResource SecondaryLabel}" Margin="0,0,14,0" />
+                            <Label Text="{Binding Text}" FontSize="13" />
+                        </FlexLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
