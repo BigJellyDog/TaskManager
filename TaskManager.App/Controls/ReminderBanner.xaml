@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             x:Class="TaskManager.App.Controls.ReminderBanner"
+             x:DataType="vm:ReminderBannerViewModel"
+             IsVisible="{Binding IsVisible}">
+
+    <Border Margin="10"
+            Padding="12,10"
+            StrokeThickness="1"
+            Stroke="{StaticResource PriorityHigh}"
+            BackgroundColor="{AppThemeBinding Light=#FFF4E5, Dark=#3A2E1E}">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="8" />
+        </Border.StrokeShape>
+
+        <VerticalStackLayout Spacing="6">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Text="{Binding Title}" FontAttributes="Bold" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="Скрыть" Command="{Binding DismissCommand}" Padding="10,2" FontSize="12" />
+            </Grid>
+
+            <!-- Клик по строке открывает задачу -->
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleItems}" Spacing="6">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ReminderRowViewModel">
+                        <Label Text="{Binding Text}" TextColor="{Binding Color}" FontSize="13" TextDecorations="Underline">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Label Text="{Binding MoreText}" IsVisible="{Binding HasMore}" FontSize="12" />
+        </VerticalStackLayout>
+    </Border>
+
+</ContentView>

@@ -6,6 +6,7 @@ using TaskManager.App.Configuration;
 using TaskManager.App.Pages;
 using TaskManager.App.Services;
 using TaskManager.App.ViewModels;
+using TaskManager.Core.Abstractions;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Reminders;
 
@@ -50,6 +51,9 @@ public static class MauiProgram
 		Directory.CreateDirectory(AppPaths.DataDirectory);
 		var databaseFileName = builder.Configuration[$"{AppOptions.SectionName}:{nameof(AppOptions.DatabaseFileName)}"]
 			?? new AppOptions().DatabaseFileName;
+		// Показ напоминаний подставляется до AddInfrastructure: та регистрирует запись в журнал только если другого нет.
+		builder.Services.AddSingleton<ReminderBannerViewModel>();
+		builder.Services.AddSingleton<IReminderNotifier, ReminderNotifier>();
 		builder.Services.AddInfrastructure(Path.Combine(AppPaths.DataDirectory, databaseFileName));
 
 		// Сервисы интерфейса.
