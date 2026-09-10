@@ -57,6 +57,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IDialogService, DialogService>();
 		builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
 		builder.Services.AddSingleton<IFileService, FileService>();
+		builder.Services.AddSingleton<IAppRestarter, AppRestarter>();
 		builder.Services.AddSingleton<AppInitializer>();
 
 		// Страницы создаются через DI: так они получают модели представления в конструкторе.

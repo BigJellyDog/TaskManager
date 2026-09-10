@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using TaskManager.Core.Abstractions;
 using TaskManager.Core.Export;
 using TaskManager.Core.Services;
@@ -37,6 +38,10 @@ public static class DependencyInjection
         services.AddScoped<StatisticsService>();
         services.AddScoped<ExportService>();
         services.AddScoped<ImportService>();
+        services.AddSingleton<IDatabaseBackup>(sp => new SqliteDatabaseBackup(
+            databasePath,
+            sp.GetRequiredService<TimeProvider>(),
+            sp.GetRequiredService<ILogger<SqliteDatabaseBackup>>()));
         services.AddOptions<ReminderOptions>();
         services.AddSingleton<ReminderService>();
 

@@ -25,12 +25,38 @@ public partial class App : Application
         return window;
     }
 
+    private static Task WaitUntilLoadedAsync(VisualElement element)
+    {
+        if (element.IsLoaded)
+        {
+            return Task.CompletedTask;
+        }
+
+        var loaded = new TaskCompletionSource();
+        void OnLoaded(object? sender, EventArgs e)
+        {
+            element.Loaded -= OnLoaded;
+            loaded.TrySetResult();
+        }
+
+        element.Loaded += OnLoaded;
+        return loaded.Task;
+    }
+
     private async Task StartAsync(Window window, LoadingPage loading)
     {
         try
         {
             await _services.GetRequiredService<AppInitializer>().InitializeAsync();
-            window.Page = new AppShell();
+            var shell = new AppShell();
+            window.Page = shell;
+
+            if (_services.GetRequiredService<AppInitializer>().StartupNotice is { } notice)
+            {
+                // Диалог нельзя показывать, пока оболочка не загрузилась: у окна ещё нет корня XAML, и WinUI падает.
+                await WaitUntilLoadedAsync(shell);
+                await _services.GetRequiredService<IDialogService>().AlertAsync("Восстановление данных", notice);
+            }
         }
 #pragma warning disable CA1031 // Запуск не должен падать молча: показываем причину на экране и пишем в журнал.
         catch (Exception ex)

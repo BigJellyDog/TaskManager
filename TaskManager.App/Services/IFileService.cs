@@ -12,6 +12,15 @@ public interface IFileService
     /// <summary>Окно выбора JSON-файла и чтение его текста. Возвращает null, если пользователь отказался.</summary>
     Task<string?> PickAndReadJsonAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Окно выбора файла с заданными расширениями (например ".db"). Возвращает путь или null, если пользователь отказался.</summary>
+    Task<string?> PickFilePathAsync(string title, params string[] extensions);
+
+    /// <summary>Окно «Сохранить как…» для уже готового файла. Возвращает путь или null, если пользователь отказался.</summary>
+    Task<string?> SaveFileWithDialogAsync(string suggestedFileName, string sourceFilePath, CancellationToken cancellationToken = default);
+
+    /// <summary>Путь к файлу в «Документы\TaskManager» (папка создаётся, файл нет).</summary>
+    string GetDocumentsFilePath(string fileName);
+
     /// <summary>Показывает файл в Проводнике.</summary>
     void RevealInFolder(string path);
 }

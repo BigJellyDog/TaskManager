@@ -37,12 +37,41 @@ public sealed class FileService : IFileService
 
     public async Task<string> SaveToDocumentsAsync(string fileName, string content, CancellationToken cancellationToken = default)
     {
-        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TaskManager");
-        Directory.CreateDirectory(directory);
-
-        var path = Path.Combine(directory, fileName);
+        var path = GetDocumentsFilePath(fileName);
         await File.WriteAllTextAsync(path, content, Utf8NoBom, cancellationToken);
         return path;
+    }
+
+    public string GetDocumentsFilePath(string fileName)
+    {
+        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TaskManager");
+        Directory.CreateDirectory(directory);
+        return Path.Combine(directory, fileName);
+    }
+
+    public async Task<string?> PickFilePathAsync(string title, params string[] extensions)
+    {
+        var fileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+        {
+            [DevicePlatform.WinUI] = extensions,
+        });
+
+        var file = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = title, FileTypes = fileType });
+        return file?.FullPath;
+    }
+
+    public async Task<string?> SaveFileWithDialogAsync(string suggestedFileName, string sourceFilePath, CancellationToken cancellationToken = default)
+    {
+        await using var stream = File.OpenRead(sourceFilePath);
+        var result = await FileSaver.Default.SaveAsync(suggestedFileName, stream, cancellationToken);
+
+        if (result.IsSuccessful)
+        {
+            return result.FilePath;
+        }
+
+        _logger.LogInformation(result.Exception, "Файл не сохранён через диалог: {FileName}", suggestedFileName);
+        return null;
     }
 
     public async Task<string?> PickAndReadJsonAsync(CancellationToken cancellationToken = default)

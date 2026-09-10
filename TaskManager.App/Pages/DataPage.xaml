@@ -43,6 +43,16 @@
                 <Button Text="Показать в папке" Command="{Binding RevealSavedCommand}" IsVisible="{Binding HasSavedPath}" Padding="12,2" />
             </HorizontalStackLayout>
 
+            <!-- Резервная копия базы -->
+            <Label Text="Резервная копия" Style="{StaticResource SectionTitle}" />
+            <Label Text="Копия всей базы (не только задач): со всей историей, тегами, повторениями и напоминаниями. Восстановление заменяет текущие данные и применяется после перезапуска; прежняя база сохраняется как страховочная копия."
+                   Style="{StaticResource HintLabel}" />
+            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
+                <Button Text="Копия: сохранить как…" Command="{Binding BackupAsCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+                <Button Text="Копия: в «Документы»" Command="{Binding BackupQuickCommand}" FlexLayout.Shrink="0" Margin="0,0,24,8" />
+                <Button Text="Восстановить из копии…" Command="{Binding RestoreCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+            </FlexLayout>
+
             <!-- Импорт -->
             <Label Text="Импорт" Style="{StaticResource SectionTitle}" />
             <Label Text="Выберите JSON-файл, созданный экспортом. Новые задачи добавляются к существующим, повторы (то же название и дедлайн) пропускаются."

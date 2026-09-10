@@ -3,6 +3,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskManager.App.Services;
+using TaskManager.Core.Abstractions;
 using TaskManager.Core.Export;
 
 namespace TaskManager.App.ViewModels;
@@ -19,11 +20,15 @@ public sealed partial class DataViewModel : ViewModelBase
     private readonly ServiceRunner _runner;
     private readonly IFileService _files;
     private readonly TimeProvider _clock;
+    private readonly IDatabaseBackup _backup;
+    private readonly IAppRestarter _restarter;
 
     public DataViewModel(
         ServiceRunner runner,
         IFileService files,
         TimeProvider clock,
+        IDatabaseBackup backup,
+        IAppRestarter restarter,
         IDialogService dialogs,
         ILogger<DataViewModel> logger)
         : base(dialogs, logger)
@@ -31,6 +36,8 @@ public sealed partial class DataViewModel : ViewModelBase
         _runner = runner;
         _files = files;
         _clock = clock;
+        _backup = backup;
+        _restarter = restarter;
     }
 
     public ObservableCollection<ImportIssueRowViewModel> ImportIssues { get; } = [];
@@ -65,6 +72,15 @@ public sealed partial class DataViewModel : ViewModelBase
 
     [RelayCommand]
     private Task ExportMarkdownQuickAsync() => ExportAsync(json: false, withDialog: false);
+
+    [RelayCommand]
+    private async Task BackupAsAsync() => await RunAsync(() => BackupAsync(withDialog: true), "Не удалось сделать резервную копию");
+
+    [RelayCommand]
+    private async Task BackupQuickAsync() => await RunAsync(() => BackupAsync(withDialog: false), "Не удалось сделать резервную копию");
+
+    [RelayCommand]
+    private async Task RestoreAsync() => await RunAsync(RestoreCoreAsync, "Не удалось подготовить восстановление");
 
     private bool CanRevealSaved() => HasSavedPath;
 
@@ -119,6 +135,82 @@ public sealed partial class DataViewModel : ViewModelBase
                 StatusMessage = $"Сохранено: {path}";
             },
             "Не удалось выполнить экспорт");
+
+    private async Task BackupAsync(bool withDialog)
+    {
+        var fileName = $"taskmanager-backup-{_clock.GetLocalNow().ToString("yyyy-MM-dd-HHmmss", CultureInfo.InvariantCulture)}.db";
+        string? path;
+
+        if (withDialog)
+        {
+            // Копия сначала собирается во временный файл, потом отдаётся окну "Сохранить как".
+            var temp = Path.Combine(Path.GetTempPath(), fileName);
+            try
+            {
+                await _backup.CreateBackupAsync(temp);
+                path = await _files.SaveFileWithDialogAsync(fileName, temp);
+            }
+            finally
+            {
+                File.Delete(temp);
+            }
+        }
+        else
+        {
+            path = _files.GetDocumentsFilePath(fileName);
+            await _backup.CreateBackupAsync(path);
+        }
+
+        if (path is null)
+        {
+            LastSavedPath = null;
+            StatusMessage = "Копия не сохранена.";
+            return;
+        }
+
+        LastSavedPath = path;
+        StatusMessage = $"Резервная копия сохранена: {path}";
+    }
+
+    private async Task RestoreCoreAsync()
+    {
+        var path = await _files.PickFilePathAsync("Выберите резервную копию", ".db");
+        if (path is null)
+        {
+            return;
+        }
+
+        // Проверка до всякого подтверждения: плохой файл отклоняется с понятной причиной (DomainValidationException).
+        var info = await _backup.InspectAsync(path);
+
+        var confirmed = await Dialogs.ConfirmAsync(
+            "Восстановление из копии",
+            $"В копии задач: {info.TaskCount}. Текущие данные будут заменены данными из копии. " +
+            "Прежняя база перед заменой сохранится как страховочная копия. Продолжить?",
+            "Заменить",
+            "Отмена");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        await _backup.StageRestoreAsync(path);
+
+        var restart = await Dialogs.ConfirmAsync(
+            "Нужен перезапуск",
+            "Копия подготовлена. Чтобы применить её, приложение нужно перезапустить. Перезапустить сейчас?",
+            "Перезапустить",
+            "Позже");
+
+        if (restart)
+        {
+            _restarter.Restart();
+            return;
+        }
+
+        LastSavedPath = null;
+        StatusMessage = "Копия будет применена при следующем запуске приложения.";
+    }
 
     private void ShowReport(ImportReport report)
     {
