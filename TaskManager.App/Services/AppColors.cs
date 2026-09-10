@@ -25,6 +25,13 @@ public static class AppColors
         _ => "StatusTodo",
     });
 
+    /// <summary>Ошибка, предупреждение и приглушённый текст в отчётах.</summary>
+    public static Color Error => Get("Overdue");
+
+    public static Color Warning => Get("PriorityHigh");
+
+    public static Color Muted => Get("StatusTodo");
+
     private static Color Get(string key) =>
         Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color
             ? color

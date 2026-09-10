@@ -1,13 +1,72 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
              x:Class="TaskManager.App.Pages.DataPage"
+             x:DataType="vm:DataViewModel"
              Title="Данные">
 
-    <Label Text="Импорт, экспорт и резервные копии появятся на одном из следующих шагов"
-           VerticalOptions="Center"
-           HorizontalOptions="Center"
-           HorizontalTextAlignment="Center"
-           Style="{StaticResource SubHeadline}" />
+    <ContentPage.Resources>
+        <Style x:Key="SectionTitle" TargetType="Label">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="Margin" Value="0,16,0,2" />
+        </Style>
+        <Style x:Key="HintLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="8" MaximumWidthRequest="900" HorizontalOptions="Start">
+
+            <!-- Экспорт -->
+            <Label Text="Экспорт" Style="{StaticResource SectionTitle}" />
+            <Label Text="JSON подходит для переноса и импорта, Markdown для чтения: чек-лист с вложенными подзадачами. История изменений не экспортируется."
+                   Style="{StaticResource HintLabel}" />
+
+            <HorizontalStackLayout Spacing="6" Margin="0,4,0,0">
+                <CheckBox IsChecked="{Binding IncludeDeleted}" VerticalOptions="Center" />
+                <Label Text="Включить удалённые задачи" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
+                <Button Text="JSON: сохранить как…" Command="{Binding ExportJsonAsCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+                <Button Text="JSON: в «Документы»" Command="{Binding ExportJsonQuickCommand}" FlexLayout.Shrink="0" Margin="0,0,24,8" />
+                <Button Text="Markdown: сохранить как…" Command="{Binding ExportMarkdownAsCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+                <Button Text="Markdown: в «Документы»" Command="{Binding ExportMarkdownQuickCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+            </FlexLayout>
+
+            <HorizontalStackLayout Spacing="12">
+                <Label Text="{Binding StatusMessage}" VerticalOptions="Center" />
+                <Button Text="Показать в папке" Command="{Binding RevealSavedCommand}" IsVisible="{Binding HasSavedPath}" Padding="12,2" />
+            </HorizontalStackLayout>
+
+            <!-- Импорт -->
+            <Label Text="Импорт" Style="{StaticResource SectionTitle}" />
+            <Label Text="Выберите JSON-файл, созданный экспортом. Новые задачи добавляются к существующим, повторы (то же название и дедлайн) пропускаются."
+                   Style="{StaticResource HintLabel}" />
+            <HorizontalStackLayout Spacing="12" Margin="0,4,0,0">
+                <Button Text="Выбрать файл JSON…" Command="{Binding ImportCommand}" />
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding HasImportReport}" Spacing="4" Margin="0,8,0,0">
+                <Label Text="Результат импорта" FontAttributes="Bold" />
+                <Label Text="{Binding ImportSummary}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding ImportIssues}" Spacing="3" Margin="0,4,0,0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ImportIssueRowViewModel">
+                            <FlexLayout Wrap="Wrap">
+                                <Label Text="{Binding Kind}" TextColor="{Binding Color}" FontAttributes="Bold" FontSize="13" Margin="0,0,12,0" />
+                                <Label Text="{Binding Text}" FontSize="13" />
+                            </FlexLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 
 </ContentPage>

@@ -1,4 +1,5 @@
 using System.Globalization;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using TaskManager.App.Configuration;
@@ -17,7 +18,9 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		// Шрифты шаблона (OpenSans) не регистрируем: в неупакованном Windows-приложении они не загружаются
 		// (ms-appx не находит файл), а на Windows и так подставляется системный шрифт.
-		builder.UseMauiApp<App>();
+		builder
+			.UseMauiApp<App>()
+			.UseMauiCommunityToolkit();
 
 		// Настройки: appsettings.json вшит в сборку, значения читаются через IOptions<T>.
 		using (var settings = typeof(MauiProgram).Assembly.GetManifestResourceStream("appsettings.json")
@@ -53,6 +56,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ServiceRunner>();
 		builder.Services.AddSingleton<IDialogService, DialogService>();
 		builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
+		builder.Services.AddSingleton<IFileService, FileService>();
 		builder.Services.AddSingleton<AppInitializer>();
 
 		// Страницы создаются через DI: так они получают модели представления в конструкторе.
@@ -64,6 +68,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<TaskDetailsPage>();
 		builder.Services.AddTransient<StatisticsViewModel>();
 		builder.Services.AddTransient<StatisticsPage>();
+		builder.Services.AddTransient<DataViewModel>();
 		builder.Services.AddTransient<DataPage>();
 
 		return builder.Build();

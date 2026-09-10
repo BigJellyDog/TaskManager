@@ -62,6 +62,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.1.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.14" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
