@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,8 +9,8 @@ using TaskManager.Core.Services;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Одна строка баннера: текст напоминания и цвет по его срочности.</summary>
-public sealed record ReminderRowViewModel(string Text, Color Color, ICommand OpenCommand);
+/// <summary>Одна строка баннера: текст напоминания, просрочена ли задача (красная жирная строка) и открытие карточки.</summary>
+public sealed record ReminderRowViewModel(string Text, bool IsOverdue, ICommand OpenCommand);
 
 /// <summary>
 /// Баннер напоминаний в боковой панели. Живёт в единственном экземпляре: фоновый сервис добавляет напоминания,
@@ -91,7 +91,7 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
             var current = reminder;
             VisibleItems.Add(new ReminderRowViewModel(
                 Describe(current, zone),
-                current.Kind == ReminderKind.Overdue ? AppColors.Error : AppColors.Warning,
+                current.Kind == ReminderKind.Overdue,
                 new AsyncRelayCommand(() => OpenAsync(current))));
         }
 

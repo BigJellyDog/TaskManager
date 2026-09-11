@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Цвета дизайна Signal (светлая тема). Ключи те же в обеих темах: при смене темы словарь подменяется целиком. -->
+<ResourceDictionary
+    x:Class="TaskManager.App.Resources.Styles.LightTheme"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Color x:Key="Bg">#F1F3F6</Color>
+    <Color x:Key="Side">#E8EBF0</Color>
+    <Color x:Key="Surface">#FFFFFF</Color>
+    <Color x:Key="SurfaceRaised">#EEF1F5</Color>
+    <Color x:Key="Column">#EFF2F5</Color>
+    <Color x:Key="Line">#D2D8E0</Color>
+    <Color x:Key="Ink">#0B0E13</Color>
+    <Color x:Key="InkMuted">#454F5C</Color>
+    <Color x:Key="Accent">#476F00</Color>
+    <Color x:Key="OnAccent">#FFFFFF</Color>
+    <Color x:Key="AccentSoft">#E6F2CC</Color>
+    <Color x:Key="PCrit">#B31F28</Color>
+    <Color x:Key="PHigh">#964700</Color>
+    <Color x:Key="PMed">#0B57A6</Color>
+    <Color x:Key="PLow">#4C5662</Color>
+    <Color x:Key="SToDo">#4C5662</Color>
+    <Color x:Key="SProg">#0B57A6</Color>
+    <Color x:Key="SBlock">#B31F28</Color>
+    <Color x:Key="SDone">#11662D</Color>
+    <Color x:Key="SCancel">#5B5B63</Color>
+
+    <SolidColorBrush x:Key="BgBrush" Color="#F1F3F6" />
+    <SolidColorBrush x:Key="SideBrush" Color="#E8EBF0" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#EEF1F5" />
+    <SolidColorBrush x:Key="LineBrush" Color="#D2D8E0" />
+    <SolidColorBrush x:Key="InkBrush" Color="#0B0E13" />
+    <SolidColorBrush x:Key="InkMutedBrush" Color="#454F5C" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#476F00" />
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#E6F2CC" />
+    <SolidColorBrush x:Key="PCritBrush" Color="#B31F28" />
+    <SolidColorBrush x:Key="PHighBrush" Color="#964700" />
+    <SolidColorBrush x:Key="PMedBrush" Color="#0B57A6" />
+    <SolidColorBrush x:Key="PLowBrush" Color="#4C5662" />
+    <SolidColorBrush x:Key="SToDoBrush" Color="#4C5662" />
+    <SolidColorBrush x:Key="SProgBrush" Color="#0B57A6" />
+    <SolidColorBrush x:Key="SBlockBrush" Color="#B31F28" />
+    <SolidColorBrush x:Key="SDoneBrush" Color="#11662D" />
+    <SolidColorBrush x:Key="SCancelBrush" Color="#5B5B63" />
+</ResourceDictionary>

@@ -1,31 +1,38 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Controls.ReminderBanner"
              x:DataType="vm:ReminderBannerViewModel"
              IsVisible="{Binding IsVisible}">
 
-    <Border Margin="10"
-            Padding="12,10"
-            StrokeThickness="1"
-            Stroke="{StaticResource PriorityHigh}"
-            BackgroundColor="{AppThemeBinding Light=#FFF4E5, Dark=#3A2E1E}">
-        <Border.StrokeShape>
-            <RoundRectangle CornerRadius="8" />
-        </Border.StrokeShape>
-
-        <VerticalStackLayout Spacing="6">
-            <Grid ColumnDefinitions="*,Auto">
-                <Label Grid.Column="0" Text="{Binding Title}" FontAttributes="Bold" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="Скрыть" Command="{Binding DismissCommand}" Padding="10,2" FontSize="12" />
+    <!-- Блок «Напоминания» внизу боковой панели: поверхность с тонкой границей, радиус 6. -->
+    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="10">
+        <VerticalStackLayout Spacing="0">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" Margin="0,0,0,6">
+                <controls:Icon Grid.Column="0" Kind="bell" Size="15" Color="{DynamicResource Ink}" />
+                <Label Grid.Column="1" Text="Напоминания" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
+                <Label Grid.Column="2" Text="Скрыть" FontSize="12" TextColor="{DynamicResource Accent}"
+                       TextDecorations="Underline" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DismissCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
             </Grid>
 
             <!-- Клик по строке открывает задачу -->
-            <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleItems}" Spacing="6">
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleItems}" Spacing="2">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="vm:ReminderRowViewModel">
-                        <Label Text="{Binding Text}" TextColor="{Binding Color}" FontSize="13" TextDecorations="Underline">
+                        <Label Text="{Binding Text}" FontSize="12" TextColor="{DynamicResource InkMuted}"
+                               TextDecorations="Underline" LineBreakMode="WordWrap">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
+                                    <Setter Property="FontAttributes" Value="Bold" />
+                                </DataTrigger>
+                            </Label.Triggers>
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding OpenCommand}" />
                             </Label.GestureRecognizers>
@@ -34,7 +41,8 @@
                 </BindableLayout.ItemTemplate>
             </VerticalStackLayout>
 
-            <Label Text="{Binding MoreText}" IsVisible="{Binding HasMore}" FontSize="12" />
+            <Label Text="{Binding MoreText}" IsVisible="{Binding HasMore}" FontSize="12"
+                   TextColor="{DynamicResource InkMuted}" Margin="0,2,0,0" />
         </VerticalStackLayout>
     </Border>
 

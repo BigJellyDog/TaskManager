@@ -17,12 +17,30 @@ public partial class App : Application
     {
         // Сначала экран загрузки: пока применяются миграции, интерфейс не должен обращаться к базе.
         var loading = new LoadingPage();
-        var window = new Window(loading) { Title = "TaskManager" };
+        var window = new Window(loading) { Title = "TaskManager", TitleBar = CreateTitleBar() };
 
         window.Created += async (_, _) => await StartAsync(window, loading);
         window.Destroying += (_, _) => _services.GetRequiredService<AppInitializer>().Shutdown();
 
         return window;
+    }
+
+    /// <summary>Заголовок окна как в макете Signal: цвет боковой панели, галочка и моноширинное название.</summary>
+    private static TitleBar CreateTitleBar()
+    {
+        var icon = new Controls.Icon { Kind = "check", Size = 14 };
+        icon.SetDynamicResource(Controls.Icon.ColorProperty, "InkMuted");
+        var label = new Label { Text = "TaskManager", FontFamily = "Consolas", FontSize = 11, CharacterSpacing = 0.4, VerticalOptions = LayoutOptions.Center };
+        label.SetDynamicResource(Label.TextColorProperty, "InkMuted");
+
+        var titleBar = new TitleBar
+        {
+            HeightRequest = 32,
+            Content = new HorizontalStackLayout { Spacing = 8, Padding = new Thickness(12, 0), Children = { icon, label }, VerticalOptions = LayoutOptions.Center },
+        };
+        titleBar.SetDynamicResource(VisualElement.BackgroundColorProperty, "Side");
+        titleBar.SetDynamicResource(TitleBar.ForegroundColorProperty, "InkMuted");
+        return titleBar;
     }
 
     private static Task WaitUntilLoadedAsync(VisualElement element)

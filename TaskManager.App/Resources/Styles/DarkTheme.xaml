@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Цвета дизайна Signal (тёмная тема). Ключи те же в обеих темах: при смене темы словарь подменяется целиком. -->
+<ResourceDictionary
+    x:Class="TaskManager.App.Resources.Styles.DarkTheme"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Color x:Key="Bg">#090B0F</Color>
+    <Color x:Key="Side">#0D1015</Color>
+    <Color x:Key="Surface">#12161C</Color>
+    <Color x:Key="SurfaceRaised">#1A1F27</Color>
+    <Color x:Key="Column">#131820</Color>
+    <Color x:Key="Line">#252C37</Color>
+    <Color x:Key="Ink">#E9EDF2</Color>
+    <Color x:Key="InkMuted">#9AA6B5</Color>
+    <Color x:Key="Accent">#C6F25A</Color>
+    <Color x:Key="OnAccent">#0A0F02</Color>
+    <Color x:Key="AccentSoft">#202D0F</Color>
+    <Color x:Key="PCrit">#FF7B7B</Color>
+    <Color x:Key="PHigh">#F5A04A</Color>
+    <Color x:Key="PMed">#6FB4FF</Color>
+    <Color x:Key="PLow">#9BA7B6</Color>
+    <Color x:Key="SToDo">#9BA7B6</Color>
+    <Color x:Key="SProg">#6FB4FF</Color>
+    <Color x:Key="SBlock">#FF8F86</Color>
+    <Color x:Key="SDone">#5FD38A</Color>
+    <Color x:Key="SCancel">#A3A3AB</Color>
+
+    <SolidColorBrush x:Key="BgBrush" Color="#090B0F" />
+    <SolidColorBrush x:Key="SideBrush" Color="#0D1015" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#12161C" />
+    <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#1A1F27" />
+    <SolidColorBrush x:Key="LineBrush" Color="#252C37" />
+    <SolidColorBrush x:Key="InkBrush" Color="#E9EDF2" />
+    <SolidColorBrush x:Key="InkMutedBrush" Color="#9AA6B5" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#C6F25A" />
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#0A0F02" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#202D0F" />
+    <SolidColorBrush x:Key="PCritBrush" Color="#FF7B7B" />
+    <SolidColorBrush x:Key="PHighBrush" Color="#F5A04A" />
+    <SolidColorBrush x:Key="PMedBrush" Color="#6FB4FF" />
+    <SolidColorBrush x:Key="PLowBrush" Color="#9BA7B6" />
+    <SolidColorBrush x:Key="SToDoBrush" Color="#9BA7B6" />
+    <SolidColorBrush x:Key="SProgBrush" Color="#6FB4FF" />
+    <SolidColorBrush x:Key="SBlockBrush" Color="#FF8F86" />
+    <SolidColorBrush x:Key="SDoneBrush" Color="#5FD38A" />
+    <SolidColorBrush x:Key="SCancelBrush" Color="#A3A3AB" />
+</ResourceDictionary>

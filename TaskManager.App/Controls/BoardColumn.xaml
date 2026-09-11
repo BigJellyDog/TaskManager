@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
+             x:Class="TaskManager.App.Controls.BoardColumn"
+             x:Name="Root"
+             x:DataType="controls:BoardColumn">
+
+    <!-- Колонка доски: заголовок со счётчиком и прокручиваемый список карточек -->
+    <Border BackgroundColor="{DynamicResource Column}" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 6" Padding="8">
+        <Grid RowDefinitions="Auto,*" RowSpacing="8">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="4,2,4,4">
+                <controls:Icon Grid.Column="0" Kind="{Binding ColumnIcon, Source={x:Reference Root}}" Size="14" Color="{DynamicResource InkMuted}" />
+                <Label Grid.Column="1" Text="{Binding ColumnTitle, Source={x:Reference Root}}" FontSize="12" FontAttributes="Bold"
+                       TextTransform="Uppercase" CharacterSpacing="0.7" VerticalOptions="Center" />
+                <Label Grid.Column="2" Text="{Binding Count, Source={x:Reference Root}}" FontFamily="{StaticResource MonoFont}"
+                       FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+            </Grid>
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding ItemsSource, Source={x:Reference Root}}" SelectionMode="None"
+                            ItemsLayout="VerticalList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TaskRowViewModel">
+                        <Border Margin="0,0,0,8" Padding="12,10" StrokeShape="RoundRectangle 5" StrokeThickness="1"
+                                BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsOverdue}" Value="True">
+                                    <Setter Property="Stroke" Value="{DynamicResource PCritBrush}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TasksViewModel}}, Path=OpenTaskCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="{Binding Title}" FontSize="14" FontAttributes="Bold" LineBreakMode="WordWrap" />
+
+                                <HorizontalStackLayout Spacing="4" IsVisible="{Binding HasParent}">
+                                    <controls:Icon Kind="subtask" Size="12" Color="{DynamicResource InkMuted}" />
+                                    <Label Text="{Binding ParentTitle}" FontSize="13" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                    <HorizontalStackLayout Spacing="5" Margin="0,0,10,0">
+                                        <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
+                                        <Label Text="{Binding PriorityText}" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
+                                               TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="5" Margin="0,0,10,0" IsVisible="{Binding HasDeadline}">
+                                        <controls:Icon Kind="calendar" Size="13" Color="{DynamicResource InkMuted}">
+                                            <controls:Icon.Triggers>
+                                                <DataTrigger TargetType="controls:Icon" Binding="{Binding IsOverdue}" Value="True">
+                                                    <Setter Property="Color" Value="{DynamicResource PCrit}" />
+                                                </DataTrigger>
+                                            </controls:Icon.Triggers>
+                                        </controls:Icon>
+                                        <Label Text="{Binding BoardDeadlineText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                               TextColor="{DynamicResource InkMuted}" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
+                                                    <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
+                                                    <Setter Property="FontAttributes" Value="Bold" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                    <Label Text="{Binding ProgressText}" IsVisible="{Binding HasProgress}" FontFamily="{StaticResource MonoFont}"
+                                           FontSize="11" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                                </FlexLayout>
+
+                                <Label Text="{Binding TagsText}" IsVisible="{Binding HasTags}" FontFamily="{StaticResource MonoFont}"
+                                       FontSize="12" TextColor="{DynamicResource InkMuted}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Border>
+
+</ContentView>

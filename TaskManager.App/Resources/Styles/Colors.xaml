@@ -27,19 +27,6 @@
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
 
-    <!-- Цвета приоритетов задач (FR-13) -->
-    <Color x:Key="PriorityLow">#7A8794</Color>
-    <Color x:Key="PriorityMedium">#2F7DD1</Color>
-    <Color x:Key="PriorityHigh">#E8890C</Color>
-    <Color x:Key="PriorityCritical">#D32F2F</Color>
-
-    <!-- Цвета статусов задач и просрочки -->
-    <Color x:Key="StatusTodo">#7A8794</Color>
-    <Color x:Key="StatusInProgress">#2F7DD1</Color>
-    <Color x:Key="StatusBlocked">#C0392B</Color>
-    <Color x:Key="StatusDone">#2E7D32</Color>
-    <Color x:Key="StatusCancelled">#9E9E9E</Color>
-    <Color x:Key="Overdue">#D32F2F</Color>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>

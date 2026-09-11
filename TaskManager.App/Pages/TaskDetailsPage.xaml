@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
@@ -30,7 +30,7 @@
                 <Label Text="{Binding DeadlineText}" Margin="0,0,18,0">
                     <Label.Triggers>
                         <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
-                            <Setter Property="TextColor" Value="{StaticResource Overdue}" />
+                            <Setter Property="TextColor" Value="{DynamicResource SBlock}" />
                             <Setter Property="FontAttributes" Value="Bold" />
                         </DataTrigger>
                     </Label.Triggers>
@@ -60,7 +60,7 @@
             <FlexLayout Wrap="Wrap">
                 <Button Text="Изменить" Command="{Binding EditCommand}" Margin="0,0,8,8" />
                 <Button Text="＋ Подзадача" Command="{Binding AddSubtaskCommand}" Margin="0,0,8,8" />
-                <Button Text="Удалить" Command="{Binding DeleteCommand}" BackgroundColor="{StaticResource Overdue}" Margin="0,0,8,8" />
+                <Button Text="Удалить" Command="{Binding DeleteCommand}" BackgroundColor="{DynamicResource SBlock}" Margin="0,0,8,8" />
                 <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
             </FlexLayout>
 

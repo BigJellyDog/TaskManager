@@ -1,171 +1,191 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.TasksPage"
              x:DataType="vm:TasksViewModel"
              Title="Задачи">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="＋ Новая задача" Command="{Binding NewTaskCommand}" />
-    </ContentPage.ToolbarItems>
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
 
-    <ContentPage.Resources>
-        <!-- Второстепенный текст: приглушённый цвет в обеих темах -->
-        <Style x:Key="SecondaryLabel" TargetType="Label">
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
-        </Style>
-    </ContentPage.Resources>
+        <!-- Заголовок: название, сводка, переключатель Доска/Список, главная кнопка -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="Задачи" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
+            </VerticalStackLayout>
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16,8,16,16" RowSpacing="8">
+            <Border Grid.Column="1" StrokeShape="RoundRectangle 5" Stroke="{DynamicResource LineBrush}" VerticalOptions="Center">
+                <Grid ColumnDefinitions="Auto,Auto">
+                    <Border x:Name="BoardTab" Grid.Column="0" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <controls:Icon x:Name="BoardIcon" Kind="board" Size="14" />
+                            <Label x:Name="BoardLabel" Text="Доска" FontSize="12" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowBoardCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border x:Name="ListTab" Grid.Column="1" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <controls:Icon x:Name="ListIcon" Kind="list" Size="14" />
+                            <Label x:Name="ListLabel" Text="Список" FontSize="12" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowListCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Border>
 
-        <!-- Строка 1: поиск, выпадающие фильтры, сортировка. FlexLayout переносит элементы на новую строку, если не хватает ширины. -->
-        <FlexLayout Grid.Row="0" Wrap="Wrap" AlignItems="Center">
-            <SearchBar Placeholder="Поиск по названию и описанию"
-                       Text="{Binding SearchText}"
-                       SearchCommand="{Binding SearchCommand}"
-                       WidthRequest="300"
-                       Margin="0,0,12,0" />
-            <Picker Title="Статус"
-                    ItemsSource="{Binding StatusOptions}"
-                    SelectedItem="{Binding SelectedStatus}"
-                    WidthRequest="150"
-                    Margin="0,0,12,0" />
-            <Picker Title="Приоритет"
-                    ItemsSource="{Binding PriorityOptions}"
-                    SelectedItem="{Binding SelectedPriority}"
-                    WidthRequest="175"
-                    Margin="0,0,12,0" />
-            <Picker Title="Тег"
-                    ItemsSource="{Binding TagOptions}"
-                    SelectedItem="{Binding SelectedTag}"
-                    WidthRequest="130"
-                    Margin="0,0,12,0" />
-            <Picker Title="Сортировка"
-                    ItemsSource="{Binding SortOptions}"
-                    SelectedItem="{Binding SelectedSort}"
-                    WidthRequest="245"
-                    Margin="0,0,0,0" />
-        </FlexLayout>
-
-        <!-- Строка 2: виды, диапазон дедлайнов, сброс -->
-        <FlexLayout Grid.Row="1" Wrap="Wrap" AlignItems="Center">
-            <HorizontalStackLayout Margin="0,0,16,4">
-                <CheckBox IsChecked="{Binding OnlyOverdue}" VerticalOptions="Center" />
-                <Label Text="Просроченные" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-            <HorizontalStackLayout Margin="0,0,16,4">
-                <CheckBox IsChecked="{Binding DueToday}" VerticalOptions="Center" />
-                <Label Text="На сегодня" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-            <HorizontalStackLayout Margin="0,0,24,4">
-                <CheckBox IsChecked="{Binding DueThisWeek}" VerticalOptions="Center" />
-                <Label Text="На неделю" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-            <HorizontalStackLayout Margin="0,0,16,4" Spacing="4">
-                <CheckBox IsChecked="{Binding UseDeadlineFrom}" VerticalOptions="Center" />
-                <Label Text="Дедлайн с" VerticalOptions="Center" />
-                <DatePicker Date="{Binding DeadlineFrom}" IsEnabled="{Binding UseDeadlineFrom}" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-            <HorizontalStackLayout Margin="0,0,24,4" Spacing="4">
-                <CheckBox IsChecked="{Binding UseDeadlineTo}" VerticalOptions="Center" />
-                <Label Text="по" VerticalOptions="Center" />
-                <DatePicker Date="{Binding DeadlineTo}" IsEnabled="{Binding UseDeadlineTo}" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-            <Button Text="Сбросить" Command="{Binding ResetFiltersCommand}" Padding="14,4" Margin="0,0,0,4" />
-        </FlexLayout>
-
-        <!-- Список -->
-        <Grid Grid.Row="2">
-            <CollectionView x:Name="TasksList" ItemsSource="{Binding Tasks}" SelectionMode="Single" SelectionChanged="OnTaskSelected">
-                <CollectionView.EmptyView>
-                    <Label Text="{Binding SummaryText}"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           Style="{StaticResource SubHeadline}" />
-                </CollectionView.EmptyView>
-
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:TaskRowViewModel">
-                        <Border StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                                Margin="0,0,0,8">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="8" />
-                            </Border.StrokeShape>
-
-                            <Grid ColumnDefinitions="6,*,Auto">
-                                <!-- Цветная полоса слева: приоритет -->
-                                <BoxView Grid.Column="0" Color="{Binding PriorityColor}" />
-
-                                <VerticalStackLayout Grid.Column="1" Padding="14,10" Spacing="4">
-                                    <Label Text="{Binding Title}"
-                                           FontAttributes="Bold"
-                                           FontSize="16"
-                                           TextDecorations="{Binding TitleDecorations}" />
-
-                                    <FlexLayout Wrap="Wrap" AlignItems="Center">
-                                        <Label Text="{Binding StatusText}"
-                                               TextColor="{Binding StatusColor}"
-                                               FontAttributes="Bold"
-                                               FontSize="13"
-                                               Margin="0,0,16,0" />
-                                        <Label Text="{Binding PriorityText, StringFormat='Приоритет: {0}'}"
-                                               Style="{StaticResource SecondaryLabel}"
-                                               Margin="0,0,16,0" />
-                                        <Label Text="{Binding DeadlineText}"
-                                               IsVisible="{Binding HasDeadline}"
-                                               Style="{StaticResource SecondaryLabel}"
-                                               Margin="0,0,16,0">
-                                            <Label.Triggers>
-                                                <!-- Просроченный дедлайн подсвечивается красным -->
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
-                                                    <Setter Property="TextColor" Value="{StaticResource Overdue}" />
-                                                    <Setter Property="FontAttributes" Value="Bold" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                        <Label Text="{Binding TagsText}"
-                                               IsVisible="{Binding HasTags}"
-                                               Style="{StaticResource SecondaryLabel}" />
-                                    </FlexLayout>
-                                </VerticalStackLayout>
-
-                                <Label Grid.Column="2"
-                                       Text="{Binding ProgressText}"
-                                       IsVisible="{Binding HasProgress}"
-                                       VerticalOptions="Center"
-                                       Margin="0,0,16,0"
-                                       Style="{StaticResource SecondaryLabel}" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               WidthRequest="40"
-                               HeightRequest="40" />
+            <controls:SignalButton Grid.Column="2" Variant="Primary" Icon="plus" Text="Новая задача" Hint="Ctrl+N"
+                                   Command="{Binding NewTaskCommand}" />
         </Grid>
 
-        <!-- Низ: сколько найдено и переключение страниц -->
-        <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
-            <HorizontalStackLayout Grid.Column="0" Spacing="16" VerticalOptions="Center">
-                <Label Text="{Binding SummaryText}" VerticalOptions="Center" Style="{StaticResource SecondaryLabel}" />
-                <Button Text="⟳ Обновить" Command="{Binding RefreshCommand}" Padding="12,2" />
-            </HorizontalStackLayout>
-            <HorizontalStackLayout Grid.Column="1" Spacing="12">
-                <Button Text="◀ Назад" Command="{Binding PreviousPageCommand}" />
-                <Label Text="{Binding PageText}" VerticalOptions="Center" />
-                <Button Text="Вперёд ▶" Command="{Binding NextPageCommand}" />
-            </HorizontalStackLayout>
+        <!-- Поиск и быстрые фильтры -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8">
+            <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,0" HeightRequest="34">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                    <controls:Icon Grid.Column="0" Kind="search" Size="15" Color="{DynamicResource InkMuted}" />
+                    <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Поиск по названию и описанию"
+                           ReturnCommand="{Binding SearchCommand}" FontSize="13" VerticalOptions="Center"
+                           MinimumHeightRequest="0" BackgroundColor="Transparent" />
+                    <Border Grid.Column="2" Padding="5,0" StrokeShape="RoundRectangle 4" VerticalOptions="Center">
+                        <Label Text="Ctrl K" FontFamily="{StaticResource MonoFont}" FontSize="11" TextColor="{DynamicResource InkMuted}" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <controls:ToggleChip Grid.Column="1" Text="{Binding OverdueChipText}" IsActive="{Binding OnlyOverdue}"
+                                 IsAlert="{Binding HasOverdue}" Command="{Binding ToggleOverdueCommand}" />
+            <controls:ToggleChip Grid.Column="2" Text="{Binding TodayChipText}" IsActive="{Binding DueToday}"
+                                 Command="{Binding ToggleTodayCommand}" />
+            <controls:ToggleChip Grid.Column="3" Text="{Binding WeekChipText}" IsActive="{Binding DueThisWeek}"
+                                 Command="{Binding ToggleWeekCommand}" />
+            <controls:DropChip Grid.Column="4" Title="Статус" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding SelectedStatus}" />
+            <controls:DropChip Grid.Column="5" Title="Тег" ItemsSource="{Binding TagOptions}" SelectedItem="{Binding SelectedTag}" />
+            <controls:ToggleChip Grid.Column="6" Text="Скрыть закрытые" IsActive="{Binding HideClosed}"
+                                 Command="{Binding ToggleHideClosedCommand}" />
+        </Grid>
+
+        <!-- Доска: колонки по статусам -->
+        <Grid Grid.Row="2" IsVisible="{Binding IsBoard}" ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+            <controls:BoardColumn Grid.Column="0" ColumnTitle="К выполнению" ColumnIcon="circle" Count="{Binding TodoCount}" ItemsSource="{Binding TodoColumn}" />
+            <controls:BoardColumn Grid.Column="1" ColumnTitle="В работе" ColumnIcon="half" Count="{Binding InProgressCount}" ItemsSource="{Binding InProgressColumn}" />
+            <controls:BoardColumn Grid.Column="2" ColumnTitle="Заблокирована" ColumnIcon="blocked" Count="{Binding BlockedColumnCount}" ItemsSource="{Binding BlockedColumn}" />
+            <controls:BoardColumn Grid.Column="3" ColumnTitle="Выполнена" ColumnIcon="done" Count="{Binding DoneCount}" ItemsSource="{Binding DoneColumn}" />
+        </Grid>
+
+        <!-- Таблица задач -->
+        <Border Grid.Row="2" IsVisible="{Binding IsList}" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0">
+            <Grid RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="12,0" ColumnSpacing="8"
+                      ColumnDefinitions="30,28,*,190,130,130">
+                    <Label Grid.Column="2" Text="Название ↓" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="Теги" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="4" Text="Приоритет" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="5" Text="Дедлайн" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <BoxView Grid.ColumnSpan="6" VerticalOptions="End" HeightRequest="1" Margin="-12,0" />
+                </Grid>
+
+                <CollectionView x:Name="TasksList" Grid.Row="1" ItemsSource="{Binding Tasks}" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="{Binding SummaryText}" HorizontalOptions="Center" VerticalOptions="Center"
+                               Style="{StaticResource CaptionLabel}" />
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TaskRowViewModel">
+                            <Grid HeightRequest="40" Padding="12,0" ColumnSpacing="8" ColumnDefinitions="30,28,*,190,130,130" BackgroundColor="Transparent">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TasksViewModel}}, Path=OpenTaskCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+
+                                <!-- Флажок: выполнить / вернуть в работу -->
+                                <Border Grid.Column="0" WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 4" StrokeThickness="1.6"
+                                        Stroke="{DynamicResource InkMutedBrush}" BackgroundColor="Transparent"
+                                        HorizontalOptions="Start" VerticalOptions="Center">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsDone}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource SDone}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource SDoneBrush}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TasksViewModel}}, Path=ToggleDoneCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <controls:Icon Kind="check" Size="14" Color="#FFFFFF" IsVisible="{Binding IsDone}" />
+                                </Border>
+
+                                <controls:Icon Grid.Column="1" Kind="{Binding StatusIcon}" Size="14" Color="{Binding StatusColor}" HorizontalOptions="Start" />
+
+                                <!-- Название, родитель и прогресс подзадач -->
+                                <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="14" LineBreakMode="TailTruncation"
+                                           TextDecorations="{Binding TitleDecorations}" VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsClosed}" Value="True">
+                                                <Setter Property="TextColor" Value="{DynamicResource InkMuted}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <HorizontalStackLayout Spacing="4" IsVisible="{Binding HasParent}" VerticalOptions="Center">
+                                        <controls:Icon Kind="subtask" Size="12" Color="{DynamicResource InkMuted}" />
+                                        <Label Text="{Binding ParentTitle}" FontSize="12" TextColor="{DynamicResource InkMuted}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <Label Text="{Binding ProgressText}" IsVisible="{Binding HasProgress}" FontFamily="{StaticResource MonoFont}"
+                                           FontSize="11" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <Label Grid.Column="3" Text="{Binding TagsText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                       TextColor="{DynamicResource InkMuted}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+
+                                <HorizontalStackLayout Grid.Column="4" Spacing="5" VerticalOptions="Center">
+                                    <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
+                                    <Label Text="{Binding PriorityText}" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
+                                           TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <HorizontalStackLayout Grid.Column="5" Spacing="5" VerticalOptions="Center" IsVisible="{Binding HasDeadline}">
+                                    <controls:Icon x:Name="DeadlineIcon" Kind="calendar" Size="13" Color="{DynamicResource InkMuted}">
+                                        <controls:Icon.Triggers>
+                                            <DataTrigger TargetType="controls:Icon" Binding="{Binding IsOverdue}" Value="True">
+                                                <Setter Property="Color" Value="{DynamicResource PCrit}" />
+                                            </DataTrigger>
+                                        </controls:Icon.Triggers>
+                                    </controls:Icon>
+                                    <Label Text="{Binding DeadlineText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                           TextColor="{DynamicResource InkMuted}" VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
+                                                <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </HorizontalStackLayout>
+
+                                <BoxView Grid.ColumnSpan="6" VerticalOptions="End" HeightRequest="1" Margin="-12,0" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="32" HeightRequest="32" />
+            </Grid>
+        </Border>
+
+        <!-- Низ: сколько найдено, обновить и переключение страниц -->
+        <Grid Grid.Row="3" IsVisible="{Binding IsList}" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="12">
+            <Label Grid.Column="0" Text="{Binding SummaryText}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
+            <controls:SignalButton Grid.Column="1" Variant="Ghost" Icon="refresh" Text="Обновить" Command="{Binding RefreshCommand}" Compact="True" />
+            <controls:SignalButton Grid.Column="3" Variant="Secondary" Icon="chevron-left" Text="Назад" Command="{Binding PreviousPageCommand}" Compact="True" />
+            <Label Grid.Column="4" Text="{Binding PageText}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
+            <controls:SignalButton Grid.Column="5" Variant="Secondary" Icon="chevron-right" IconAfter="True" Text="Вперёд" Command="{Binding NextPageCommand}" Compact="True" />
         </Grid>
     </Grid>
 

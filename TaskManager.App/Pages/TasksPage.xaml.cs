@@ -1,4 +1,4 @@
-using TaskManager.App.ViewModels;
+﻿using TaskManager.App.ViewModels;
 
 namespace TaskManager.App.Pages;
 
@@ -19,15 +19,37 @@ public partial class TasksPage : ContentPage
                 TasksList.ScrollTo(0, position: ScrollToPosition.Start, animate: false);
             }
         };
+
+        // Переключатель Доска/Список перекрашивается вместе с выбором и с темой.
+        _viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(TasksViewModel.IsBoard))
+            {
+                UpdateTabs();
+            }
+        };
+        UpdateTabs();
     }
 
-    // Клик по строке открывает задачу. Выбор сразу снимаем, иначе повторный клик по той же строке не сработал бы.
-    private async void OnTaskSelected(object? sender, SelectionChangedEventArgs e)
+    private void UpdateTabs()
     {
-        if (e.CurrentSelection is [TaskRowViewModel row, ..])
+        ApplyTab(BoardTab, BoardIcon, BoardLabel, _viewModel.IsBoard);
+        ApplyTab(ListTab, ListIcon, ListLabel, !_viewModel.IsBoard);
+    }
+
+    private static void ApplyTab(Border tab, Controls.Icon icon, Label label, bool selected)
+    {
+        if (selected)
         {
-            TasksList.SelectedItem = null;
-            await _viewModel.OpenTaskAsync(row.Id);
+            tab.SetDynamicResource(BackgroundColorProperty, "SurfaceRaised");
+            icon.SetDynamicResource(Controls.Icon.ColorProperty, "Accent");
+            label.SetDynamicResource(Label.TextColorProperty, "Accent");
+        }
+        else
+        {
+            tab.BackgroundColor = Colors.Transparent;
+            icon.SetDynamicResource(Controls.Icon.ColorProperty, "InkMuted");
+            label.SetDynamicResource(Label.TextColorProperty, "InkMuted");
         }
     }
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="TaskManager.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -6,27 +6,21 @@
     xmlns:pages="clr-namespace:TaskManager.App.Pages"
     xmlns:controls="clr-namespace:TaskManager.App.Controls"
     Title="TaskManager"
-    FlyoutBehavior="Locked">
+    FlyoutBehavior="Locked"
+    FlyoutWidth="207"
+    FlyoutBackgroundColor="{DynamicResource Side}">
 
-    <!-- Баннер напоминаний внизу боковой панели: виден на любом экране -->
-    <Shell.FlyoutFooter>
-        <controls:ReminderBanner />
-    </Shell.FlyoutFooter>
+    <!-- Постоянная боковая панель Signal: разделы, счётчики и напоминания -->
+    <Shell.FlyoutContent>
+        <controls:SidebarView />
+    </Shell.FlyoutContent>
 
-    <!-- Постоянная боковая панель навигации. Страницы создаются через DI, поэтому принимают зависимости в конструкторе. -->
-    <ShellContent
-        Title="Задачи"
-        ContentTemplate="{DataTemplate pages:TasksPage}"
-        Route="tasks" />
-
-    <ShellContent
-        Title="Статистика"
-        ContentTemplate="{DataTemplate pages:StatisticsPage}"
-        Route="statistics" />
-
-    <ShellContent
-        Title="Данные"
-        ContentTemplate="{DataTemplate pages:DataPage}"
-        Route="data" />
+    <!-- Страницы создаются через DI, поэтому принимают зависимости в конструкторе. -->
+    <ShellContent ContentTemplate="{DataTemplate pages:TasksPage}" Route="tasks" />
+    <ShellContent ContentTemplate="{DataTemplate pages:StatisticsPage}" Route="statistics" />
+    <ShellContent ContentTemplate="{DataTemplate pages:DataPage}" Route="data" />
+    <ShellContent ContentTemplate="{DataTemplate pages:SoonPage}" Route="trash" />
+    <ShellContent ContentTemplate="{DataTemplate pages:SoonPage}" Route="tags" />
+    <ShellContent ContentTemplate="{DataTemplate pages:SoonPage}" Route="settings" />
 
 </Shell>

@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -22,6 +22,21 @@ public static class MauiProgram
 		builder
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit();
+
+		// Поля ввода без штатной рамки WinUI: рамку и подсветку фокуса рисует наша оболочка (Signal).
+		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
+		{
+#if WINDOWS
+			handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+			var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+			handler.PlatformView.Resources["TextControlBackground"] = transparent;
+			handler.PlatformView.Resources["TextControlBackgroundPointerOver"] = transparent;
+			handler.PlatformView.Resources["TextControlBackgroundFocused"] = transparent;
+			handler.PlatformView.Resources["TextControlBorderBrush"] = transparent;
+			handler.PlatformView.Resources["TextControlBorderBrushPointerOver"] = transparent;
+			handler.PlatformView.Resources["TextControlBorderBrushFocused"] = transparent;
+#endif
+		});
 
 		// Настройки: appsettings.json вшит в сборку, значения читаются через IOptions<T>.
 		using (var settings = typeof(MauiProgram).Assembly.GetManifestResourceStream("appsettings.json")
@@ -53,6 +68,7 @@ public static class MauiProgram
 			?? new AppOptions().DatabaseFileName;
 		// Показ напоминаний подставляется до AddInfrastructure: та регистрирует запись в журнал только если другого нет.
 		builder.Services.AddSingleton<ReminderBannerViewModel>();
+		builder.Services.AddSingleton<SidebarViewModel>();
 		builder.Services.AddSingleton<IReminderNotifier, ReminderNotifier>();
 		builder.Services.AddInfrastructure(Path.Combine(AppPaths.DataDirectory, databaseFileName));
 

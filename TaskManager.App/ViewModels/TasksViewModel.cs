@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Options;
@@ -108,6 +108,56 @@ public sealed partial class TasksViewModel : ViewModelBase
     private bool dueThisWeek;
 
     [ObservableProperty]
+    private bool hideClosed;
+
+    /// <summary>Показана доска (колонки по статусам), иначе таблица.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsList))]
+    [NotifyPropertyChangedFor(nameof(SubtitleText))]
+    private bool isBoard = true;
+
+    public ObservableCollection<TaskRowViewModel> TodoColumn { get; } = [];
+
+    public ObservableCollection<TaskRowViewModel> InProgressColumn { get; } = [];
+
+    public ObservableCollection<TaskRowViewModel> BlockedColumn { get; } = [];
+
+    public ObservableCollection<TaskRowViewModel> DoneColumn { get; } = [];
+
+    [ObservableProperty]
+    private int todoCount;
+
+    [ObservableProperty]
+    private int inProgressCount;
+
+    [ObservableProperty]
+    private int blockedColumnCount;
+
+    [ObservableProperty]
+    private int doneCount;
+
+    public bool IsList => !IsBoard;
+
+    public bool HasOverdue => OverdueCount > 0;
+
+    [ObservableProperty]
+    private int overdueCount;
+
+    [ObservableProperty]
+    private int todayCount;
+
+    [ObservableProperty]
+    private int weekCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SubtitleText))]
+    private int allCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SubtitleText))]
+    private int blockedCount;
+
+    [ObservableProperty]
     private bool useDeadlineFrom;
 
     [ObservableProperty]
@@ -134,6 +184,39 @@ public sealed partial class TasksViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(SummaryText))]
     private int totalCount;
 
+    /// <summary>Подзаголовок страницы: «26 ЗАДАЧ · 2 ПРОСРОЧЕНО · 2 ЗАБЛОКИРОВАНО».</summary>
+    public string SubtitleText
+    {
+        get
+        {
+            var parts = new List<string> { $"{AllCount} {Plural(AllCount, "задача", "задачи", "задач")}" };
+            if (OverdueCount > 0)
+            {
+                parts.Add($"{OverdueCount} просрочено");
+            }
+
+            if (BlockedCount > 0)
+            {
+                parts.Add($"{BlockedCount} {(BlockedCount == 1 ? "заблокирована" : "заблокировано")}");
+            }
+
+            if (!IsBoard)
+            {
+                parts.Clear();
+                parts.Add($"{AllCount} {Plural(AllCount, "задача", "задачи", "задач")}");
+                parts.Add("сортировка: " + (SelectedSort?.Title ?? string.Empty).ToLower(System.Globalization.CultureInfo.CurrentCulture));
+            }
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    public string OverdueChipText => $"Просрочено · {OverdueCount}";
+
+    public string TodayChipText => $"Сегодня · {TodayCount}";
+
+    public string WeekChipText => $"Неделя · {WeekCount}";
+
     public string SummaryText => TotalCount == 0 ? "Задач не найдено" : $"Найдено задач: {TotalCount}";
 
     public string PageText => $"Страница {Page} из {Math.Max(TotalPages, 1)}";
@@ -155,6 +238,20 @@ public sealed partial class TasksViewModel : ViewModelBase
     partial void OnSelectedSortChanged(FilterOption<IReadOnlyList<TaskSort>?>? value) => FilterChanged();
 
     partial void OnOnlyOverdueChanged(bool value) => FilterChanged();
+
+    partial void OnHideClosedChanged(bool value) => FilterChanged();
+
+    partial void OnIsBoardChanged(bool value) => FilterChanged();
+
+    partial void OnOverdueCountChanged(int value)
+    {
+        OnPropertyChanged(nameof(OverdueChipText));
+        OnPropertyChanged(nameof(HasOverdue));
+    }
+
+    partial void OnTodayCountChanged(int value) => OnPropertyChanged(nameof(TodayChipText));
+
+    partial void OnWeekCountChanged(int value) => OnPropertyChanged(nameof(WeekChipText));
 
     partial void OnDueTodayChanged(bool value) => FilterChanged();
 
@@ -186,6 +283,48 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     /// <summary>Открывает карточку задачи.</summary>
     public Task OpenTaskAsync(int id) => _navigation.GoToAsync($"taskdetails?id={id}");
+
+    [RelayCommand]
+    private void ShowBoard() => IsBoard = true;
+
+    [RelayCommand]
+    private void ShowList() => IsBoard = false;
+
+    [RelayCommand]
+    private Task OpenTaskAsync(TaskRowViewModel row)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+        return OpenTaskAsync(row.Id);
+    }
+
+    [RelayCommand]
+    private void ToggleOverdue() => OnlyOverdue = !OnlyOverdue;
+
+    [RelayCommand]
+    private void ToggleToday() => DueToday = !DueToday;
+
+    [RelayCommand]
+    private void ToggleWeek() => DueThisWeek = !DueThisWeek;
+
+    [RelayCommand]
+    private void ToggleHideClosed() => HideClosed = !HideClosed;
+
+    /// <summary>Флажок в строке: выполнить задачу или вернуть её в работу. Ошибки (блокировка, подзадачи) показывает RunAsync.</summary>
+    [RelayCommand]
+    private async Task ToggleDoneAsync(TaskRowViewModel row)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+
+        var changed = await RunAsync(
+            () => _runner.RunAsync(sp => row.IsClosed
+                ? sp.GetRequiredService<TaskService>().ReopenAsync(row.Id, row.RowVersion)
+                : sp.GetRequiredService<TaskService>().ChangeStatusAsync(row.Id, TaskStatus.Done, expectedRowVersion: row.RowVersion)),
+            "Не удалось изменить статус");
+
+        // При ошибке строка осталась прежней, но список всё равно обновляем: возможно, задачу изменили в другом месте.
+        _ = changed;
+        await ReloadAsync();
+    }
 
     [RelayCommand]
     private Task SearchAsync()
@@ -245,6 +384,7 @@ public sealed partial class TasksViewModel : ViewModelBase
             SelectedTag = TagOptions.Count > 0 ? TagOptions[0] : AllTags;
             SelectedSort = SortOptions[0];
             OnlyOverdue = false;
+            HideClosed = false;
             DueToday = false;
             DueThisWeek = false;
             UseDeadlineFrom = false;
@@ -332,7 +472,69 @@ public sealed partial class TasksViewModel : ViewModelBase
 
         TotalCount = result.TotalCount;
         TotalPages = result.TotalPages;
+        await LoadCountsAsync();
+        if (IsBoard)
+        {
+            await LoadBoardAsync(now, zone);
+        }
+
         TasksReplaced?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Доска: четыре колонки по статусам. Поиск, теги и быстрые фильтры действуют и здесь, а фильтр по статусу нет:
+    /// статус задаёт сама колонка. Отменённые на доске не показываются.
+    /// </summary>
+    private async Task LoadBoardAsync(DateTimeOffset now, TimeZoneInfo zone)
+    {
+        async Task FillAsync(TaskStatus status, ObservableCollection<TaskRowViewModel> column, Action<int> setCount)
+        {
+            var filter = BuildFilter() with { Statuses = [status] };
+            var result = await _runner.RunAsync(sp =>
+                sp.GetRequiredService<TaskService>().SearchAsync(filter, SelectedSort?.Value, 1, TaskQuery.MaxPageSize));
+
+            column.Clear();
+            foreach (var task in result.Items)
+            {
+                column.Add(new TaskRowViewModel(task, now, zone));
+            }
+
+            setCount(result.TotalCount);
+        }
+
+        await FillAsync(TaskStatus.Todo, TodoColumn, c => TodoCount = c);
+        await FillAsync(TaskStatus.InProgress, InProgressColumn, c => InProgressCount = c);
+        await FillAsync(TaskStatus.Blocked, BlockedColumn, c => BlockedColumnCount = c);
+        await FillAsync(TaskStatus.Done, DoneColumn, c => DoneCount = c);
+    }
+
+    /// <summary>Счётчики чипов и подзаголовка. Считаются без учёта остальных фильтров: это размер выборки, а не её видимой части.</summary>
+    private async Task LoadCountsAsync()
+    {
+        async Task<int> CountAsync(TaskFilter filter) =>
+            (await _runner.RunAsync(sp => sp.GetRequiredService<TaskService>().SearchAsync(filter, pageSize: 1))).TotalCount;
+
+        OverdueCount = await CountAsync(new TaskFilter(OnlyOverdue: true));
+        TodayCount = await CountAsync(new TaskFilter(DueToday: true));
+        WeekCount = await CountAsync(new TaskFilter(DueThisWeek: true));
+        BlockedCount = await CountAsync(new TaskFilter(Statuses: [TaskStatus.Blocked]));
+        AllCount = await CountAsync(new TaskFilter());
+    }
+
+    private static string Plural(int count, string one, string few, string many)
+    {
+        var tail = count % 100;
+        if (tail is >= 11 and <= 14)
+        {
+            return many;
+        }
+
+        return (count % 10) switch
+        {
+            1 => one,
+            2 or 3 or 4 => few,
+            _ => many,
+        };
     }
 
     private async Task<PagedResult<TaskItem>> FetchAsync(int pageNumber)
@@ -355,7 +557,9 @@ public sealed partial class TasksViewModel : ViewModelBase
         DateTimeOffset? to = UseDeadlineTo ? StartOfDay(DeadlineTo.AddDays(1)).AddTicks(-1) : null;
 
         return new TaskFilter(
-            Statuses: SelectedStatus?.Value is { } status ? [status] : null,
+            Statuses: SelectedStatus?.Value is { } status
+                ? [status]
+                : HideClosed ? [TaskStatus.Todo, TaskStatus.InProgress, TaskStatus.Blocked] : null,
             Priority: SelectedPriority?.Value,
             Tag: SelectedTag?.Value,
             DeadlineFrom: from,
