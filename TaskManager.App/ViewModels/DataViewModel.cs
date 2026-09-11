@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskManager.App.Services;
 using TaskManager.Core.Abstractions;
 using TaskManager.Core.Export;
+using TaskManager.Core.Services;
 
 namespace TaskManager.App.ViewModels;
 
@@ -82,6 +83,12 @@ public sealed partial class DataViewModel : ViewModelBase
     [RelayCommand]
     private async Task RestoreAsync() => await RunAsync(RestoreCoreAsync, "Не удалось подготовить восстановление");
 
+    [RelayCommand]
+    private async Task SeedDemoAsync() => await RunAsync(SeedDemoCoreAsync, "Не удалось создать демо-данные");
+
+    [RelayCommand]
+    private async Task RemoveDemoAsync() => await RunAsync(RemoveDemoCoreAsync, "Не удалось удалить демо-данные");
+
     private bool CanRevealSaved() => HasSavedPath;
 
     [RelayCommand(CanExecute = nameof(CanRevealSaved))]
@@ -135,6 +142,67 @@ public sealed partial class DataViewModel : ViewModelBase
                 StatusMessage = $"Сохранено: {path}";
             },
             "Не удалось выполнить экспорт");
+
+    private async Task SeedDemoCoreAsync()
+    {
+        var exists = await _runner.RunAsync(sp => sp.GetRequiredService<DemoDataService>().HasDemoDataAsync());
+
+        var confirmed = exists
+            ? await Dialogs.ConfirmAsync(
+                "Демо-данные уже есть",
+                "Прежние демо-задачи будут удалены (в корзину) и созданы заново. Ваши собственные задачи не затрагиваются. Продолжить?",
+                "Пересоздать",
+                "Отмена")
+            : await Dialogs.ConfirmAsync(
+                "Демо-данные",
+                $"К вашим задачам будет добавлено около 25 демо-задач с тегом «{DemoDataService.DemoTag}»: проект с подзадачами и зависимостями, " +
+                "просроченные и ближайшие дедлайны, повторения, выполненные задачи с историей. Продолжить?",
+                "Добавить",
+                "Отмена");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        var count = await _runner.RunAsync(async sp =>
+        {
+            var demo = sp.GetRequiredService<DemoDataService>();
+            if (exists)
+            {
+                await demo.RemoveDemoDataAsync();
+            }
+
+            return await demo.SeedAsync();
+        });
+
+        LastSavedPath = null;
+        StatusMessage = $"Добавлено демо-задач: {count}. Они отмечены тегом «{DemoDataService.DemoTag}».";
+    }
+
+    private async Task RemoveDemoCoreAsync()
+    {
+        var exists = await _runner.RunAsync(sp => sp.GetRequiredService<DemoDataService>().HasDemoDataAsync());
+        if (!exists)
+        {
+            LastSavedPath = null;
+            StatusMessage = "Демо-задач нет.";
+            return;
+        }
+
+        var confirmed = await Dialogs.ConfirmAsync(
+            "Удалить демо-данные",
+            $"Все задачи с тегом «{DemoDataService.DemoTag}» будут удалены (в корзину). Продолжить?",
+            "Удалить",
+            "Отмена");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        var removed = await _runner.RunAsync(sp => sp.GetRequiredService<DemoDataService>().RemoveDemoDataAsync());
+        LastSavedPath = null;
+        StatusMessage = $"Удалено демо-задач: {removed}.";
+    }
 
     private async Task BackupAsync(bool withDialog)
     {

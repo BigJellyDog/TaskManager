@@ -43,6 +43,15 @@
                 <Button Text="Показать в папке" Command="{Binding RevealSavedCommand}" IsVisible="{Binding HasSavedPath}" Padding="12,2" />
             </HorizontalStackLayout>
 
+            <!-- Демо-данные -->
+            <Label Text="Демо-данные" Style="{StaticResource SectionTitle}" />
+            <Label Text="Набор примеров для знакомства и скриншотов: проект с подзадачами и зависимостями, просроченные и ближайшие дедлайны, повторения, выполненные задачи с историей. Все демо-задачи отмечены тегом «демо»; ваши задачи не затрагиваются."
+                   Style="{StaticResource HintLabel}" />
+            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
+                <Button Text="Заполнить демо-данными" Command="{Binding SeedDemoCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+                <Button Text="Удалить демо-данные" Command="{Binding RemoveDemoCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
+            </FlexLayout>
+
             <!-- Резервная копия базы -->
             <Label Text="Резервная копия" Style="{StaticResource SectionTitle}" />
             <Label Text="Копия всей базы (не только задач): со всей историей, тегами, повторениями и напоминаниями. Восстановление заменяет текущие данные и применяется после перезапуска; прежняя база сохраняется как страховочная копия."

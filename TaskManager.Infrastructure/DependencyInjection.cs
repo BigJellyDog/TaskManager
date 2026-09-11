@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<StatisticsService>();
         services.AddScoped<ExportService>();
         services.AddScoped<ImportService>();
+        services.AddScoped<DemoDataService>();
         services.AddSingleton<IDatabaseBackup>(sp => new SqliteDatabaseBackup(
             databasePath,
             sp.GetRequiredService<TimeProvider>(),
