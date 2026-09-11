@@ -1,0 +1,313 @@
+{
+ "name": "TaskManager",
+ "version": 1,
+ "color": {
+  "themes": [
+   {
+    "id": "dark",
+    "name": "Тёмная"
+   },
+   {
+    "id": "light",
+    "name": "Светлая"
+   }
+  ],
+  "tokens": [
+   {
+    "name": "bg",
+    "value": {
+     "light": "#F1F3F6",
+     "dark": "#090B0F"
+    },
+    "usage": "Фон страницы. Под него ложатся ink, ink-muted, accent."
+   },
+   {
+    "name": "side",
+    "value": {
+     "light": "#E8EBF0",
+     "dark": "#0D1015"
+    },
+    "usage": "Фон боковой панели и заголовка окна. На нём ink и ink-muted."
+   },
+   {
+    "name": "surface",
+    "value": {
+     "light": "#FFFFFF",
+     "dark": "#12161C"
+    },
+    "usage": "Фон строк, карточек и панелей. На нём ink, ink-muted, accent и цвета статусов."
+   },
+   {
+    "name": "surface-raised",
+    "value": {
+     "light": "#EEF1F5",
+     "dark": "#1A1F27"
+    },
+    "usage": "Наведение на строку, подложка трека гистограммы, сегментный переключатель."
+   },
+   {
+    "name": "line",
+    "value": {
+     "light": "#D2D8E0",
+     "dark": "#252C37"
+    },
+    "usage": "Тонкие границы карточек и разделители. Не несёт смысла, поэтому ниже 3:1."
+   },
+   {
+    "name": "ink",
+    "value": {
+     "light": "#0B0E13",
+     "dark": "#E9EDF2"
+    },
+    "usage": "Основной текст на bg, side, surface, surface-raised."
+   },
+   {
+    "name": "ink-muted",
+    "value": {
+     "light": "#454F5C",
+     "dark": "#9AA6B5"
+    },
+    "usage": "Подписи, теги, второстепенный текст на bg, side, surface, surface-raised и accent-soft."
+   },
+   {
+    "name": "accent",
+    "value": {
+     "light": "#476F00",
+     "dark": "#C6F25A"
+    },
+    "usage": "Главная кнопка, выбранный пункт навигации, ссылки. Текст на нём: on-accent."
+   },
+   {
+    "name": "on-accent",
+    "value": {
+     "light": "#FFFFFF",
+     "dark": "#0A0F02"
+    },
+    "usage": "Текст и иконки на заливке accent."
+   },
+   {
+    "name": "accent-soft",
+    "value": {
+     "light": "#E6F2CC",
+     "dark": "#202D0F"
+    },
+    "usage": "Фон выбранного пункта навигации и мягких акцентов, текст accent поверх."
+   },
+   {
+    "name": "p-crit",
+    "value": {
+     "light": "#B31F28",
+     "dark": "#FF7B7B"
+    },
+    "usage": "Приоритет «Критический»: метка, иконка, столбец гистограммы. Текст на surface и bg; вместе с иконкой из 4 столбиков и словом."
+   },
+   {
+    "name": "p-high",
+    "value": {
+     "light": "#964700",
+     "dark": "#F5A04A"
+    },
+    "usage": "Приоритет «Высокий» (3 столбика + слово)."
+   },
+   {
+    "name": "p-med",
+    "value": {
+     "light": "#0B57A6",
+     "dark": "#6FB4FF"
+    },
+    "usage": "Приоритет «Средний» (2 столбика + слово)."
+   },
+   {
+    "name": "p-low",
+    "value": {
+     "light": "#4C5662",
+     "dark": "#9BA7B6"
+    },
+    "usage": "Приоритет «Низкий» (1 столбик + слово)."
+   },
+   {
+    "name": "s-todo",
+    "value": {
+     "light": "#4C5662",
+     "dark": "#9BA7B6"
+    },
+    "usage": "Статус «К выполнению»: пустой круг + слово. Серо-синий, отличается от «Низкий» формой иконки."
+   },
+   {
+    "name": "s-prog",
+    "value": {
+     "light": "#0B57A6",
+     "dark": "#6FB4FF"
+    },
+    "usage": "Статус «В работе»: наполовину залитый круг + слово."
+   },
+   {
+    "name": "s-block",
+    "value": {
+     "light": "#B31F28",
+     "dark": "#FF8F86"
+    },
+    "usage": "Статус «Заблокирована»: перечёркнутый круг + слово. Также просрочка."
+   },
+   {
+    "name": "s-done",
+    "value": {
+     "light": "#11662D",
+     "dark": "#5FD38A"
+    },
+    "usage": "Статус «Выполнена»: круг с галочкой + слово."
+   },
+   {
+    "name": "s-cancel",
+    "value": {
+     "light": "#5B5B63",
+     "dark": "#A3A3AB"
+    },
+    "usage": "Статус «Отменена»: круг с крестом + слово."
+   }
+  ]
+ },
+ "type": {
+  "fonts": [],
+  "families": {
+   "sans": "\"Segoe UI Variable\",\"Segoe UI\",system-ui,sans-serif",
+   "mono": "Consolas,\"Cascadia Mono\",monospace"
+  },
+  "groups": [
+   {
+    "name": "Текст",
+    "family": "sans",
+    "styles": [
+     {
+      "name": "metric",
+      "fontSize": "34px",
+      "lineHeight": "40px",
+      "fontWeight": 700,
+      "usage": "Число в карточке статистики."
+     },
+     {
+      "name": "display",
+      "fontSize": "26px",
+      "lineHeight": "32px",
+      "fontWeight": 700,
+      "usage": "Заголовок страницы и карточки задачи."
+     },
+     {
+      "name": "h1",
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "fontWeight": 700,
+      "usage": "Заголовок раздела."
+     },
+     {
+      "name": "h2",
+      "fontSize": "18px",
+      "lineHeight": "24px",
+      "fontWeight": 700,
+      "usage": "Заголовок блока внутри карточки."
+     },
+     {
+      "name": "title",
+      "fontSize": "15px",
+      "lineHeight": "20px",
+      "fontWeight": 600,
+      "usage": "Название задачи в списке."
+     },
+     {
+      "name": "body",
+      "fontSize": "14px",
+      "lineHeight": "20px",
+      "fontWeight": 400,
+      "usage": "Обычный текст и кнопки."
+     },
+     {
+      "name": "caption",
+      "fontSize": "13px",
+      "lineHeight": "18px",
+      "fontWeight": 500,
+      "usage": "Статус, теги, дедлайн в строке."
+     },
+     {
+      "name": "micro",
+      "fontSize": "12px",
+      "lineHeight": "16px",
+      "fontWeight": 400,
+      "usage": "Мелкие пояснения, подписи."
+     }
+    ]
+   }
+  ]
+ },
+ "spacing": {
+  "tokens": [
+   {
+    "name": "space-1",
+    "value": "4px",
+    "usage": "Зазор между иконкой и текстом."
+   },
+   {
+    "name": "space-2",
+    "value": "8px",
+    "usage": "Расстояние между мелкими элементами и строками списка."
+   },
+   {
+    "name": "space-3",
+    "value": "12px",
+    "usage": "Внутренний отступ плотных строк, зазор между блоками."
+   },
+   {
+    "name": "space-4",
+    "value": "16px",
+    "usage": "Отступ внутри карточек."
+   },
+   {
+    "name": "space-6",
+    "value": "24px",
+    "usage": "Поля страницы."
+   },
+   {
+    "name": "space-8",
+    "value": "32px",
+    "usage": "Крупные разрывы между разделами."
+   }
+  ]
+ },
+ "radius": {
+  "tokens": [
+   {
+    "name": "radius-sm",
+    "value": "4px",
+    "usage": "Полосы гистограммы, мелкие метки."
+   },
+   {
+    "name": "radius-md",
+    "value": "6px",
+    "usage": "Кнопки, поля ввода, пункты навигации."
+   },
+   {
+    "name": "radius-lg",
+    "value": "8px",
+    "usage": "Строки списка, карточки, панели."
+   },
+   {
+    "name": "radius-pill",
+    "value": "999px",
+    "usage": "Чипы статусов."
+   }
+  ]
+ },
+ "shadow": {
+  "tokens": [
+   {
+    "name": "elev-1",
+    "value": "0 1px 2px rgba(0,0,0,0.14)",
+    "usage": "Выбранный сегмент переключателя."
+   },
+   {
+    "name": "elev-2",
+    "value": "0 8px 24px rgba(0,0,0,0.18)",
+    "usage": "Выпадающие списки и меню."
+   }
+  ]
+ }
+}
