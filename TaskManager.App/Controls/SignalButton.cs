@@ -180,12 +180,17 @@ public sealed class SignalButton : Border
 
         _row.Children.Add(_hintBox);
 
-        _label.Text = Text;
-        _label.IsVisible = Text.Length > 0;
-        _icon.Kind = Icon;
-        _icon.IsVisible = Icon.Length > 0;
-        _hint.Text = Hint;
-        _hintBox.IsVisible = Hint.Length > 0;
+        // Привязка к ещё не заполненной модели может вернуть null: тогда считаем текст пустым.
+        var text = Text ?? string.Empty;
+        var icon = Icon ?? string.Empty;
+        var hint = Hint ?? string.Empty;
+
+        _label.Text = text;
+        _label.IsVisible = text.Length > 0;
+        _icon.Kind = icon;
+        _icon.IsVisible = icon.Length > 0;
+        _hint.Text = hint;
+        _hintBox.IsVisible = hint.Length > 0;
         HeightRequest = Compact ? 28 : 32;
         Padding = Compact ? new Thickness(10, 0) : new Thickness(14, 0);
         _label.FontAttributes = Compact || Variant is ButtonVariant.Ghost ? FontAttributes.None : FontAttributes.Bold;

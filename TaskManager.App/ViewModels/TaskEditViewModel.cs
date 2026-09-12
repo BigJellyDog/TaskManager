@@ -1,3 +1,4 @@
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskManager.App.Services;
@@ -64,6 +65,229 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     }
 
     public IReadOnlyList<FilterOption<Priority>> PriorityOptions { get; }
+
+    /// <summary>Теги задачи чипами. Источник правды для сохранения остаётся TagsText (через запятую): список его отражает.</summary>
+    public ObservableCollection<string> TagList { get; } = [];
+
+    [ObservableProperty]
+    private string? newTag;
+
+    private bool _syncingTags;
+
+    /// <summary>Время дедлайна текстом «ЧЧ:ММ». Неверный ввод игнорируется, поле возвращается к прежнему значению.</summary>
+    public string DeadlineTimeText
+    {
+        get => DeadlineTime.ToString(@"hh\:mm", System.Globalization.CultureInfo.InvariantCulture);
+        set
+        {
+            if (TimeSpan.TryParseExact(value?.Trim(), [@"h\:mm", @"hh\:mm"], System.Globalization.CultureInfo.InvariantCulture, out var time) && time < TimeSpan.FromDays(1))
+            {
+                DeadlineTime = time;
+            }
+
+            OnPropertyChanged(nameof(DeadlineTimeText));
+        }
+    }
+
+    partial void OnDeadlineTimeChanged(TimeSpan value) => OnPropertyChanged(nameof(DeadlineTimeText));
+
+    public string TitleCounter => $"{Title?.Length ?? 0} / 200";
+
+    public bool IsCritical => SelectedPriority?.Value == Priority.Critical;
+
+    public bool IsHighPriority => SelectedPriority?.Value == Priority.High;
+
+    public bool IsMediumPriority => SelectedPriority?.Value == Priority.Medium;
+
+    public bool IsLowPriority => SelectedPriority?.Value == Priority.Low;
+
+    public bool IsModeAfter => SelectedMode?.Value == RecurrenceMode.AfterCompletion;
+
+    public bool IsModeCalendar => SelectedMode?.Value == RecurrenceMode.ByCalendar;
+
+    /// <summary>Предпросмотр карточки: показывает задачу так, как она будет выглядеть на доске.</summary>
+    public string PreviewTitle => string.IsNullOrWhiteSpace(Title) ? "Название задачи" : Title.Trim();
+
+    public string PreviewPriorityText => SelectedPriority?.Title ?? string.Empty;
+
+    public Color PreviewPriorityColor => AppColors.For(SelectedPriority?.Value ?? Priority.Medium);
+
+    public int PreviewPriorityLevel => (SelectedPriority?.Value ?? Priority.Medium) switch
+    {
+        Priority.Critical => 4,
+        Priority.High => 3,
+        Priority.Medium => 2,
+        _ => 1,
+    };
+
+    public string PreviewDeadlineText => HasDeadline
+        ? new DateTime(DeadlineDate.Year, DeadlineDate.Month, DeadlineDate.Day, DeadlineTime.Hours, DeadlineTime.Minutes, 0, DateTimeKind.Unspecified)
+            .ToString("dd.MM HH:mm", System.Globalization.CultureInfo.InvariantCulture)
+        : string.Empty;
+
+    public bool PreviewHasDeadline => HasDeadline;
+
+    public string PreviewRecurrenceText
+    {
+        get
+        {
+            if (!HasRecurrence)
+            {
+                return string.Empty;
+            }
+
+            if (!IsWeekly)
+            {
+                return SelectedRecurrence?.Title.ToLower(System.Globalization.CultureInfo.CurrentCulture) ?? string.Empty;
+            }
+
+            var days = new (bool On, string Name)[]
+            {
+                (Monday, "пн"), (Tuesday, "вт"), (Wednesday, "ср"), (Thursday, "чт"), (Friday, "пт"), (Saturday, "сб"), (Sunday, "вс"),
+            };
+            return string.Join(", ", days.Where(d => d.On).Select(d => d.Name));
+        }
+    }
+
+    public bool PreviewHasRecurrence => PreviewRecurrenceText.Length > 0;
+
+    public string PreviewTagsText => string.Join("  ", TagList.Select(t => "#" + t));
+
+    public bool PreviewHasTags => TagList.Count > 0;
+
+    // Любое изменение полей формы обновляет предпросмотр и счётчики: перечислять зависимости у каждого поля незачем.
+    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.PropertyName is null || Array.IndexOf(DependentNames, e.PropertyName) >= 0 || e.PropertyName is nameof(IsBusy) or nameof(IsNotBusy))
+        {
+            return;
+        }
+
+        foreach (var name in DependentNames)
+        {
+            OnPropertyChanged(name);
+        }
+    }
+
+    private static readonly string[] DependentNames =
+    [
+        nameof(TitleCounter), nameof(IsCritical), nameof(IsHighPriority), nameof(IsMediumPriority), nameof(IsLowPriority),
+        nameof(IsModeAfter), nameof(IsModeCalendar), nameof(PreviewTitle), nameof(PreviewPriorityText), nameof(PreviewPriorityColor),
+        nameof(PreviewPriorityLevel), nameof(PreviewDeadlineText), nameof(PreviewHasDeadline), nameof(PreviewRecurrenceText),
+        nameof(PreviewHasRecurrence), nameof(PreviewTagsText), nameof(PreviewHasTags),
+    ];
+
+    partial void OnTagsTextChanged(string? value)
+    {
+        if (_syncingTags)
+        {
+            return;
+        }
+
+        _syncingTags = true;
+        try
+        {
+            TagList.Clear();
+            foreach (var tag in (value ?? string.Empty).Split([',', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (!TagList.Contains(tag, StringComparer.CurrentCultureIgnoreCase))
+                {
+                    TagList.Add(tag);
+                }
+            }
+        }
+        finally
+        {
+            _syncingTags = false;
+        }
+    }
+
+    private void SyncTagsText()
+    {
+        _syncingTags = true;
+        try
+        {
+            TagsText = string.Join(", ", TagList);
+        }
+        finally
+        {
+            _syncingTags = false;
+        }
+    }
+
+    /// <summary>Добавляет тег из поля «+ тег» (по Enter или запятой). Повтор без учёта регистра игнорируется.</summary>
+    [RelayCommand]
+    private void AddTag()
+    {
+        foreach (var tag in (NewTag ?? string.Empty).Split([',', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var clean = tag.TrimStart('#');
+            if (clean.Length > 0 && !TagList.Contains(clean, StringComparer.CurrentCultureIgnoreCase))
+            {
+                TagList.Add(clean);
+            }
+        }
+
+        NewTag = string.Empty;
+        SyncTagsText();
+        OnPropertyChanged(nameof(PreviewTagsText));
+        OnPropertyChanged(nameof(PreviewHasTags));
+    }
+
+    [RelayCommand]
+    private void RemoveTag(string tag)
+    {
+        TagList.Remove(tag);
+        SyncTagsText();
+        OnPropertyChanged(nameof(PreviewTagsText));
+        OnPropertyChanged(nameof(PreviewHasTags));
+    }
+
+    /// <summary>Подсказка из существующих тегов: клик добавляет тег в задачу.</summary>
+    [RelayCommand]
+    private void PickTag(string tag)
+    {
+        NewTag = tag;
+        AddTag();
+    }
+
+    public ObservableCollection<string> ExistingTags { get; } = [];
+
+    public bool HasExistingTags => ExistingTags.Count > 0;
+
+    [RelayCommand]
+    private void SelectPriority(string name) =>
+        SelectedPriority = PriorityOptions.First(o => o.Value.ToString() == name);
+
+    [RelayCommand]
+    private void ToggleDeadline() => HasDeadline = !HasDeadline;
+
+    [RelayCommand]
+    private void StepUp() => IntervalValue = Math.Min(365, IntervalValue + 1);
+
+    [RelayCommand]
+    private void StepDown() => IntervalValue = Math.Max(1, IntervalValue - 1);
+
+    [RelayCommand]
+    private void SelectMode(string name) =>
+        SelectedMode = ModeOptions.First(o => o.Value.ToString() == name);
+
+    [RelayCommand]
+    private void ToggleDay(string day)
+    {
+        switch (day)
+        {
+            case "Mon": Monday = !Monday; break;
+            case "Tue": Tuesday = !Tuesday; break;
+            case "Wed": Wednesday = !Wednesday; break;
+            case "Thu": Thursday = !Thursday; break;
+            case "Fri": Friday = !Friday; break;
+            case "Sat": Saturday = !Saturday; break;
+            case "Sun": Sunday = !Sunday; break;
+        }
+    }
 
     public IReadOnlyList<FilterOption<RecurrenceFrequency?>> RecurrenceOptions { get; }
 
@@ -187,6 +411,13 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     {
         var tags = await _runner.RunAsync(sp => sp.GetRequiredService<ITagRepository>().ListAsync());
         ExistingTagsHint = tags.Count == 0 ? string.Empty : "Уже есть: " + string.Join(", ", tags.Select(t => t.Name));
+        ExistingTags.Clear();
+        foreach (var tag in tags)
+        {
+            ExistingTags.Add(tag.Name);
+        }
+
+        OnPropertyChanged(nameof(HasExistingTags));
 
         if (_taskId > 0)
         {

@@ -24,6 +24,41 @@ public static class MauiProgram
 			.UseMauiCommunityToolkit();
 
 		// Поля ввода без штатной рамки WinUI: рамку и подсветку фокуса рисует наша оболочка (Signal).
+		Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
+		{
+#if WINDOWS
+			handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+			var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+			handler.PlatformView.Background = transparent;
+			handler.PlatformView.Resources["CalendarDatePickerBackground"] = transparent;
+			handler.PlatformView.Resources["CalendarDatePickerBackgroundPointerOver"] = transparent;
+			handler.PlatformView.Resources["CalendarDatePickerBackgroundPressed"] = transparent;
+			handler.PlatformView.Resources["CalendarDatePickerBorderBrush"] = transparent;
+			handler.PlatformView.Resources["CalendarDatePickerBorderBrushPointerOver"] = transparent;
+			handler.PlatformView.Resources["CalendarDatePickerBorderBrushPressed"] = transparent;
+#endif
+		});
+		Microsoft.Maui.Handlers.TimePickerHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
+		{
+#if WINDOWS
+			var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+			handler.PlatformView.Background = transparent;
+			handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+#endif
+		});
+		Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
+		{
+#if WINDOWS
+			handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+			var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+			handler.PlatformView.Resources["TextControlBackground"] = transparent;
+			handler.PlatformView.Resources["TextControlBackgroundPointerOver"] = transparent;
+			handler.PlatformView.Resources["TextControlBackgroundFocused"] = transparent;
+			handler.PlatformView.Resources["TextControlBorderBrush"] = transparent;
+			handler.PlatformView.Resources["TextControlBorderBrushPointerOver"] = transparent;
+			handler.PlatformView.Resources["TextControlBorderBrushFocused"] = transparent;
+#endif
+		});
 		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
 		{
 #if WINDOWS
