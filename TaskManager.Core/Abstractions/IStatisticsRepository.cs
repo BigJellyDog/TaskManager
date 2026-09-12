@@ -2,14 +2,25 @@ using TaskManager.Core.Services;
 
 namespace TaskManager.Core.Abstractions;
 
+/// <summary>Параметры подсчёта статистики.</summary>
+/// <param name="Now">Текущий момент: от него считается просрочка.</param>
+/// <param name="WeekSince">Начало окна «за неделю».</param>
+/// <param name="MonthSince">Начало окна «за месяц».</param>
+/// <param name="PeriodSince">Начало выбранного периода для «Вовремя», «Среднее время» и графика; null — всё время.</param>
+/// <param name="ChartDays">Сколько последних дней показывает график выполненных.</param>
+/// <param name="TimeZone">Часовой пояс, по которому задачи раскладываются по календарным дням.</param>
+public sealed record StatisticsQuery(
+    DateTimeOffset Now,
+    DateTimeOffset WeekSince,
+    DateTimeOffset MonthSince,
+    DateTimeOffset? PeriodSince,
+    int ChartDays,
+    TimeZoneInfo TimeZone);
+
 public interface IStatisticsRepository
 {
     /// <summary>
-    /// Считает статистику агрегатными запросами к БД (без загрузки задач в память).
-    /// Удалённые задачи не учитываются.
+    /// Считает статистику запросами к БД. Удалённые задачи не учитываются.
     /// </summary>
-    /// <param name="now">Текущий момент: от него считается просрочка.</param>
-    /// <param name="weekSince">Начало окна "за неделю".</param>
-    /// <param name="monthSince">Начало окна "за месяц".</param>
-    Task<TaskStatistics> GetAsync(DateTimeOffset now, DateTimeOffset weekSince, DateTimeOffset monthSince, CancellationToken cancellationToken = default);
+    Task<TaskStatistics> GetAsync(StatisticsQuery query, CancellationToken cancellationToken = default);
 }

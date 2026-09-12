@@ -2,123 +2,297 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.StatisticsPage"
              x:DataType="vm:StatisticsViewModel"
              Title="Статистика">
 
     <ContentPage.Resources>
-        <!-- Карточка с цифрой -->
-        <Style x:Key="StatCard" TargetType="Border">
-            <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" />
-            <Setter Property="StrokeThickness" Value="1" />
-            <Setter Property="Padding" Value="18,14" />
-            <Setter Property="Margin" Value="0,0,14,14" />
-            <Setter Property="WidthRequest" Value="215" />
-            <Setter Property="StrokeShape">
-                <RoundRectangle CornerRadius="10" />
-            </Setter>
+        <!-- Плитка с показателем -->
+        <Style x:Key="MetricTile" TargetType="Border" BasedOn="{StaticResource CardBorder}">
+            <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+            <Setter Property="Padding" Value="14,12" />
         </Style>
-        <Style x:Key="BigNumber" TargetType="Label">
-            <Setter Property="FontSize" Value="34" />
+        <Style x:Key="MetricCaption" TargetType="Label" BasedOn="{StaticResource MonoLabel}">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="CharacterSpacing" Value="0.6" />
+        </Style>
+        <Style x:Key="MetricValue" TargetType="Label" BasedOn="{StaticResource MetricLabel}">
+            <Setter Property="FontSize" Value="28" />
+        </Style>
+        <Style x:Key="MetricNote" TargetType="Label" BasedOn="{StaticResource MicroLabel}">
+            <Setter Property="FontSize" Value="11" />
+        </Style>
+        <Style x:Key="Panel" TargetType="Border" BasedOn="{StaticResource CardBorder}">
+            <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+            <Setter Property="Padding" Value="14,12" />
+        </Style>
+        <Style x:Key="PanelTitle" TargetType="Label" BasedOn="{StaticResource MonoLabel}">
+            <Setter Property="FontSize" Value="11" />
             <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="CharacterSpacing" Value="1.6" />
         </Style>
-        <Style x:Key="CardCaption" TargetType="Label">
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
-        </Style>
-        <Style x:Key="CardNote" TargetType="Label">
+        <Style x:Key="ChartValue" TargetType="Label">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="PeriodItem" TargetType="Border">
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 3" />
+            <Setter Property="Padding" Value="12,4" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
         </Style>
     </ContentPage.Resources>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="10" MaximumWidthRequest="1000" HorizontalOptions="Start">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12" Padding="28,20,28,14">
 
-            <HorizontalStackLayout Spacing="16">
-                <Label Text="Сводка" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
-                <Button Text="⟳ Обновить" Command="{Binding RefreshCommand}" Padding="12,2" />
-                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
-            </HorizontalStackLayout>
+        <!-- Заголовок, переключатель периода, обновление -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="Статистика" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{Binding Subtitle}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
+            </VerticalStackLayout>
 
-            <Label Text="Пока нет данных: создайте и выполните несколько задач."
-                   IsVisible="{Binding IsEmpty}"
-                   TextColor="{StaticResource Gray500}" />
-
-            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
-                <Border Style="{StaticResource StatCard}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding CompletedLastWeek}" Style="{StaticResource BigNumber}" />
-                        <Label Text="Выполнено за неделю" Style="{StaticResource CardCaption}" />
-                        <Label Text="последние 7 суток" Style="{StaticResource CardNote}" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource StatCard}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding CompletedLastMonth}" Style="{StaticResource BigNumber}" />
-                        <Label Text="Выполнено за месяц" Style="{StaticResource CardCaption}" />
-                        <Label Text="последние 30 суток" Style="{StaticResource CardNote}" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource StatCard}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding OnTimeText}" Style="{StaticResource BigNumber}" />
-                        <Label Text="Выполнено вовремя" Style="{StaticResource CardCaption}" />
-                        <Label Text="{Binding OnTimeNote}" Style="{StaticResource CardNote}" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource StatCard}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding AverageText}" Style="{StaticResource BigNumber}" />
-                        <Label Text="Среднее время выполнения" Style="{StaticResource CardCaption}" />
-                        <Label Text="от создания до выполнения" Style="{StaticResource CardNote}" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource StatCard}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding OverdueCount}" Style="{StaticResource BigNumber}">
+            <Border Grid.Column="1" BackgroundColor="{DynamicResource SurfaceRaised}" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 5" Padding="3" VerticalOptions="Center">
+                <HorizontalStackLayout Spacing="2">
+                    <Border Style="{StaticResource PeriodItem}">
+                        <Label Text="7 дней" FontSize="13" TextColor="{DynamicResource InkMuted}">
                             <Label.Triggers>
-                                <!-- Просроченные задачи подсвечиваются красным, пока они есть -->
-                                <DataTrigger TargetType="Label" Binding="{Binding HasOverdue}" Value="True">
-                                    <Setter Property="TextColor" Value="{DynamicResource SBlock}" />
+                                <DataTrigger TargetType="Label" Binding="{Binding IsWeek}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource Ink}" />
+                                    <Setter Property="FontAttributes" Value="Bold" />
                                 </DataTrigger>
                             </Label.Triggers>
                         </Label>
-                        <Label Text="Просрочено" Style="{StaticResource CardCaption}" />
-                        <Label Text="открытые с прошедшим дедлайном" Style="{StaticResource CardNote}" />
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsWeek}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource Surface}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectPeriodCommand}" CommandParameter="Week" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource PeriodItem}">
+                        <Label Text="30 дней" FontSize="13" TextColor="{DynamicResource InkMuted}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsMonth}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource Ink}" />
+                                    <Setter Property="FontAttributes" Value="Bold" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsMonth}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource Surface}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectPeriodCommand}" CommandParameter="Month" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource PeriodItem}">
+                        <Label Text="Всё время" FontSize="13" TextColor="{DynamicResource InkMuted}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsAllTime}" Value="True">
+                                    <Setter Property="TextColor" Value="{DynamicResource Ink}" />
+                                    <Setter Property="FontAttributes" Value="Bold" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsAllTime}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource Surface}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectPeriodCommand}" CommandParameter="AllTime" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </HorizontalStackLayout>
+            </Border>
+
+            <controls:SignalButton Grid.Column="2" Icon="refresh" Text="Обновить" Command="{Binding RefreshCommand}" />
+        </Grid>
+
+        <!-- Шесть показателей -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="10">
+            <Border Grid.Column="0" Style="{StaticResource MetricTile}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Выполнено за неделю" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{Binding CompletedLastWeek}" Style="{StaticResource MetricValue}" />
+                    <Label Text="последние 7 суток" Style="{StaticResource MetricNote}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource MetricTile}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Выполнено за месяц" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{Binding CompletedLastMonth}" Style="{StaticResource MetricValue}" />
+                    <Label Text="последние 30 суток" Style="{StaticResource MetricNote}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource MetricTile}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Вовремя" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{Binding OnTimeText}" Style="{StaticResource MetricValue}" />
+                    <Label Text="{Binding OnTimeNote}" Style="{StaticResource MetricNote}" />
+                    <controls:Segments Count="5" Filled="{Binding OnTimeBlocks}" Margin="0,4,0,0" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="3" Style="{StaticResource MetricTile}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Среднее время" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{Binding AverageText}" Style="{StaticResource MetricValue}" />
+                    <Label Text="от создания до выполнения" Style="{StaticResource MetricNote}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource MetricTile}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Просрочено" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{Binding OverdueCount}" Style="{StaticResource MetricValue}">
+                        <Label.Triggers>
+                            <!-- Просроченные задачи подсвечиваются красным, пока они есть -->
+                            <DataTrigger TargetType="Label" Binding="{Binding HasOverdue}" Value="True">
+                                <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label Text="открытые с дедлайном в прошлом" Style="{StaticResource MetricNote}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="5" Style="{StaticResource MetricTile}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Заблокировано" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{Binding BlockedCount}" Style="{StaticResource MetricValue}" />
+                    <Label Text="ждут выполнения зависимостей" Style="{StaticResource MetricNote}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Три панели: приоритеты, выполнено по дням, дедлайны на 7 дней -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="10">
+            <Border Grid.Column="0" Style="{StaticResource Panel}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Открытые по приоритетам" Style="{StaticResource PanelTitle}" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Bars}" Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PriorityBarViewModel">
+                                <Grid ColumnDefinitions="108,*,24,36" ColumnSpacing="10">
+                                    <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
+                                        <controls:PriorityBars Level="{Binding Level}" Color="{Binding Color}" />
+                                        <Label Text="{Binding Title}" FontSize="11" TextColor="{Binding Color}"
+                                               TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <controls:BarMeter Grid.Column="1" Fraction="{Binding Fraction}" FillColor="{Binding Color}" />
+                                    <Label Grid.Column="2" Text="{Binding Count}" Style="{StaticResource ChartValue}"
+                                           HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                    <Label Grid.Column="3" Text="{Binding Percent}" Style="{StaticResource MonoLabel}"
+                                           FontSize="11" CharacterSpacing="0" HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
-                </Border>
+                </VerticalStackLayout>
+            </Border>
 
-                <Border Style="{StaticResource StatCard}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding BlockedCount}" Style="{StaticResource BigNumber}" />
-                        <Label Text="Заблокировано" Style="{StaticResource CardCaption}" />
-                        <Label Text="ждут выполнения зависимостей" Style="{StaticResource CardNote}" />
+            <Border Grid.Column="1" Style="{StaticResource Panel}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Выполнено по дням" Style="{StaticResource PanelTitle}" />
+                    <FlexLayout BindableLayout.ItemsSource="{Binding CompletedColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ChartColumnViewModel">
+                                <VerticalStackLayout FlexLayout.Grow="1" FlexLayout.Basis="0" Spacing="4" VerticalOptions="End" Margin="2,0">
+                                    <Label Text="{Binding Value}" Style="{StaticResource ChartValue}" />
+                                    <Border HeightRequest="78" StrokeThickness="0" StrokeShape="RoundRectangle 3"
+                                            BackgroundColor="{DynamicResource SurfaceRaised}">
+                                        <BoxView VerticalOptions="End" HeightRequest="{Binding Height}" Color="{Binding Color}" />
+                                    </Border>
+                                    <Label Text="{Binding Label}" FontSize="11" TextColor="{DynamicResource InkMuted}"
+                                           HorizontalTextAlignment="Center" LineBreakMode="NoWrap" HeightRequest="16" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                    <Label Text="{Binding CompletedHint}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Panel}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Дедлайны на 7 дней" Style="{StaticResource PanelTitle}" />
+                    <FlexLayout BindableLayout.ItemsSource="{Binding DeadlineColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ChartColumnViewModel">
+                                <VerticalStackLayout FlexLayout.Grow="1" FlexLayout.Basis="0" Spacing="4" VerticalOptions="End" Margin="2,0">
+                                    <Label Text="{Binding Value}" Style="{StaticResource ChartValue}" TextColor="{Binding ValueColor}" />
+                                    <Border HeightRequest="78" StrokeThickness="0" StrokeShape="RoundRectangle 3"
+                                            BackgroundColor="{DynamicResource SurfaceRaised}">
+                                        <BoxView VerticalOptions="End" HeightRequest="{Binding Height}" Color="{Binding Color}" />
+                                    </Border>
+                                    <Label Text="{Binding Label}" FontSize="10" TextColor="{DynamicResource InkMuted}"
+                                           HorizontalTextAlignment="Center" LineBreakMode="NoWrap" HeightRequest="16" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                    <Label Text="{Binding DeadlinesHint}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Две панели: статусы и теги -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Border Grid.Column="0" Style="{StaticResource Panel}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Открытые по статусам" Style="{StaticResource PanelTitle}" />
+                    <FlexLayout BindableLayout.ItemsSource="{Binding StatusSegments}" Direction="Row" HeightRequest="18">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:StatusSegmentViewModel">
+                                <BoxView FlexLayout.Grow="{Binding Weight}" FlexLayout.Basis="0" Color="{Binding Color}"
+                                         CornerRadius="2" Margin="1.5,0" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                    <FlexLayout BindableLayout.ItemsSource="{Binding StatusSegments}" Direction="Row" Wrap="Wrap">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:StatusSegmentViewModel">
+                                <HorizontalStackLayout Spacing="6" Margin="0,0,18,0">
+                                    <controls:Icon Kind="{Binding Icon}" Size="14" Color="{Binding Color}" VerticalOptions="Center" />
+                                    <Label Text="{Binding Title}" FontSize="12" FontAttributes="Bold" TextColor="{Binding Color}" VerticalOptions="Center" />
+                                    <Label Text="{Binding Count}" Style="{StaticResource ChartValue}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource Panel}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Теги в открытых задачах" Style="{StaticResource PanelTitle}" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Tags}" Spacing="6">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TagBarViewModel">
+                                <Grid ColumnDefinitions="110,*,24" ColumnSpacing="10">
+                                    <Label Grid.Column="0" Text="{Binding Name}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                           TextColor="{DynamicResource InkMuted}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                                    <controls:BarMeter Grid.Column="1" Fraction="{Binding Fraction}" FillColor="{DynamicResource Accent}" HeightRequest="6" />
+                                    <Label Grid.Column="2" Text="{Binding Count}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                           HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
-                </Border>
-            </FlexLayout>
-
-            <!-- Гистограмма: открытые задачи по приоритетам -->
-            <Label Text="Открытые задачи по приоритетам" FontSize="20" FontAttributes="Bold" Margin="0,10,0,4" />
-            <Label Text="{Binding OpenCount, StringFormat='Всего открытых: {0}'}" Style="{StaticResource CardCaption}" />
-
-            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Bars}" Spacing="8" Margin="0,6,0,0">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:PriorityBarViewModel">
-                        <HorizontalStackLayout Spacing="12">
-                            <Label Text="{Binding Title}" WidthRequest="120" VerticalOptions="Center" />
-                            <BoxView Color="{Binding Color}" WidthRequest="{Binding Width}" HeightRequest="24" CornerRadius="4" VerticalOptions="Center" />
-                            <Label Text="{Binding Count}" FontAttributes="Bold" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </VerticalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
-
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
 </ContentPage>
