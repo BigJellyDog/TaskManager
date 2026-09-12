@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!-- Стили дизайна Signal. Цвета берутся из словаря темы (DarkTheme/LightTheme.xaml) через DynamicResource,
      поэтому при смене темы всё перекрашивается само. -->
 <ResourceDictionary
@@ -275,6 +275,17 @@
         <Setter Property="StrokeThickness" Value="1" />
         <Setter Property="StrokeShape" Value="RoundRectangle 8" />
         <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <!-- Полосы прокрутки не показываем: прокрутка колесом мыши работает, а полоса в макете Signal не нужна. -->
+    <Style TargetType="ScrollView">
+        <Setter Property="VerticalScrollBarVisibility" Value="Never" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Never" />
+    </Style>
+
+    <Style TargetType="CollectionView">
+        <Setter Property="VerticalScrollBarVisibility" Value="Never" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Never" />
     </Style>
 
 </ResourceDictionary>
