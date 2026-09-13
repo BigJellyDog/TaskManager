@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -47,6 +47,7 @@ public sealed partial class DataViewModel : ViewModelBase
     private bool includeDeleted;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasStatus))]
     private string statusMessage = string.Empty;
 
     [ObservableProperty]
@@ -59,6 +60,8 @@ public sealed partial class DataViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool hasImportReport;
+
+    public bool HasStatus => !string.IsNullOrEmpty(StatusMessage);
 
     public bool HasSavedPath => !string.IsNullOrEmpty(LastSavedPath);
 

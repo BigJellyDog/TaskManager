@@ -1,91 +1,161 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.DataPage"
              x:DataType="vm:DataViewModel"
              Title="Данные">
 
     <ContentPage.Resources>
-        <Style x:Key="SectionTitle" TargetType="Label">
-            <Setter Property="FontSize" Value="20" />
-            <Setter Property="FontAttributes" Value="Bold" />
-            <Setter Property="Margin" Value="0,16,0,2" />
+        <Style x:Key="Panel" TargetType="Border" BasedOn="{StaticResource CardBorder}">
+            <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+            <Setter Property="Padding" Value="14,12" />
         </Style>
-        <Style x:Key="HintLabel" TargetType="Label">
+        <Style x:Key="PanelTitle" TargetType="Label" BasedOn="{StaticResource MonoLabel}">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="CharacterSpacing" Value="1.6" />
+        </Style>
+        <Style x:Key="PanelNote" TargetType="Label" BasedOn="{StaticResource MicroLabel}">
+            <Setter Property="LineHeight" Value="1.15" />
+        </Style>
+        <!-- Строка действия: название слева, кнопки справа -->
+        <Style x:Key="ActionRow" TargetType="Border">
+            <Setter Property="StrokeShape" Value="RoundRectangle 5" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Stroke" Value="{DynamicResource LineBrush}" />
+            <Setter Property="BackgroundColor" Value="{DynamicResource Bg}" />
+            <Setter Property="Padding" Value="12,6,6,6" />
+        </Style>
+        <Style x:Key="ActionName" TargetType="Label">
             <Setter Property="FontSize" Value="13" />
-            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="VerticalOptions" Value="Center" />
         </Style>
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="8" MaximumWidthRequest="900" HorizontalOptions="Start">
+        <Grid RowDefinitions="Auto,Auto" RowSpacing="14" Padding="28,20,28,14">
 
-            <!-- Экспорт -->
-            <Label Text="Экспорт" Style="{StaticResource SectionTitle}" />
-            <Label Text="JSON подходит для переноса и импорта, Markdown для чтения: чек-лист с вложенными подзадачами. История изменений не экспортируется."
-                   Style="{StaticResource HintLabel}" />
-
-            <HorizontalStackLayout Spacing="6" Margin="0,4,0,0">
-                <CheckBox IsChecked="{Binding IncludeDeleted}" VerticalOptions="Center" />
-                <Label Text="Включить удалённые задачи" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
-                <Button Text="JSON: сохранить как…" Command="{Binding ExportJsonAsCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-                <Button Text="JSON: в «Документы»" Command="{Binding ExportJsonQuickCommand}" FlexLayout.Shrink="0" Margin="0,0,24,8" />
-                <Button Text="Markdown: сохранить как…" Command="{Binding ExportMarkdownAsCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-                <Button Text="Markdown: в «Документы»" Command="{Binding ExportMarkdownQuickCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-            </FlexLayout>
-
-            <HorizontalStackLayout Spacing="12">
-                <Label Text="{Binding StatusMessage}" VerticalOptions="Center" />
-                <Button Text="Показать в папке" Command="{Binding RevealSavedCommand}" IsVisible="{Binding HasSavedPath}" Padding="12,2" />
-            </HorizontalStackLayout>
-
-            <!-- Демо-данные -->
-            <Label Text="Демо-данные" Style="{StaticResource SectionTitle}" />
-            <Label Text="Набор примеров для знакомства и скриншотов: проект с подзадачами и зависимостями, просроченные и ближайшие дедлайны, повторения, выполненные задачи с историей. Все демо-задачи отмечены тегом «демо»; ваши задачи не затрагиваются."
-                   Style="{StaticResource HintLabel}" />
-            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
-                <Button Text="Заполнить демо-данными" Command="{Binding SeedDemoCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-                <Button Text="Удалить демо-данные" Command="{Binding RemoveDemoCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-            </FlexLayout>
-
-            <!-- Резервная копия базы -->
-            <Label Text="Резервная копия" Style="{StaticResource SectionTitle}" />
-            <Label Text="Копия всей базы (не только задач): со всей историей, тегами, повторениями и напоминаниями. Восстановление заменяет текущие данные и применяется после перезапуска; прежняя база сохраняется как страховочная копия."
-                   Style="{StaticResource HintLabel}" />
-            <FlexLayout Wrap="Wrap" Margin="0,6,0,0">
-                <Button Text="Копия: сохранить как…" Command="{Binding BackupAsCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-                <Button Text="Копия: в «Документы»" Command="{Binding BackupQuickCommand}" FlexLayout.Shrink="0" Margin="0,0,24,8" />
-                <Button Text="Восстановить из копии…" Command="{Binding RestoreCommand}" FlexLayout.Shrink="0" Margin="0,0,8,8" />
-            </FlexLayout>
-
-            <!-- Импорт -->
-            <Label Text="Импорт" Style="{StaticResource SectionTitle}" />
-            <Label Text="Выберите JSON-файл, созданный экспортом. Новые задачи добавляются к существующим, повторы (то же название и дедлайн) пропускаются."
-                   Style="{StaticResource HintLabel}" />
-            <HorizontalStackLayout Spacing="12" Margin="0,4,0,0">
-                <Button Text="Выбрать файл JSON…" Command="{Binding ImportCommand}" />
-                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-            <VerticalStackLayout IsVisible="{Binding HasImportReport}" Spacing="4" Margin="0,8,0,0">
-                <Label Text="Результат импорта" FontAttributes="Bold" />
-                <Label Text="{Binding ImportSummary}" />
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding ImportIssues}" Spacing="3" Margin="0,4,0,0">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ImportIssueRowViewModel">
-                            <FlexLayout Wrap="Wrap">
-                                <Label Text="{Binding Kind}" TextColor="{Binding Color}" FontAttributes="Bold" FontSize="13" Margin="0,0,12,0" />
-                                <Label Text="{Binding Text}" FontSize="13" />
-                            </FlexLayout>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label Text="Данные" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                    <Label Text="Экспорт · резервная копия · импорт" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
                 </VerticalStackLayout>
-            </VerticalStackLayout>
-        </VerticalStackLayout>
+                <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+
+                <!-- Резервная копия -->
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Panel}" Stroke="{DynamicResource AccentBrush}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Резервная копия" Style="{StaticResource PanelTitle}" />
+                        <Label Text="Копия всей базы: история, теги, повторения, напоминания." Style="{StaticResource PanelNote}" />
+                        <Border Style="{StaticResource ActionRow}">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                <Label Text="Создать копию" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Variant="Primary" Compact="True" Text="В «Документы»" Command="{Binding BackupQuickCommand}" />
+                                <controls:SignalButton Grid.Column="2" Compact="True" Text="Сохранить как…" Command="{Binding BackupAsCommand}" />
+                            </Grid>
+                        </Border>
+                        <HorizontalStackLayout Spacing="10" IsVisible="{Binding HasStatus}">
+                            <controls:Icon Kind="check" Size="14" Color="{DynamicResource SDone}" />
+                            <Label Text="{Binding StatusMessage}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                   TextColor="{DynamicResource SDone}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                            <Label Text="Показать в папке" IsVisible="{Binding HasSavedPath}" FontSize="12" TextColor="{DynamicResource Accent}" TextDecorations="Underline" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RevealSavedCommand}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Экспорт -->
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource Panel}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Экспорт" Style="{StaticResource PanelTitle}" />
+                        <Label Text="JSON — для переноса и импорта, Markdown — для чтения. История не экспортируется." Style="{StaticResource PanelNote}" />
+                        <HorizontalStackLayout Spacing="10">
+                            <controls:SwitchToggle IsOn="{Binding IncludeDeleted}" />
+                            <Label Text="Включить удалённые задачи" FontSize="13" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Border Style="{StaticResource ActionRow}">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                <Label Text="JSON" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Text="В «Документы»" Command="{Binding ExportJsonQuickCommand}" />
+                                <controls:SignalButton Grid.Column="2" Compact="True" Text="Сохранить как…" Command="{Binding ExportJsonAsCommand}" />
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource ActionRow}">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                <Label Text="Markdown" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Text="В «Документы»" Command="{Binding ExportMarkdownQuickCommand}" />
+                                <controls:SignalButton Grid.Column="2" Compact="True" Text="Сохранить как…" Command="{Binding ExportMarkdownAsCommand}" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Восстановление -->
+                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource Panel}" Stroke="{DynamicResource PCritBrush}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Восстановление" Style="{StaticResource PanelTitle}" TextColor="{DynamicResource PCrit}" />
+                        <Label Text="Заменит текущие данные и применится после перезапуска. Прежняя база сохранится как страховочная копия."
+                               Style="{StaticResource PanelNote}" />
+                        <Border Style="{StaticResource ActionRow}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                <Label Text="Восстановить из копии…" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Variant="Danger" Icon="undo" Text="Выбрать файл" Command="{Binding RestoreCommand}" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Импорт -->
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Panel}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Импорт" Style="{StaticResource PanelTitle}" />
+                        <Label Text="Новые задачи добавляются к существующим, повторы (то же название и дедлайн) пропускаются." Style="{StaticResource PanelNote}" />
+                        <Border Style="{StaticResource ActionRow}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                <Label Text="Файл JSON" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Text="Выбрать файл…" Command="{Binding ImportCommand}" />
+                            </Grid>
+                        </Border>
+
+                        <VerticalStackLayout IsVisible="{Binding HasImportReport}" Spacing="4">
+                            <Label Text="{Binding ImportSummary}" FontFamily="{StaticResource MonoFont}" FontSize="12" TextColor="{DynamicResource InkMuted}" />
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding ImportIssues}" Spacing="3">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ImportIssueRowViewModel">
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="{Binding Kind}" TextColor="{Binding Color}" FontFamily="{StaticResource MonoFont}"
+                                                   FontSize="10" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="0.6" WidthRequest="84" VerticalOptions="Center" />
+                                            <Label Text="{Binding Text}" FontSize="12" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Демо-данные -->
+                <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Panel}">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <VerticalStackLayout VerticalOptions="Center">
+                            <Label Text="Демо-данные" FontSize="13" FontAttributes="Bold" />
+                            <Label Text="Набор примеров с тегом «демо»: ваши задачи не затрагиваются." Style="{StaticResource PanelNote}" />
+                        </VerticalStackLayout>
+                        <controls:SignalButton Grid.Column="1" Compact="True" Text="Заполнить демо-данными" Command="{Binding SeedDemoCommand}" />
+                        <controls:SignalButton Grid.Column="2" Compact="True" Variant="Danger" Text="Удалить демо-данные" Command="{Binding RemoveDemoCommand}" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
     </ScrollView>
 
 </ContentPage>
