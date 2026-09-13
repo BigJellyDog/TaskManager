@@ -1,4 +1,4 @@
-using TaskManager.Core.Domain;
+﻿using TaskManager.Core.Domain;
 
 namespace TaskManager.Core.Abstractions;
 
@@ -14,6 +14,9 @@ public interface ITagRepository
 
     /// <summary>Теги, которых нет ни у одной задачи (в том числе удалённой).</summary>
     Task<IReadOnlyList<Tag>> ListUnusedAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Все теги с числом живых задач и признаком "нигде не используется".</summary>
+    Task<IReadOnlyList<TaskManager.Core.Services.TagUsage>> ListUsageAsync(CancellationToken cancellationToken = default);
 
     Task AddAsync(Tag tag, CancellationToken cancellationToken = default);
 

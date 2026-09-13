@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IReminderRepository, ReminderRepository>();
         services.AddScoped<IStatisticsRepository, StatisticsRepository>();
+        services.AddScoped<ITrashRepository, TrashRepository>();
 
         // Сервисы приложения. TimeProvider и IReminderNotifier регистрируются через TryAdd:
         // приложение может заранее подставить свои (например, показ уведомлений в интерфейсе).
@@ -36,6 +37,8 @@ public static class DependencyInjection
         services.AddScoped<TaskService>();
         services.AddScoped<ReminderChecker>();
         services.AddScoped<StatisticsService>();
+        services.AddScoped<TrashService>();
+        services.AddScoped<TagService>();
         services.AddScoped<ExportService>();
         services.AddScoped<ImportService>();
         services.AddScoped<DemoDataService>();
