@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
+             x:Class="TaskManager.App.Pages.TrashPage"
+             x:DataType="vm:TrashViewModel"
+             Title="Корзина">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
+
+        <!-- Заголовок и действия -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="Корзина" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
+            </VerticalStackLayout>
+            <controls:SignalButton Grid.Column="1" Icon="undo" Text="Восстановить выбранные"
+                                   Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding HasSelection}" />
+            <controls:SignalButton Grid.Column="2" Variant="Danger" Icon="trash" Text="Очистить корзину"
+                                   Command="{Binding EmptyCommand}" IsEnabled="{Binding HasRows}" />
+        </Grid>
+
+        <!-- Пояснение -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="14,10">
+            <HorizontalStackLayout Spacing="10">
+                <controls:Icon Kind="bell" Size="16" Color="{DynamicResource InkMuted}" />
+                <Label Text="Удалённые задачи скрыты из списка и статистики. Восстановление возвращает задачу вместе с подзадачами."
+                       FontSize="13" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- Таблица -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0" VerticalOptions="Start">
+            <Grid RowDefinitions="Auto,Auto">
+                <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
+                      ColumnDefinitions="28,*,150,120,140,250">
+                    <Label Grid.Column="1" Text="Название" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="Был статус" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="Удалена" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="4" Text="Подзадачи" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+
+                <VerticalStackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Rows}">
+                    <BindableLayout.EmptyView>
+                        <Label Text="В корзине пусто" HorizontalOptions="Center" Margin="0,28" Style="{StaticResource CaptionLabel}" />
+                    </BindableLayout.EmptyView>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TrashRowViewModel">
+                            <Grid MinimumHeightRequest="48" Padding="14,0" ColumnSpacing="10" ColumnDefinitions="28,*,150,120,140,250">
+                                <!-- Флажок выбора -->
+                                <Border Grid.Column="0" WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 4" StrokeThickness="1.6"
+                                        Stroke="{DynamicResource InkMutedBrush}" BackgroundColor="Transparent"
+                                        HorizontalOptions="Start" VerticalOptions="Center">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource Accent}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TrashViewModel}}, Path=ToggleSelectCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <controls:Icon Kind="check" Size="14" Color="{DynamicResource OnAccent}" IsVisible="{Binding IsSelected}" />
+                                </Border>
+
+                                <Label Grid.Column="1" Text="{Binding Title}" FontAttributes="Bold" FontSize="14" LineBreakMode="TailTruncation" VerticalOptions="Center" />
+
+                                <HorizontalStackLayout Grid.Column="2" Spacing="6" VerticalOptions="Center">
+                                    <controls:Icon Kind="{Binding StatusIcon}" Size="14" Color="{Binding StatusColor}" />
+                                    <Label Text="{Binding StatusText}" FontSize="13" FontAttributes="Bold" TextColor="{Binding StatusColor}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <Label Grid.Column="3" Text="{Binding DeletedText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                       TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                                <Label Grid.Column="4" Text="{Binding SubtasksText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                       TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+
+                                <HorizontalStackLayout Grid.Column="5" Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
+                                    <controls:SignalButton Text="Восстановить" Compact="True"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TrashViewModel}}, Path=RestoreOneCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                    <controls:SignalButton Text="Удалить навсегда" Compact="True" Variant="Danger"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TrashViewModel}}, Path=PurgeOneCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                </HorizontalStackLayout>
+
+                                <BoxView Grid.ColumnSpan="6" VerticalOptions="End" HeightRequest="1" Margin="-14,0" Color="{DynamicResource Line}" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <Label Grid.Row="3" Text="Удаление навсегда необратимо: перед ним программа спросит подтверждение с числом задач."
+               Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" />
+    </Grid>
+</ContentPage>

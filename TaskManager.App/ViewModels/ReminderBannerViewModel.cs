@@ -28,8 +28,12 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
     // Активные напоминания: по одному на задачу (новое, более срочное, заменяет прежнее).
     private readonly List<Reminder> _active = [];
 
-    public ReminderBannerViewModel(TimeProvider clock, INavigationService navigation, ILogger<ReminderBannerViewModel> logger)
+    private readonly UserSettings _settings;
+
+    public ReminderBannerViewModel(TimeProvider clock, INavigationService navigation, UserSettings settings, ILogger<ReminderBannerViewModel> logger)
     {
+        _settings = settings;
+        settings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(Refresh);
         _clock = clock;
         _navigation = navigation;
         _logger = logger;
@@ -95,7 +99,7 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
                 new AsyncRelayCommand(() => OpenAsync(current))));
         }
 
-        IsVisible = ordered.Count > 0;
+        IsVisible = ordered.Count > 0 && _settings.ShowReminderBanner;
         Title = $"Напоминания ({ordered.Count})";
         HasMore = ordered.Count > MaxVisible;
         MoreText = HasMore ? $"… и ещё {ordered.Count - MaxVisible}" : string.Empty;

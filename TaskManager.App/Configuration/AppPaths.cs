@@ -1,4 +1,4 @@
-namespace TaskManager.App.Configuration;
+﻿namespace TaskManager.App.Configuration;
 
 /// <summary>Где приложение хранит свои файлы.</summary>
 public static class AppPaths

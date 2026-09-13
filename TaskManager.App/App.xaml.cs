@@ -11,6 +11,17 @@ public partial class App : Application
     {
         InitializeComponent();
         _services = services;
+
+        var settings = services.GetRequiredService<UserSettings>();
+        ThemeManager.Apply(settings.Theme);
+        settings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(() => ThemeManager.Apply(settings.Theme));
+        RequestedThemeChanged += (_, _) =>
+        {
+            if (settings.Theme == ThemeChoice.System)
+            {
+                ThemeManager.Apply(ThemeChoice.System);
+            }
+        };
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

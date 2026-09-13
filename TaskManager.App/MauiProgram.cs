@@ -108,6 +108,7 @@ public static class MauiProgram
 		builder.Services.AddInfrastructure(Path.Combine(AppPaths.DataDirectory, databaseFileName));
 
 		// Сервисы интерфейса.
+		builder.Services.AddSingleton<UserSettings>();
 		builder.Services.AddSingleton<ServiceRunner>();
 		builder.Services.AddSingleton<IDialogService, DialogService>();
 		builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
@@ -124,6 +125,12 @@ public static class MauiProgram
 		builder.Services.AddTransient<TaskDetailsPage>();
 		builder.Services.AddTransient<StatisticsViewModel>();
 		builder.Services.AddTransient<StatisticsPage>();
+		builder.Services.AddTransient<TrashViewModel>();
+		builder.Services.AddTransient<TrashPage>();
+		builder.Services.AddTransient<TagsViewModel>();
+		builder.Services.AddTransient<TagsPage>();
+		builder.Services.AddTransient<SettingsViewModel>();
+		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<DataViewModel>();
 		builder.Services.AddTransient<DataPage>();
 

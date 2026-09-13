@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,7 +16,7 @@ public class ReminderService : BackgroundService
     private readonly IServiceScopeFactory _scopes;
     private readonly TimeProvider _clock;
     private readonly ILogger<ReminderService> _logger;
-    private readonly TimeSpan _interval;
+    private readonly ReminderOptions _options;
 
     public ReminderService(
         IServiceScopeFactory scopes,
@@ -29,22 +29,24 @@ public class ReminderService : BackgroundService
         _scopes = scopes;
         _clock = clock;
         _logger = logger;
-        _interval = TimeSpan.FromSeconds(Math.Max(1, options.Value.IntervalSeconds));
+        _options = options.Value;
     }
+
+    private TimeSpan Interval => TimeSpan.FromSeconds(Math.Max(1, _options.IntervalSeconds));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Сервис напоминаний запущен, интервал проверки {Interval}", _interval);
+        _logger.LogInformation("Сервис напоминаний запущен, интервал проверки {Interval}", Interval);
 
         try
         {
-            using var timer = new PeriodicTimer(_interval, _clock);
-
+            // Интервал читается перед каждой паузой: смена настройки действует со следующей проверки.
             do
             {
                 await RunOnceAsync(stoppingToken);
+                await Task.Delay(Interval, _clock, stoppingToken);
             }
-            while (await timer.WaitForNextTickAsync(stoppingToken));
+            while (true);
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
@@ -84,7 +86,7 @@ public class ReminderService : BackgroundService
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            _logger.LogError(ex, "Ошибка при проверке напоминаний, следующая попытка через {Interval}", _interval);
+            _logger.LogError(ex, "Ошибка при проверке напоминаний, следующая попытка через {Interval}", Interval);
         }
     }
 }

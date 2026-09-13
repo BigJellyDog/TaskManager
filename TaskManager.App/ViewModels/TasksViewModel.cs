@@ -21,7 +21,9 @@ public sealed partial class TasksViewModel : ViewModelBase
     private readonly ServiceRunner _runner;
     private readonly TimeProvider _clock;
     private readonly INavigationService _navigation;
-    private readonly int _pageSize;
+    private readonly UserSettings _settings;
+
+    private int _pageSize => Math.Clamp(_settings.PageSize, 1, TaskQuery.MaxPageSize);
 
     // Пока значения фильтров меняются программно (сброс, загрузка тегов), перезагрузку на каждое изменение не запускаем.
     private bool _suppressReload;
@@ -32,7 +34,7 @@ public sealed partial class TasksViewModel : ViewModelBase
     public TasksViewModel(
         ServiceRunner runner,
         TimeProvider clock,
-        IOptions<AppOptions> options,
+        UserSettings settings,
         IDialogService dialogs,
         INavigationService navigation,
         ILogger<TasksViewModel> logger)
@@ -41,7 +43,9 @@ public sealed partial class TasksViewModel : ViewModelBase
         _runner = runner;
         _clock = clock;
         _navigation = navigation;
-        _pageSize = Math.Clamp(options.Value.DefaultPageSize, 1, TaskQuery.MaxPageSize);
+        _settings = settings;
+        hideClosed = settings.HideClosed;
+        isBoard = settings.DefaultBoard;
 
         StatusOptions =
         [

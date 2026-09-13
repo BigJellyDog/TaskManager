@@ -19,8 +19,8 @@
     <ShellContent ContentTemplate="{DataTemplate pages:TasksPage}" Route="tasks" />
     <ShellContent ContentTemplate="{DataTemplate pages:StatisticsPage}" Route="statistics" />
     <ShellContent ContentTemplate="{DataTemplate pages:DataPage}" Route="data" />
-    <ShellContent ContentTemplate="{DataTemplate pages:SoonPage}" Route="trash" />
-    <ShellContent ContentTemplate="{DataTemplate pages:SoonPage}" Route="tags" />
-    <ShellContent ContentTemplate="{DataTemplate pages:SoonPage}" Route="settings" />
+    <ShellContent ContentTemplate="{DataTemplate pages:TrashPage}" Route="trash" />
+    <ShellContent ContentTemplate="{DataTemplate pages:TagsPage}" Route="tags" />
+    <ShellContent ContentTemplate="{DataTemplate pages:SettingsPage}" Route="settings" />
 
 </Shell>

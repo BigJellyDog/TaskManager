@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
+             xmlns:controls="clr-namespace:TaskManager.App.Controls"
+             x:Class="TaskManager.App.Pages.TagsPage"
+             x:DataType="vm:TagsViewModel"
+             Title="Теги">
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,240" ColumnSpacing="10">
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="Теги" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
+            </VerticalStackLayout>
+
+            <Border Grid.Column="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,0" HeightRequest="34" VerticalOptions="Center">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <controls:Icon Grid.Column="0" Kind="search" Size="15" Color="{DynamicResource InkMuted}" />
+                    <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Найти тег" FontSize="13"
+                           VerticalOptions="Center" MinimumHeightRequest="0" BackgroundColor="Transparent" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0" VerticalOptions="Start">
+            <Grid RowDefinitions="Auto,Auto">
+                <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
+                      ColumnDefinitions="*,220,280">
+                    <Label Grid.Column="0" Text="Тег" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Задач" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+
+                <VerticalStackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Rows}">
+                    <BindableLayout.EmptyView>
+                        <Label Text="Тегов нет" HorizontalOptions="Center" Margin="0,28" Style="{StaticResource CaptionLabel}" />
+                    </BindableLayout.EmptyView>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TagRowViewModel">
+                            <Grid MinimumHeightRequest="40" Padding="14,4" ColumnSpacing="10" ColumnDefinitions="*,220,280">
+                                <Grid.Triggers>
+                                    <DataTrigger TargetType="Grid" Binding="{Binding IsEditing}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource AccentSoft}" />
+                                    </DataTrigger>
+                                </Grid.Triggers>
+
+                                <!-- Обычный вид -->
+                                <Label Grid.Column="0" Text="{Binding DisplayName}" IsVisible="{Binding IsNotEditing}"
+                                       FontFamily="{StaticResource MonoFont}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                                <HorizontalStackLayout Grid.Column="1" Spacing="10" IsVisible="{Binding IsNotEditing}" VerticalOptions="Center">
+                                    <controls:BarMeter Fraction="{Binding Fraction}" FillColor="{DynamicResource Accent}" HeightRequest="6" WidthRequest="170" />
+                                    <Label Text="{Binding TaskCount}" FontFamily="{StaticResource MonoFont}" FontSize="13"
+                                           WidthRequest="24" HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}">
+                                    <controls:SignalButton Variant="Ghost" Icon="edit" Text="Переименовать" Compact="True"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=StartEditCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                    <controls:SignalButton Icon="trash" Text="Удалить" Compact="True" Variant="Ghost" IsEnabled="{Binding CanDelete}"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=DeleteCommand}"
+                                                           CommandParameter="{Binding .}">
+                                        <controls:SignalButton.Triggers>
+                                            <DataTrigger TargetType="controls:SignalButton" Binding="{Binding CanDelete}" Value="True">
+                                                <Setter Property="Variant" Value="Danger" />
+                                            </DataTrigger>
+                                        </controls:SignalButton.Triggers>
+                                    </controls:SignalButton>
+                                </HorizontalStackLayout>
+
+                                <!-- Правка -->
+                                <controls:InputBox Grid.Column="0" IsVisible="{Binding IsEditing}" HeightRequest="30">
+                                    <Entry Text="{Binding EditName}" FontFamily="{StaticResource MonoFont}" FontSize="13" FontAttributes="Bold"
+                                           VerticalOptions="Center" MinimumHeightRequest="0" BackgroundColor="Transparent"
+                                           ReturnCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=SaveEditCommand}"
+                                           ReturnCommandParameter="{Binding .}" />
+                                </controls:InputBox>
+                                <Label Grid.Column="1" Text="{Binding EditHint}" IsVisible="{Binding IsEditing}"
+                                       Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" VerticalOptions="Center" />
+                                <HorizontalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding IsEditing}">
+                                    <controls:SignalButton Variant="Primary" Text="Сохранить" Compact="True"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=SaveEditCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                    <controls:SignalButton Text="Отмена" Compact="True"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=CancelEditCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                </HorizontalStackLayout>
+
+                                <BoxView Grid.ColumnSpan="3" VerticalOptions="End" HeightRequest="1" Margin="-14,0" Color="{DynamicResource Line}" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <Label Grid.Row="2" Text="Переименование меняет тег во всех задачах. Удалить можно только тег, который не используется."
+               Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" />
+    </Grid>
+</ContentPage>
