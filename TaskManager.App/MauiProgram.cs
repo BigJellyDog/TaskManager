@@ -109,6 +109,7 @@ public static class MauiProgram
 
 		// Сервисы интерфейса.
 		builder.Services.AddSingleton<UserSettings>();
+		builder.Services.AddSingleton<HotKeyService>();
 		builder.Services.AddSingleton<ServiceRunner>();
 		builder.Services.AddSingleton<IDialogService, DialogService>();
 		builder.Services.AddSingleton<INavigationService, ShellNavigationService>();

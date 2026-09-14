@@ -48,7 +48,7 @@
             <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,0" HeightRequest="34">
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                     <controls:Icon Grid.Column="0" Kind="search" Size="15" Color="{DynamicResource InkMuted}" />
-                    <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Поиск по названию и описанию"
+                    <Entry x:Name="SearchEntry" Grid.Column="1" Text="{Binding SearchText}" Placeholder="Поиск по названию и описанию"
                            ReturnCommand="{Binding SearchCommand}" FontSize="13" VerticalOptions="Center"
                            MinimumHeightRequest="0" BackgroundColor="Transparent" />
                     <Border Grid.Column="2" Padding="5,0" StrokeShape="RoundRectangle 4" VerticalOptions="Center">

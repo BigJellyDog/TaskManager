@@ -1,4 +1,5 @@
-﻿using TaskManager.App.ViewModels;
+﻿using TaskManager.App.Services;
+using TaskManager.App.ViewModels;
 
 namespace TaskManager.App.Pages;
 
@@ -6,10 +7,13 @@ public partial class TasksPage : ContentPage
 {
     private readonly TasksViewModel _viewModel;
 
-    public TasksPage(TasksViewModel viewModel)
+    private readonly HotKeyService _hotKeys;
+
+    public TasksPage(TasksViewModel viewModel, HotKeyService hotKeys)
     {
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
+        _hotKeys = hotKeys;
 
         // Новая страница или новые фильтры: показываем список с начала, а не с прежней прокрутки.
         _viewModel.TasksReplaced += (_, _) =>
@@ -53,10 +57,25 @@ public partial class TasksPage : ContentPage
         }
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _hotKeys.Pressed -= OnHotKey;
+    }
+
+    private void OnHotKey(HotKeyAction action)
+    {
+        if (action == HotKeyAction.Search)
+        {
+            SearchEntry.Focus();
+        }
+    }
+
     // async void допустим для обработчика события жизненного цикла. Ошибки загрузки обрабатывает сама модель.
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        _hotKeys.Pressed += OnHotKey;
         await _viewModel.LoadAsync();
     }
 }

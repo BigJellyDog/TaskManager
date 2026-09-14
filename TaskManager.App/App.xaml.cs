@@ -30,6 +30,7 @@ public partial class App : Application
         var loading = new LoadingPage();
         var window = new Window(loading) { Title = "TaskManager", TitleBar = CreateTitleBar() };
 
+        window.HandlerChanged += (_, _) => _services.GetRequiredService<HotKeyService>().Attach(window);
         window.Created += async (_, _) => await StartAsync(window, loading);
         window.Destroying += (_, _) => _services.GetRequiredService<AppInitializer>().Shutdown();
 

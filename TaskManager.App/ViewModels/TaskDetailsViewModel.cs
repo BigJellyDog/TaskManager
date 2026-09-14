@@ -451,6 +451,15 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     /// «Выполнить», из завершённых «Переоткрыть». Если оно сейчас недоступно (не завершены подзадачи или зависимости),
     /// кнопка остаётся серой, а причина написана под ней.
     /// </summary>
+    /// <summary>Ctrl+D: выполняет задачу, если сейчас доступно действие «Выполнить» (а не «В работу» или «Переоткрыть»).</summary>
+    public void TryComplete()
+    {
+        if (PrimaryAction is { Title: "Выполнить", IsEnabled: true } action && action.Command.CanExecute(null))
+        {
+            action.Command.Execute(null);
+        }
+    }
+
     private void BuildActions(TaskItem task, IReadOnlyList<SubtaskEntry> subtasks)
     {
         var status = task.Status;
