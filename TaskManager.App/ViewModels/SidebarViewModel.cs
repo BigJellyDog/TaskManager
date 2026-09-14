@@ -46,8 +46,9 @@ public sealed partial class SidebarViewModel : ObservableObject
     private readonly INavigationService _navigation;
     private readonly ILogger<SidebarViewModel> _logger;
 
-    public SidebarViewModel(ServiceRunner runner, INavigationService navigation, ILogger<SidebarViewModel> logger)
+    public SidebarViewModel(ServiceRunner runner, INavigationService navigation, ReminderBannerViewModel reminders, ILogger<SidebarViewModel> logger)
     {
+        Reminders = reminders;
         _runner = runner;
         _navigation = navigation;
         _logger = logger;
@@ -65,6 +66,16 @@ public sealed partial class SidebarViewModel : ObservableObject
     }
 
     public ObservableCollection<NavItemViewModel> Items { get; }
+
+    /// <summary>Баннер напоминаний: в узкой панели вместо него показывается колокольчик со значком.</summary>
+    public ReminderBannerViewModel Reminders { get; }
+
+    /// <summary>Окно узкое (около 1024): панель сворачивается до значков.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsExpanded))]
+    private bool isCompact;
+
+    public bool IsExpanded => !IsCompact;
 
     /// <summary>Подсвечивает раздел по текущему адресу Shell (например, "//tasks/taskdetails?id=3" это «Задачи»).</summary>
     public void SelectRoute(string? location)

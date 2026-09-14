@@ -47,6 +47,13 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
     [ObservableProperty]
     private string title = string.Empty;
 
+    /// <summary>Сколько напоминаний активно: показывается значком у колокольчика в узкой панели.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasCount))]
+    private int count;
+
+    public bool HasCount => Count > 0 && _settings.ShowReminderBanner;
+
     [ObservableProperty]
     private string moreText = string.Empty;
 
@@ -101,6 +108,8 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
 
         IsVisible = ordered.Count > 0 && _settings.ShowReminderBanner;
         Title = $"Напоминания ({ordered.Count})";
+        Count = ordered.Count;
+        OnPropertyChanged(nameof(HasCount));
         HasMore = ordered.Count > MaxVisible;
         MoreText = HasMore ? $"… и ещё {ordered.Count - MaxVisible}" : string.Empty;
     }

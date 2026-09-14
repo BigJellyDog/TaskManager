@@ -239,7 +239,32 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     partial void OnSelectedTagChanged(FilterOption<string?>? value) => FilterChanged();
 
-    partial void OnSelectedSortChanged(FilterOption<IReadOnlyList<TaskSort>?>? value) => FilterChanged();
+    partial void OnSelectedSortChanged(FilterOption<IReadOnlyList<TaskSort>?>? value)
+    {
+        OnPropertyChanged(nameof(TitleHeader));
+        OnPropertyChanged(nameof(PriorityHeader));
+        OnPropertyChanged(nameof(DeadlineHeader));
+        FilterChanged();
+    }
+
+    // Заголовки колонок таблицы: стрелка стоит у колонки, по которой сейчас отсортировано.
+    public string TitleHeader => "Название" + Arrow(2);
+
+    public string PriorityHeader => "Приоритет" + Arrow(0);
+
+    public string DeadlineHeader => "Дедлайн" + Arrow(1);
+
+    private string Arrow(int sortOptionIndex) => ReferenceEquals(SelectedSort, SortOptions[sortOptionIndex]) ? " ↓" : string.Empty;
+
+    /// <summary>Нажатие на заголовок колонки: сортировка по названию, приоритету (с учётом срочности) или дедлайну.</summary>
+    [RelayCommand]
+    private void SortBy(string column) =>
+        SelectedSort = column switch
+        {
+            "title" => SortOptions[2],
+            "deadline" => SortOptions[1],
+            _ => SortOptions[0],
+        };
 
     partial void OnOnlyOverdueChanged(bool value) => FilterChanged();
 

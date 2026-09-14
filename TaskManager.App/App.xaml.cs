@@ -5,6 +5,9 @@ namespace TaskManager.App;
 
 public partial class App : Application
 {
+    // Окно уже этой ширины (в единицах интерфейса) показывает панель без подписей.
+    private const double CompactWidth = 1100;
+
     private readonly IServiceProvider _services;
 
     public App(IServiceProvider services)
@@ -30,6 +33,20 @@ public partial class App : Application
         var loading = new LoadingPage();
         var window = new Window(loading) { Title = "TaskManager", TitleBar = CreateTitleBar() };
 
+        // Узкое окно (около 1024): боковая панель сворачивается до значков, как в макете.
+        window.SizeChanged += (_, _) =>
+        {
+            var sidebar = _services.GetRequiredService<ViewModels.SidebarViewModel>();
+            var compact = window.Width is > 0 and < CompactWidth;
+            if (compact != sidebar.IsCompact)
+            {
+                sidebar.IsCompact = compact;
+                if (Shell.Current is { } shell)
+                {
+                    shell.FlyoutWidth = compact ? 56 : 207;
+                }
+            }
+        };
         window.HandlerChanged += (_, _) => _services.GetRequiredService<HotKeyService>().Attach(window);
         window.Created += async (_, _) => await StartAsync(window, loading);
         window.Destroying += (_, _) => _services.GetRequiredService<AppInitializer>().Shutdown();

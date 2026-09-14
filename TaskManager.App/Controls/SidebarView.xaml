@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
@@ -7,9 +7,9 @@
              x:DataType="vm:SidebarViewModel">
 
     <!-- Боковая панель Signal: марка, разделы с горячими клавишами, напоминания внизу. -->
-    <Grid BackgroundColor="{DynamicResource Side}" RowDefinitions="Auto,Auto,*,Auto" Padding="8,10,8,10">
+    <Grid BackgroundColor="{DynamicResource Side}" RowDefinitions="Auto,Auto,*,Auto" Padding="8,10,8,10" x:Name="SidebarGrid">
 
-        <Label Grid.Row="0" Margin="12,12,0,18" Style="{StaticResource MonoLabel}"
+        <Label Grid.Row="0" IsVisible="{Binding IsExpanded}" Margin="12,12,0,18" Style="{StaticResource MonoLabel}"
                TextColor="{DynamicResource Ink}" FontSize="12" FontAttributes="Bold" CharacterSpacing="2.5">
             <Label.FormattedText>
                 <FormattedString>
@@ -20,7 +20,7 @@
             </Label.FormattedText>
         </Label>
 
-        <VerticalStackLayout Grid.Row="1" Spacing="2" BindableLayout.ItemsSource="{Binding Items}">
+        <VerticalStackLayout Grid.Row="1" Spacing="2" Margin="0,0,0,0" BindableLayout.ItemsSource="{Binding Items}">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="vm:NavItemViewModel">
                     <VerticalStackLayout>
@@ -37,7 +37,7 @@
                                                       CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="0">
                                 <controls:Icon Grid.Column="0" Kind="{Binding Icon}" Size="18" Color="{DynamicResource InkMuted}">
                                     <controls:Icon.Triggers>
                                         <DataTrigger TargetType="controls:Icon" Binding="{Binding IsSelected}" Value="True">
@@ -45,7 +45,7 @@
                                         </DataTrigger>
                                     </controls:Icon.Triggers>
                                 </controls:Icon>
-                                <Label Grid.Column="1" Text="{Binding Title}" FontSize="13" TextColor="{DynamicResource InkMuted}"
+                                <Label Grid.Column="1" Margin="10,0,0,0" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:SidebarViewModel}}, Path=IsExpanded}" Text="{Binding Title}" FontSize="13" TextColor="{DynamicResource InkMuted}"
                                        FontAttributes="None" VerticalOptions="Center">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
@@ -54,9 +54,9 @@
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
-                                <Label Grid.Column="2" Text="{Binding Count}" IsVisible="{Binding HasCount}"
+                                <Label Grid.Column="2" Margin="10,0,0,0" Text="{Binding Count}" IsVisible="{Binding HasCount}"
                                        FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
-                                <Border Grid.Column="3" Padding="5,0" StrokeShape="RoundRectangle 4" VerticalOptions="Center">
+                                <Border Grid.Column="3" Margin="10,0,0,0" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:SidebarViewModel}}, Path=IsExpanded}" Padding="5,0" StrokeShape="RoundRectangle 4" VerticalOptions="Center">
                                     <Label Text="{Binding Hint}" FontFamily="{StaticResource MonoFont}" FontSize="11"
                                            TextColor="{DynamicResource InkMuted}" />
                                 </Border>
@@ -67,7 +67,18 @@
             </BindableLayout.ItemTemplate>
         </VerticalStackLayout>
 
-        <controls:ReminderBanner Grid.Row="3" />
+        <Grid Grid.Row="3" IsVisible="{Binding IsExpanded}">
+            <controls:ReminderBanner />
+        </Grid>
+
+        <!-- Узкая панель: вместо баннера колокольчик со значком числа напоминаний -->
+        <Grid Grid.Row="3" IsVisible="{Binding IsCompact}" WidthRequest="40" HeightRequest="40" HorizontalOptions="Center">
+            <controls:Icon Kind="bell" Size="18" Color="{DynamicResource InkMuted}" />
+            <Border IsVisible="{Binding Reminders.HasCount}" BackgroundColor="{DynamicResource PCrit}" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 7" Padding="4,0" HorizontalOptions="End" VerticalOptions="Start" Margin="0,2,2,0">
+                <Label Text="{Binding Reminders.Count}" FontSize="10" TextColor="White" />
+            </Border>
+        </Grid>
     </Grid>
 
 </ContentView>
