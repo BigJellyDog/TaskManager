@@ -228,8 +228,38 @@ public sealed partial class TasksViewModel : ViewModelBase
     /// <summary>Вызывается при показе страницы: подгружает теги и список (данные могли измениться на других экранах).</summary>
     public async Task LoadAsync()
     {
+        ApplyListIntent();
         await RunAsync(LoadTagsAsync, "Не удалось загрузить теги");
         await ReloadAsync();
+    }
+
+    /// <summary>Открыли из статистики: показываем список с нужным фильтром вместо прежнего.</summary>
+    private void ApplyListIntent()
+    {
+        if (ListIntent.Take() is not { } intent)
+        {
+            return;
+        }
+
+        IsBoard = false;
+        ResetFilterValues();
+
+        _suppressReload = true;
+        try
+        {
+            if (intent == ListIntent.Overdue)
+            {
+                OnlyOverdue = true;
+            }
+            else if (intent == ListIntent.Blocked)
+            {
+                SelectedStatus = StatusOptions.First(o => o.Value == TaskStatus.Blocked);
+            }
+        }
+        finally
+        {
+            _suppressReload = false;
+        }
     }
 
     // Изменение любого фильтра перезагружает список с первой страницы.
@@ -413,7 +443,7 @@ public sealed partial class TasksViewModel : ViewModelBase
             SelectedTag = TagOptions.Count > 0 ? TagOptions[0] : AllTags;
             SelectedSort = SortOptions[0];
             OnlyOverdue = false;
-            HideClosed = false;
+            HideClosed = _settings.HideClosed;
             DueToday = false;
             DueThisWeek = false;
             UseDeadlineFrom = false;

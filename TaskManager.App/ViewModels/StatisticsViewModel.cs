@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -32,11 +32,13 @@ public sealed partial class StatisticsViewModel : ViewModelBase
     private static readonly CultureInfo Ru = CultureInfo.GetCultureInfo("ru-RU");
 
     private readonly ServiceRunner _runner;
+    private readonly INavigationService _navigation;
 
-    public StatisticsViewModel(ServiceRunner runner, IDialogService dialogs, ILogger<StatisticsViewModel> logger)
+    public StatisticsViewModel(ServiceRunner runner, INavigationService navigation, IDialogService dialogs, ILogger<StatisticsViewModel> logger)
         : base(dialogs, logger)
     {
         _runner = runner;
+        _navigation = navigation;
     }
 
     public ObservableCollection<PriorityBarViewModel> Bars { get; } = [];
@@ -102,6 +104,20 @@ public sealed partial class StatisticsViewModel : ViewModelBase
     public bool IsAllTime => Period == StatisticsPeriod.AllTime;
 
     public Task LoadAsync() => RunAsync(LoadCoreAsync, "Не удалось загрузить статистику");
+
+    [RelayCommand]
+    private Task ShowOverdueAsync()
+    {
+        ListIntent.Request(ListIntent.Overdue);
+        return _navigation.GoToAsync("//tasks");
+    }
+
+    [RelayCommand]
+    private Task ShowBlockedAsync()
+    {
+        ListIntent.Request(ListIntent.Blocked);
+        return _navigation.GoToAsync("//tasks");
+    }
 
     [RelayCommand]
     private async Task RefreshAsync() => await LoadAsync();
