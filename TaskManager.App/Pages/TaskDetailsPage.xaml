@@ -225,7 +225,7 @@
                             <Label Text="{Binding PrimaryReason}" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
                         </HorizontalStackLayout>
 
-                        <FlexLayout Wrap="Wrap" JustifyContent="SpaceBetween" AlignItems="Start" AlignContent="Start" BindableLayout.ItemsSource="{Binding SecondaryActions}">
+                        <FlexLayout Wrap="Wrap" JustifyContent="SpaceBetween" AlignItems="Start" AlignContent="Start" Padding="0,2,0,0" BindableLayout.ItemsSource="{Binding SecondaryActions}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ActionButtonViewModel">
                                     <controls:SignalButton Variant="{Binding Variant}" Icon="{Binding Icon}" Text="{Binding Title}" Command="{Binding Command}"

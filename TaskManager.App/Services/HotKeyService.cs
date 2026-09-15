@@ -1,4 +1,4 @@
-namespace TaskManager.App.Services;
+﻿namespace TaskManager.App.Services;
 
 /// <summary>Действие, которое страница выполняет по горячей клавише (общие переходы сервис делает сам).</summary>
 public enum HotKeyAction
@@ -41,9 +41,9 @@ public sealed class HotKeyService
 #if WINDOWS
         if (window.Handler?.PlatformView is Microsoft.UI.Xaml.Window native && native.Content is { } root)
         {
-            // handledEventsToo: Entry и Editor помечают нажатия обработанными, но Ctrl+Enter и Esc нужны и из них.
+            // Перехватываем до поля ввода (PreviewKeyDown): иначе Ctrl+N вписал бы «n» в строку поиска, а Ctrl+Enter и Esc не дошли бы до нас.
             root.AddHandler(
-                Microsoft.UI.Xaml.UIElement.KeyDownEvent,
+                Microsoft.UI.Xaml.UIElement.PreviewKeyDownEvent,
                 new Microsoft.UI.Xaml.Input.KeyEventHandler((_, e) => OnKeyDown(e)),
                 handledEventsToo: true);
         }

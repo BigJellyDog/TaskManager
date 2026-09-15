@@ -1,4 +1,4 @@
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace TaskManager.App.Controls;
@@ -191,7 +191,12 @@ public sealed class SignalButton : Border
         _icon.IsVisible = icon.Length > 0;
         _hint.Text = hint;
         _hintBox.IsVisible = hint.Length > 0;
-        HeightRequest = Compact ? 28 : 32;
+        // Высоту, заданную в XAML (например, 42 у главной кнопки карточки), не затираем: стандартные 28/32 подставляем сами.
+        if (HeightRequest is -1 or 28 or 32)
+        {
+            HeightRequest = Compact ? 28 : 32;
+        }
+
         Padding = Compact ? new Thickness(10, 0) : new Thickness(14, 0);
         _label.FontAttributes = Compact || Variant is ButtonVariant.Ghost ? FontAttributes.None : FontAttributes.Bold;
 
