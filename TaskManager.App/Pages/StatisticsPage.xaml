@@ -184,7 +184,7 @@
         </Grid>
 
         <!-- Три панели: приоритеты, выполнено по дням, дедлайны на 7 дней -->
-        <Grid Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="10">
+        <Grid x:Name="ChartsRow" Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Открытые по приоритетам" Style="{StaticResource PanelTitle}" />
@@ -231,7 +231,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource Panel}">
+            <Border x:Name="DeadlinesPanel" Grid.Column="2" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Дедлайны на 7 дней" Style="{StaticResource PanelTitle}" />
                     <FlexLayout BindableLayout.ItemsSource="{Binding DeadlineColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
@@ -255,7 +255,7 @@
         </Grid>
 
         <!-- Две панели: статусы и теги -->
-        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
+        <Grid x:Name="BottomRow" Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Открытые по статусам" Style="{StaticResource PanelTitle}" />
