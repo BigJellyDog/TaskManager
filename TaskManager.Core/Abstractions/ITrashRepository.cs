@@ -1,4 +1,4 @@
-using TaskManager.Core.Services;
+﻿using TaskManager.Core.Services;
 
 namespace TaskManager.Core.Abstractions;
 
@@ -10,6 +10,9 @@ public interface ITrashRepository
     /// Подзадачи удалённой задачи отдельными строками не показываются, они учтены в счётчике.
     /// </summary>
     Task<IReadOnlyList<TrashEntry>> ListAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Сколько строк в корзине (удалённых задач верхнего уровня). Дешёвый счётчик для боковой панели.</summary>
+    Task<int> CountAsync(CancellationToken cancellationToken = default);
 
     /// <summary>Идентификаторы удалённых потомков задачи (подзадачи любой глубины), родители раньше детей.</summary>
     Task<IReadOnlyList<int>> GetDeletedDescendantIdsAsync(int rootId, CancellationToken cancellationToken = default);

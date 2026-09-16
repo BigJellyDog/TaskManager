@@ -20,7 +20,7 @@
                 <Grid ColumnDefinitions="Auto,Auto">
                     <Border x:Name="BoardTab" Grid.Column="0" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
                         <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                            <controls:Icon x:Name="BoardIcon" Kind="board" Size="14" />
+                            <controls:Icon x:Name="BoardIcon" Kind="board" Size="16" />
                             <Label x:Name="BoardLabel" Text="Доска" FontSize="12" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Border.GestureRecognizers>
@@ -29,7 +29,7 @@
                     </Border>
                     <Border x:Name="ListTab" Grid.Column="1" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
                         <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                            <controls:Icon x:Name="ListIcon" Kind="list" Size="14" />
+                            <controls:Icon x:Name="ListIcon" Kind="list" Size="16" />
                             <Label x:Name="ListLabel" Text="Список" FontSize="12" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Border.GestureRecognizers>

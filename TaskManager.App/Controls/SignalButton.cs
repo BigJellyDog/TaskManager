@@ -233,6 +233,9 @@ public sealed class SignalButton : Border
             };
         }
 
+        // Прежнее значение фона (прозрачный у прозрачной кнопки, посветлевший у основной под указателем) мешало бы ресурсу.
+        ClearValue(BackgroundColorProperty);
+
         var hovering = _hover && enabled;
         if (hovering && Variant is ButtonVariant.Secondary or ButtonVariant.Danger or ButtonVariant.Ghost)
         {

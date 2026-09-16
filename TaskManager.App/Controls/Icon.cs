@@ -129,7 +129,7 @@ internal static class IconPaths
             ["subtask"] = [("M15 10L20 15L15 20", false), ("M4 4v7a4 4 0 0 0 4 4h12", false)], // corner-down-right
             ["done"] = [("M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0", false), ("m9 12 2 2 4-4", false)], // circle-check
             ["chevron-down"] = [("m6 9 6 6 6-6", false)], // chevron-down
-            ["list"] = [("M3 12h.01", false), ("M3 18h.01", false), ("M3 6h.01", false), ("M8 12h13", false), ("M8 18h13", false), ("M8 6h13", false)], // list
+            ["list"] = [("M9 6h12", false), ("M9 12h12", false), ("M9 18h12", false), ("M2.5 6a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0", true), ("M2.5 12a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0", true), ("M2.5 18a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0", true)], // list
             ["bell"] = [("M10.268 21a2 2 0 0 0 3.464 0", false), ("M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326", false)], // bell
             ["plus"] = [("M5 12h14", false), ("M12 5v14", false)], // plus
             ["chevron-left"] = [("m15 18-6-6 6-6", false)], // chevron-left

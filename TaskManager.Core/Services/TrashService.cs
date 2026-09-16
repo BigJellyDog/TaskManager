@@ -1,4 +1,4 @@
-using TaskManager.Core.Abstractions;
+﻿using TaskManager.Core.Abstractions;
 using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Core.Services;
@@ -25,6 +25,8 @@ public class TrashService
 
     public Task<IReadOnlyList<TrashEntry>> ListAsync(CancellationToken cancellationToken = default) =>
         _trash.ListAsync(cancellationToken);
+
+    public Task<int> CountAsync(CancellationToken cancellationToken = default) => _trash.CountAsync(cancellationToken);
 
     /// <summary>Восстанавливает задачи вместе с их удалёнными подзадачами. Возвращает число восстановленных задач.</summary>
     public async Task<int> RestoreAsync(IReadOnlyCollection<int> ids, CancellationToken cancellationToken = default)

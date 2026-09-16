@@ -98,7 +98,7 @@ public sealed partial class SidebarViewModel : ObservableObject
             var page = await _runner.RunAsync(sp => sp.GetRequiredService<TaskService>().SearchAsync(new TaskFilter(), pageSize: 1));
             Items[0].Count = page.TotalCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-            var trashed = (await _runner.RunAsync(sp => sp.GetRequiredService<TrashService>().ListAsync())).Count;
+            var trashed = await _runner.RunAsync(sp => sp.GetRequiredService<TrashService>().CountAsync());
             Items[3].Count = trashed == 0 ? string.Empty : trashed.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 #pragma warning disable CA1031 // Счётчик в панели не должен ронять приложение.

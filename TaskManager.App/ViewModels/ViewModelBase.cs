@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using TaskManager.App.Services;
 
 namespace TaskManager.App.ViewModels;

@@ -103,15 +103,10 @@ public sealed class HoverBehavior : Behavior<View>
 
         if (HoverBackground.Length > 0)
         {
-            if (on)
-            {
-                _view.SetDynamicResource(VisualElement.BackgroundColorProperty, HoverBackground);
-            }
-            else
-            {
-                _view.RemoveDynamicResource(VisualElement.BackgroundColorProperty);
-                _view.BackgroundColor = Colors.Transparent;
-            }
+            // Фон в XAML задан значением, а оно сильнее динамического ресурса, поэтому цвет подставляем сами.
+            _view.BackgroundColor = on && Application.Current?.Resources.TryGetValue(HoverBackground, out var value) == true && value is Color color
+                ? color
+                : Colors.Transparent;
         }
 
         if (HoverStroke.Length > 0 && _view is Border border)

@@ -47,7 +47,11 @@ public partial class App : Application
                 }
             }
         };
-        window.HandlerChanged += (_, _) => _services.GetRequiredService<HotKeyService>().Attach(window);
+        window.HandlerChanged += (_, _) =>
+        {
+            _services.GetRequiredService<HotKeyService>().Attach(window);
+            ThemeManager.AttachWindow(window);
+        };
         window.Created += async (_, _) => await StartAsync(window, loading);
         window.Destroying += (_, _) => _services.GetRequiredService<AppInitializer>().Shutdown();
 

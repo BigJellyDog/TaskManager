@@ -106,5 +106,12 @@ public sealed class TaskRowViewModel
     /// <summary>Прогресс подзадач вида "1/2" (пусто, если подзадач нет).</summary>
     public string ProgressText { get; }
 
+    /// <summary>
+    /// Всё, что видно в строке. Если подписи двух выборок совпадают, список на экране не перестраивается:
+    /// переключение вкладок не пересоздаёт десятки карточек, когда данные не менялись.
+    /// </summary>
+    public string Signature =>
+        $"{Id}|{RowVersion}|{Title}|{StatusText}|{PriorityText}|{TagsText}|{ParentTitle}|{ProgressText}|{DeadlineText}|{IsOverdue}";
+
     public bool HasProgress => ProgressText.Length > 0;
 }

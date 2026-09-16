@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Abstractions;
 using TaskManager.Core.Domain;
 using TaskManager.Core.Services;
@@ -44,6 +44,14 @@ public class TrashRepository : ITrashRepository
             .OrderByDescending(e => e.DeletedAt)
             .ThenByDescending(e => e.Id)
             .ToList();
+    }
+
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        var all = AllTasks;
+        return await all
+            .Where(t => t.IsDeleted && (t.ParentId == null || !all.Any(p => p.Id == t.ParentId && p.IsDeleted)))
+            .CountAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<int>> GetDeletedDescendantIdsAsync(int rootId, CancellationToken cancellationToken = default)

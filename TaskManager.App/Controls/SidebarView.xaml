@@ -26,7 +26,7 @@
                     <VerticalStackLayout>
                         <BoxView HeightRequest="1" Margin="4,8,4,8" IsVisible="{Binding SeparatorAbove}" />
 
-                        <Border x:Name="Row" Padding="10,8" BackgroundColor="Transparent" Stroke="Transparent" StrokeShape="RoundRectangle 6">
+                        <Border x:Name="Row" Padding="10,0" HeightRequest="34" BackgroundColor="Transparent" Stroke="Transparent" StrokeShape="RoundRectangle 6">
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
                                     <Setter Property="BackgroundColor" Value="{DynamicResource AccentSoft}" />
@@ -40,7 +40,7 @@
                                                       CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="0" VerticalOptions="Center">
                                 <controls:Icon Grid.Column="0" Kind="{Binding Icon}" Size="18" Color="{DynamicResource InkMuted}">
                                     <controls:Icon.Triggers>
                                         <DataTrigger TargetType="controls:Icon" Binding="{Binding IsSelected}" Value="True">
@@ -48,7 +48,7 @@
                                         </DataTrigger>
                                     </controls:Icon.Triggers>
                                 </controls:Icon>
-                                <Label Grid.Column="1" Margin="10,0,0,0" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:SidebarViewModel}}, Path=IsExpanded}" Text="{Binding Title}" FontSize="13" TextColor="{DynamicResource InkMuted}"
+                                <Label Grid.Column="1" Margin="10,0,0,0" HeightRequest="18" VerticalTextAlignment="Center" LineBreakMode="NoWrap" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:SidebarViewModel}}, Path=IsExpanded}" Text="{Binding Title}" FontSize="13" TextColor="{DynamicResource InkMuted}"
                                        FontAttributes="None" VerticalOptions="Center">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">

@@ -511,73 +511,113 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     private async Task LoadPageAsync()
     {
-        var result = await FetchAsync(Page);
-
-        // Страниц стало меньше (например, задачи удалили на другом экране): переходим на последнюю.
-        if (result.Items.Count == 0 && result.TotalCount > 0 && Page > result.TotalPages)
-        {
-            Page = result.TotalPages;
-            result = await FetchAsync(Page);
-        }
-
         var now = _clock.GetUtcNow();
         var zone = _clock.LocalTimeZone;
+        var changed = false;
 
-        Tasks.Clear();
-        foreach (var task in result.Items)
-        {
-            Tasks.Add(new TaskRowViewModel(task, now, zone));
-        }
-
-        TotalCount = result.TotalCount;
-        TotalPages = result.TotalPages;
-        await LoadCountsAsync();
+        // Загружаем только то, что видно: на доске колонки, в списке одну страницу.
         if (IsBoard)
         {
-            await LoadBoardAsync(now, zone);
+            changed |= await LoadBoardAsync(now, zone);
+        }
+        else
+        {
+            var result = await FetchAsync(Page);
+
+            // Страниц стало меньше (например, задачи удалили на другом экране): переходим на последнюю.
+            if (result.Items.Count == 0 && result.TotalCount > 0 && Page > result.TotalPages)
+            {
+                Page = result.TotalPages;
+                result = await FetchAsync(Page);
+            }
+
+            changed |= Sync(Tasks, result.Items.Select(t => new TaskRowViewModel(t, now, zone)).ToList());
+            TotalCount = result.TotalCount;
+            TotalPages = result.TotalPages;
         }
 
-        TasksReplaced?.Invoke(this, EventArgs.Empty);
+        await LoadCountsAsync();
+
+        if (changed)
+        {
+            TasksReplaced?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>Заменяет содержимое списка, только если оно изменилось. Возвращает, менялось ли оно.</summary>
+    private static bool Sync(ObservableCollection<TaskRowViewModel> target, IReadOnlyList<TaskRowViewModel> fresh)
+    {
+        if (target.Count == fresh.Count && target.Zip(fresh).All(pair => pair.First.Signature == pair.Second.Signature))
+        {
+            return false;
+        }
+
+        target.Clear();
+        foreach (var row in fresh)
+        {
+            target.Add(row);
+        }
+
+        return true;
     }
 
     /// <summary>
     /// Доска: четыре колонки по статусам. Поиск, теги и быстрые фильтры действуют и здесь, а фильтр по статусу нет:
-    /// статус задаёт сама колонка. Отменённые на доске не показываются.
+    /// статус задаёт сама колонка. Отменённые на доске не показываются. Колонки читаются одновременно.
     /// </summary>
-    private async Task LoadBoardAsync(DateTimeOffset now, TimeZoneInfo zone)
+    private async Task<bool> LoadBoardAsync(DateTimeOffset now, TimeZoneInfo zone)
     {
-        async Task FillAsync(TaskStatus status, ObservableCollection<TaskRowViewModel> column, Action<int> setCount)
+        Task<PagedResult<TaskItem>> Fetch(TaskStatus status)
         {
             var filter = BuildFilter() with { Statuses = [status] };
-            var result = await _runner.RunAsync(sp =>
-                sp.GetRequiredService<TaskService>().SearchAsync(filter, SelectedSort?.Value, 1, TaskQuery.MaxPageSize));
-
-            column.Clear();
-            foreach (var task in result.Items)
-            {
-                column.Add(new TaskRowViewModel(task, now, zone));
-            }
-
-            setCount(result.TotalCount);
+            var sort = SelectedSort?.Value;
+            return _runner.RunAsync(sp =>
+                sp.GetRequiredService<TaskService>().SearchAsync(filter, sort, 1, TaskQuery.MaxPageSize));
         }
 
-        await FillAsync(TaskStatus.Todo, TodoColumn, c => TodoCount = c);
-        await FillAsync(TaskStatus.InProgress, InProgressColumn, c => InProgressCount = c);
-        await FillAsync(TaskStatus.Blocked, BlockedColumn, c => BlockedColumnCount = c);
-        await FillAsync(TaskStatus.Done, DoneColumn, c => DoneCount = c);
+        var todo = Fetch(TaskStatus.Todo);
+        var progress = Fetch(TaskStatus.InProgress);
+        var blocked = Fetch(TaskStatus.Blocked);
+        var done = Fetch(TaskStatus.Done);
+        await Task.WhenAll(todo, progress, blocked, done);
+
+        List<TaskRowViewModel> Rows(PagedResult<TaskItem> result) => result.Items.Select(t => new TaskRowViewModel(t, now, zone)).ToList();
+
+        var changed = Sync(TodoColumn, Rows(todo.Result));
+        changed |= Sync(InProgressColumn, Rows(progress.Result));
+        changed |= Sync(BlockedColumn, Rows(blocked.Result));
+        changed |= Sync(DoneColumn, Rows(done.Result));
+
+        TodoCount = todo.Result.TotalCount;
+        InProgressCount = progress.Result.TotalCount;
+        BlockedColumnCount = blocked.Result.TotalCount;
+        DoneCount = done.Result.TotalCount;
+        return changed;
     }
 
     /// <summary>Счётчики чипов и подзаголовка. Считаются без учёта остальных фильтров: это размер выборки, а не её видимой части.</summary>
     private async Task LoadCountsAsync()
     {
-        async Task<int> CountAsync(TaskFilter filter) =>
-            (await _runner.RunAsync(sp => sp.GetRequiredService<TaskService>().SearchAsync(filter, pageSize: 1))).TotalCount;
+        // Все пять счётчиков в одной области зависимостей: одна база, один контекст, без пяти пересозданий.
+        var counts = await _runner.RunAsync(async sp =>
+        {
+            var service = sp.GetRequiredService<TaskService>();
 
-        OverdueCount = await CountAsync(new TaskFilter(OnlyOverdue: true));
-        TodayCount = await CountAsync(new TaskFilter(DueToday: true));
-        WeekCount = await CountAsync(new TaskFilter(DueThisWeek: true));
-        BlockedCount = await CountAsync(new TaskFilter(Statuses: [TaskStatus.Blocked]));
-        AllCount = await CountAsync(new TaskFilter());
+            async Task<int> CountAsync(TaskFilter filter) => (await service.SearchAsync(filter, pageSize: 1)).TotalCount;
+
+            return (
+                Overdue: await CountAsync(new TaskFilter(OnlyOverdue: true)),
+                Today: await CountAsync(new TaskFilter(DueToday: true)),
+                Week: await CountAsync(new TaskFilter(DueThisWeek: true)),
+                Blocked: await CountAsync(new TaskFilter(Statuses: [TaskStatus.Blocked])),
+                All: await CountAsync(new TaskFilter()));
+        });
+
+        OverdueCount = counts.Overdue;
+        TodayCount = counts.Today;
+        WeekCount = counts.Week;
+        BlockedCount = counts.Blocked;
+        AllCount = counts.All;
     }
 
     private static string Plural(int count, string one, string few, string many)
