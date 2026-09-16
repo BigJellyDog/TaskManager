@@ -32,6 +32,9 @@
                                     <Setter Property="BackgroundColor" Value="{DynamicResource AccentSoft}" />
                                 </DataTrigger>
                             </Border.Triggers>
+                            <Border.Behaviors>
+                                <controls:HoverBehavior HoverBackground="SurfaceRaised" IsSuppressed="{Binding IsSelected}" />
+                            </Border.Behaviors>
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SidebarViewModel}}, Path=OpenCommand}"
                                                       CommandParameter="{Binding .}" />

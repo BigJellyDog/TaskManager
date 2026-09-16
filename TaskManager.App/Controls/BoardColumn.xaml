@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
@@ -24,6 +24,9 @@
                     <DataTemplate x:DataType="vm:TaskRowViewModel">
                         <Border Margin="0,0,0,8" Padding="12,10" StrokeShape="RoundRectangle 5" StrokeThickness="1"
                                 BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}">
+                            <Border.Behaviors>
+                                <controls:HoverBehavior HoverStroke="AccentBrush" RestStroke="LineBrush" IsSuppressed="{Binding IsOverdue}" />
+                            </Border.Behaviors>
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border" Binding="{Binding IsOverdue}" Value="True">
                                     <Setter Property="Stroke" Value="{DynamicResource PCritBrush}" />

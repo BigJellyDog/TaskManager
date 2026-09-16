@@ -105,6 +105,9 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="vm:TaskRowViewModel">
                             <Grid HeightRequest="40" Padding="12,0" ColumnSpacing="8" ColumnDefinitions="30,28,*,190,130,130" BackgroundColor="Transparent">
+                                <Grid.Behaviors>
+                                    <controls:HoverBehavior HoverBackground="SurfaceRaised" />
+                                </Grid.Behaviors>
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TasksViewModel}}, Path=OpenTaskCommand}"
                                                           CommandParameter="{Binding .}" />

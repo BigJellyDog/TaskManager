@@ -45,6 +45,7 @@ public sealed class SignalButton : Border
     private readonly Label _label = new() { FontSize = 13, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center };
     private readonly Label _hint = new() { FontFamily = "Consolas", FontSize = 11, VerticalOptions = LayoutOptions.Center };
     private readonly Border _hintBox;
+    private bool _hover;
     private readonly HorizontalStackLayout _row = new() { Spacing = 7, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 
     public SignalButton()
@@ -79,6 +80,13 @@ public sealed class SignalButton : Border
             }
         };
         GestureRecognizers.Add(tap);
+
+        // Под указателем: обычная и опасная кнопки светлеют до «приподнятой» поверхности, прозрачная получает такой же
+        // фон и яркий текст, основная становится чуть ярче.
+        var pointer = new PointerGestureRecognizer();
+        pointer.PointerEntered += (_, _) => SetHover(true);
+        pointer.PointerExited += (_, _) => SetHover(false);
+        GestureRecognizers.Add(pointer);
 
         Apply();
     }
@@ -142,6 +150,9 @@ public sealed class SignalButton : Border
         }
     }
 
+    private static Color? TryGetColor(string key) =>
+        Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color ? color : null;
+
     private static void OnChanged(BindableObject bindable, object oldValue, object newValue) => ((SignalButton)bindable).Apply();
 
     private static void OnCommandChanged(BindableObject bindable, object? oldValue, object? newValue)
@@ -158,6 +169,12 @@ public sealed class SignalButton : Border
         }
 
         button.Apply();
+    }
+
+    private void SetHover(bool hover)
+    {
+        _hover = hover;
+        Apply();
     }
 
     private void OnCanExecuteChanged(object? sender, EventArgs e) => MainThread.BeginInvokeOnMainThread(Apply);
@@ -216,7 +233,22 @@ public sealed class SignalButton : Border
             };
         }
 
-        if (background.Length > 0)
+        var hovering = _hover && enabled;
+        if (hovering && Variant is ButtonVariant.Secondary or ButtonVariant.Danger or ButtonVariant.Ghost)
+        {
+            background = "SurfaceRaised";
+            if (Variant == ButtonVariant.Ghost)
+            {
+                foreground = "Ink";
+            }
+        }
+
+        if (hovering && Variant == ButtonVariant.Primary && TryGetColor("Accent") is { } accent)
+        {
+            // Чуть ярче (в макете filter: brightness(1.06)).
+            BackgroundColor = accent.WithLuminosity(Math.Min(1f, accent.GetLuminosity() * 1.06f));
+        }
+        else if (background.Length > 0)
         {
             this.SetDynamicResource(BackgroundColorProperty, background);
         }
