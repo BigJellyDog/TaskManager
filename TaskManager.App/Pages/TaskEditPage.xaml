@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
@@ -197,12 +197,12 @@
                                            FontFamily="{StaticResource MonoFont}" FontSize="12" WidthRequest="110" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </controls:InputBox>
-                            <HorizontalStackLayout Spacing="8" IsVisible="{Binding HasExistingTags}">
-                                <Label Text="Уже есть:" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
-                                <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding ExistingTags}">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding HasExistingTags}">
+                                <Label Grid.Column="0" Text="Уже есть:" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                                <FlexLayout Grid.Column="1" Wrap="Wrap" BindableLayout.ItemsSource="{Binding ExistingTags}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="x:String">
-                                            <Label Text="{Binding ., StringFormat='#{0}'}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                            <Label Margin="0,0,10,2" Text="{Binding ., StringFormat='#{0}'}" FontFamily="{StaticResource MonoFont}" FontSize="12"
                                                    TextColor="{DynamicResource InkMuted}" VerticalOptions="Center">
                                                 <Label.GestureRecognizers>
                                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TaskEditViewModel}}, Path=PickTagCommand}"
@@ -211,8 +211,8 @@
                                             </Label>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
-                                </HorizontalStackLayout>
-                            </HorizontalStackLayout>
+                                </FlexLayout>
+                            </Grid>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
 

@@ -134,13 +134,12 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
 
     private static string Describe(Reminder reminder, TimeZoneInfo zone)
     {
-        var when = TimeZoneInfo.ConvertTime(reminder.Deadline, zone).ToString("dd.MM HH:mm", CultureInfo.InvariantCulture);
-
+        // Коротко, как в макете: срок виден на карточке задачи, в баннере важна только срочность.
         var state = reminder.Kind switch
         {
-            ReminderKind.Overdue => $"просрочена (дедлайн {when})",
-            ReminderKind.DueIn1Hour => $"меньше часа до дедлайна ({when})",
-            _ => $"меньше суток до дедлайна ({when})",
+            ReminderKind.Overdue => "просрочена",
+            ReminderKind.DueIn1Hour => "меньше часа",
+            _ => "меньше суток",
         };
 
         return $"«{reminder.Title}»: {state}";

@@ -14,6 +14,38 @@ public partial class TaskDetailsPage : ContentPage
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
         _hotKeys = hotKeys;
+
+        // Дополнительные действия: сетка в две колонки, пересобирается при смене статуса.
+        _viewModel.SecondaryActions.CollectionChanged += (_, _) => BuildSecondaryActions();
+        BuildSecondaryActions();
+    }
+
+    private void BuildSecondaryActions()
+    {
+        SecondaryGrid.Children.Clear();
+        SecondaryGrid.RowDefinitions.Clear();
+
+        var actions = _viewModel.SecondaryActions;
+        for (var i = 0; i < actions.Count; i++)
+        {
+            if (i % 2 == 0)
+            {
+                SecondaryGrid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+            }
+
+            var action = actions[i];
+            var button = new Controls.SignalButton
+            {
+                Variant = action.Variant,
+                Icon = action.Icon,
+                Text = action.Title,
+                Command = action.Command,
+                IsEnabled = action.IsEnabled,
+                HorizontalOptions = LayoutOptions.Fill,
+                HeightRequest = 34,
+            };
+            SecondaryGrid.Add(button, i % 2, i / 2);
+        }
     }
 
     protected override void OnDisappearing()
