@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Shapes;
 
@@ -92,10 +92,10 @@ public sealed class ToggleChip : Border
 }
 
 /// <summary>
-/// Выпадающий чип «СТАТУС ▾». Внешний вид рисуем сами, а список открывает невидимый Picker поверх: так остаётся
-/// штатное поведение выбора. Если выбран не первый пункт («Все …»), на чипе подпись выбранного.
+/// Выпадающий чип «СТАТУС ▾» из макета: рамка 1 px, моноширинная подпись заглавными. Нажатие открывает список в стиле
+/// Signal под чипом. Если выбран не первый пункт («Все …»), на чипе подпись выбранного, а рамка и текст акцентные.
 /// </summary>
-public sealed class DropChip : Grid
+public sealed class DropChip : Border
 {
     public static readonly BindableProperty TitleProperty =
         BindableProperty.Create(nameof(Title), typeof(string), typeof(DropChip), string.Empty, propertyChanged: OnChanged);
@@ -104,9 +104,8 @@ public sealed class DropChip : Grid
         BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(DropChip), null, propertyChanged: OnItemsChanged);
 
     public static readonly BindableProperty SelectedItemProperty =
-        BindableProperty.Create(nameof(SelectedItem), typeof(object), typeof(DropChip), null, BindingMode.TwoWay, propertyChanged: OnSelectedChanged);
+        BindableProperty.Create(nameof(SelectedItem), typeof(object), typeof(DropChip), null, BindingMode.TwoWay, propertyChanged: OnChanged);
 
-    private readonly Picker _picker = new() { Opacity = 0.011, BackgroundColor = Colors.Transparent };
     private readonly Label _label = new()
     {
         FontFamily = "Consolas",
@@ -116,35 +115,20 @@ public sealed class DropChip : Grid
         VerticalOptions = LayoutOptions.Center,
     };
 
-    private readonly Icon _chevron = new() { Kind = "chevron-down", Size = 12 };
-
     public DropChip()
     {
         VerticalOptions = LayoutOptions.Center;
         HeightRequest = 28;
+        StrokeShape = new RoundRectangle { CornerRadius = 4 };
+        StrokeThickness = 1;
+        Padding = new Thickness(10, 0);
+        Content = _label;
+        this.SetDynamicResource(BackgroundColorProperty, "Bg");
 
-        var visual = new Border
-        {
-            StrokeShape = new RoundRectangle { CornerRadius = 4 },
-            StrokeThickness = 1,
-            Padding = new Thickness(10, 0),
-            Content = new HorizontalStackLayout { Spacing = 5, Children = { _label, _chevron }, VerticalOptions = LayoutOptions.Center },
-        };
-        visual.SetDynamicResource(Border.StrokeProperty, "LineBrush");
-        visual.SetDynamicResource(BackgroundColorProperty, "Bg");
-        _label.SetDynamicResource(Label.TextColorProperty, "InkMuted");
-        _chevron.SetDynamicResource(Icon.ColorProperty, "InkMuted");
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => Open();
+        GestureRecognizers.Add(tap);
 
-        _picker.SelectedIndexChanged += (_, _) =>
-        {
-            if (_picker.SelectedItem is { } item && !Equals(item, SelectedItem))
-            {
-                SelectedItem = item;
-            }
-        };
-
-        Children.Add(visual);
-        Children.Add(_picker);
         Apply();
     }
 
@@ -171,7 +155,6 @@ public sealed class DropChip : Grid
     private static void OnItemsChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
         var chip = (DropChip)bindable;
-        chip._picker.ItemsSource = newValue as IList;
         if (newValue is System.Collections.Specialized.INotifyCollectionChanged notify)
         {
             notify.CollectionChanged += (_, _) => chip.Apply();
@@ -180,22 +163,25 @@ public sealed class DropChip : Grid
         chip.Apply();
     }
 
-    private static void OnSelectedChanged(BindableObject bindable, object? oldValue, object? newValue)
+    private void Open()
     {
-        var chip = (DropChip)bindable;
-        if (!Equals(chip._picker.SelectedItem, newValue))
+        if (ItemsSource is not { Count: > 0 } items)
         {
-            chip._picker.SelectedItem = newValue;
+            return;
         }
 
-        chip.Apply();
+        var texts = items.Cast<object>().Select(x => x.ToString() ?? string.Empty).ToList();
+        DropMenu.Show(this, texts, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: true);
     }
 
     private void Apply()
     {
         var first = ItemsSource is { Count: > 0 } ? ItemsSource[0] : null;
         var chosen = SelectedItem is { } item && !Equals(item, first) ? item.ToString() : null;
-        _label.Text = chosen ?? Title;
+
+        // В макете подпись «Тег ▾» просто текст со стрелкой.
+        _label.Text = (chosen ?? Title) + " ▾";
         _label.SetDynamicResource(Label.TextColorProperty, chosen is null ? "InkMuted" : "Accent");
+        this.SetDynamicResource(StrokeProperty, chosen is null ? "LineBrush" : "AccentBrush");
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace TaskManager.App.Controls;
@@ -60,7 +60,7 @@ public sealed class InputBox : Border
 }
 
 /// <summary>
-/// Выпадающее поле: показывает выбранный пункт и шеврон, а список открывает невидимый Picker поверх.
+/// Выпадающее поле: показывает выбранный пункт и шеврон, нажатие открывает список в стиле Signal под полем.
 /// Используется там, где нужно поле высотой с обычный ввод (повторение, зависимость).
 /// </summary>
 public sealed class DropField : Grid
@@ -72,10 +72,10 @@ public sealed class DropField : Grid
         BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(DropField), null, propertyChanged: OnItemsChanged);
 
     public static readonly BindableProperty SelectedItemProperty =
-        BindableProperty.Create(nameof(SelectedItem), typeof(object), typeof(DropField), null, BindingMode.TwoWay, propertyChanged: OnSelectedChanged);
+        BindableProperty.Create(nameof(SelectedItem), typeof(object), typeof(DropField), null, BindingMode.TwoWay, propertyChanged: (b, _, _) => ((DropField)b).Apply());
 
-    private readonly Picker _picker = new() { Opacity = 0.011, BackgroundColor = Colors.Transparent };
     private readonly Label _label = new() { FontSize = 14, VerticalOptions = LayoutOptions.Center };
+    private readonly InputBox _box;
 
     public DropField()
     {
@@ -84,17 +84,12 @@ public sealed class DropField : Grid
         var chevron = new Icon { Kind = "chevron-down", Size = 14, HorizontalOptions = LayoutOptions.End };
         chevron.SetDynamicResource(Icon.ColorProperty, "InkMuted");
 
-        var box = new InputBox { Content = new Grid { Children = { _label, chevron } } };
-        _picker.SelectedIndexChanged += (_, _) =>
-        {
-            if (_picker.SelectedItem is { } item && !Equals(item, SelectedItem))
-            {
-                SelectedItem = item;
-            }
-        };
+        _box = new InputBox { Content = new Grid { Children = { _label, chevron } } };
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => Open();
+        _box.GestureRecognizers.Add(tap);
 
-        Children.Add(box);
-        Children.Add(_picker);
+        Children.Add(_box);
         Apply();
     }
 
@@ -119,7 +114,6 @@ public sealed class DropField : Grid
     private static void OnItemsChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
         var field = (DropField)bindable;
-        field._picker.ItemsSource = newValue as IList;
         if (newValue is System.Collections.Specialized.INotifyCollectionChanged notify)
         {
             notify.CollectionChanged += (_, _) => field.Apply();
@@ -128,15 +122,15 @@ public sealed class DropField : Grid
         field.Apply();
     }
 
-    private static void OnSelectedChanged(BindableObject bindable, object? oldValue, object? newValue)
+    private void Open()
     {
-        var field = (DropField)bindable;
-        if (!Equals(field._picker.SelectedItem, newValue))
+        if (ItemsSource is not { Count: > 0 } items)
         {
-            field._picker.SelectedItem = newValue;
+            return;
         }
 
-        field.Apply();
+        var texts = items.Cast<object>().Select(x => x.ToString() ?? string.Empty).ToList();
+        DropMenu.Show(_box, texts, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: false);
     }
 
     private void Apply()

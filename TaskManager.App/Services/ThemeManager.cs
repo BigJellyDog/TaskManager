@@ -108,6 +108,9 @@ public static class ThemeManager
             ? Microsoft.UI.Xaml.ElementTheme.Default
             : _mode == ThemeMode.Dark ? Microsoft.UI.Xaml.ElementTheme.Dark : Microsoft.UI.Xaml.ElementTheme.Light;
 
+    /// <summary>Текущая тема приложения в виде темы WinUI, для окон, которые мы рисуем сами.</summary>
+    public static Microsoft.UI.Xaml.ElementTheme NativeTheme => ElementThemeNow();
+
     /// <summary>Подключает системный элемент с раскрывающимся окном (список, календарь) к теме приложения.</summary>
     public static void Register(Microsoft.UI.Xaml.FrameworkElement element)
     {
