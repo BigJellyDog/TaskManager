@@ -64,8 +64,8 @@
             <controls:ToggleChip Grid.Column="3" Text="{Binding WeekChipText}" IsActive="{Binding DueThisWeek}"
                                  Command="{Binding ToggleWeekCommand}" />
             <controls:DropChip Grid.Column="4" Title="Статус" IsVisible="{Binding IsList}" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding SelectedStatus}" />
-            <controls:DropChip Grid.Column="5" Title="Тег" ItemsSource="{Binding TagOptions}" SelectedItem="{Binding SelectedTag}" />
-            <controls:DropChip Grid.Column="6" Title="Приоритет" IsVisible="{Binding IsBoard}" ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriority}" />
+            <controls:DropChip Grid.Column="5" Title="Тег" Kind="tag" ItemsSource="{Binding TagOptions}" SelectedItem="{Binding SelectedTag}" />
+            <controls:DropChip Grid.Column="6" Title="Приоритет" Kind="priority" IsVisible="{Binding IsBoard}" ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriority}" />
             <controls:ToggleChip Grid.Column="7" IsVisible="{Binding IsList}" Text="Скрыть закрытые" IsActive="{Binding HideClosed}"
                                  Command="{Binding ToggleHideClosedCommand}" />
         </Grid>

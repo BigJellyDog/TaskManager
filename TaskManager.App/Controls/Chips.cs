@@ -106,6 +106,9 @@ public sealed class DropChip : Border
     public static readonly BindableProperty SelectedItemProperty =
         BindableProperty.Create(nameof(SelectedItem), typeof(object), typeof(DropChip), null, BindingMode.TwoWay, propertyChanged: OnChanged);
 
+    public static readonly BindableProperty KindProperty =
+        BindableProperty.Create(nameof(Kind), typeof(string), typeof(DropChip), string.Empty);
+
     private readonly Label _label = new()
     {
         FontFamily = "Consolas",
@@ -138,6 +141,13 @@ public sealed class DropChip : Border
         set => SetValue(TitleProperty, value);
     }
 
+    /// <summary>Вид пунктов: «tag» (с решёткой, как теги на карточках) или «priority» (столбики и цвет приоритета).</summary>
+    public string Kind
+    {
+        get => (string)GetValue(KindProperty);
+        set => SetValue(KindProperty, value);
+    }
+
     public IList? ItemsSource
     {
         get => (IList?)GetValue(ItemsSourceProperty);
@@ -151,6 +161,35 @@ public sealed class DropChip : Border
     }
 
     private static void OnChanged(BindableObject bindable, object oldValue, object newValue) => ((DropChip)bindable).Apply();
+
+    // Пункт «Все …» всегда первый и без оформления; остальные оформляются по виду списка.
+    private DropEntry Describe(object item, int index)
+    {
+        var text = item.ToString() ?? string.Empty;
+        if (index == 0)
+        {
+            return new DropEntry(text);
+        }
+
+        if (Kind == "tag")
+        {
+            return new DropEntry("#" + text, Muted: true);
+        }
+
+        if (Kind == "priority" && item.GetType().GetProperty("Value")?.GetValue(item) is Core.Domain.Priority priority)
+        {
+            var key = priority switch
+            {
+                Core.Domain.Priority.Critical => "PCrit",
+                Core.Domain.Priority.High => "PHigh",
+                Core.Domain.Priority.Medium => "PMed",
+                _ => "PLow",
+            };
+            return new DropEntry(text, (int)priority + 1, key);
+        }
+
+        return new DropEntry(text);
+    }
 
     private static void OnItemsChanged(BindableObject bindable, object? oldValue, object? newValue)
     {
@@ -170,8 +209,8 @@ public sealed class DropChip : Border
             return;
         }
 
-        var texts = items.Cast<object>().Select(x => x.ToString() ?? string.Empty).ToList();
-        DropMenu.Show(this, texts, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: true);
+        var entries = items.Cast<object>().Select(Describe).ToList();
+        DropMenu.Show(this, entries, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: true);
     }
 
     private void Apply()
@@ -180,7 +219,8 @@ public sealed class DropChip : Border
         var chosen = SelectedItem is { } item && !Equals(item, first) ? item.ToString() : null;
 
         // В макете подпись «Тег ▾» просто текст со стрелкой.
-        _label.Text = (chosen ?? Title) + " ▾";
+        var shown = chosen is not null && Kind == "tag" ? "#" + chosen : chosen;
+        _label.Text = (shown ?? Title) + " ▾";
         _label.SetDynamicResource(Label.TextColorProperty, chosen is null ? "InkMuted" : "Accent");
         this.SetDynamicResource(StrokeProperty, chosen is null ? "LineBrush" : "AccentBrush");
     }

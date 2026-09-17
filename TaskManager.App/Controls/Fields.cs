@@ -129,8 +129,8 @@ public sealed class DropField : Grid
             return;
         }
 
-        var texts = items.Cast<object>().Select(x => x.ToString() ?? string.Empty).ToList();
-        DropMenu.Show(_box, texts, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: false);
+        var entries = items.Cast<object>().Select(x => new DropEntry(x.ToString() ?? string.Empty)).ToList();
+        DropMenu.Show(_box, entries, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: false);
     }
 
     private void Apply()
