@@ -74,19 +74,47 @@ public static class ThemeManager
     private static bool _followSystem;
 
     // Раскрывающиеся списки и меню рисует Windows: без этого они берут тему системы и могут быть светлыми в тёмном приложении.
+    // Тему получают корень окна и каждый такой элемент: список раскрывается из своего элемента, а не из корня.
     private static void ApplyToWindow(ThemeMode mode, bool keepUserTheme)
     {
         _followSystem = keepUserTheme;
+        _mode = mode;
 #if WINDOWS
+        var theme = ElementThemeNow();
         if ((_window ?? Application.Current?.Windows.FirstOrDefault())?.Handler?.PlatformView is Microsoft.UI.Xaml.Window native
             && native.Content is Microsoft.UI.Xaml.FrameworkElement root)
         {
-            root.RequestedTheme = keepUserTheme
-                ? Microsoft.UI.Xaml.ElementTheme.Default
-                : mode == ThemeMode.Dark ? Microsoft.UI.Xaml.ElementTheme.Dark : Microsoft.UI.Xaml.ElementTheme.Light;
+            root.RequestedTheme = theme;
+        }
+
+        _native.RemoveAll(reference => !reference.TryGetTarget(out _));
+        foreach (var reference in _native)
+        {
+            if (reference.TryGetTarget(out var element))
+            {
+                element.RequestedTheme = theme;
+            }
         }
 #endif
     }
+
+    private static ThemeMode _mode = ThemeMode.Dark;
+
+#if WINDOWS
+    private static readonly List<WeakReference<Microsoft.UI.Xaml.FrameworkElement>> _native = [];
+
+    private static Microsoft.UI.Xaml.ElementTheme ElementThemeNow() =>
+        _followSystem
+            ? Microsoft.UI.Xaml.ElementTheme.Default
+            : _mode == ThemeMode.Dark ? Microsoft.UI.Xaml.ElementTheme.Dark : Microsoft.UI.Xaml.ElementTheme.Light;
+
+    /// <summary>Подключает системный элемент с раскрывающимся окном (список, календарь) к теме приложения.</summary>
+    public static void Register(Microsoft.UI.Xaml.FrameworkElement element)
+    {
+        _native.Add(new WeakReference<Microsoft.UI.Xaml.FrameworkElement>(element));
+        element.RequestedTheme = ElementThemeNow();
+    }
+#endif
 
     private static bool IsTheme(ResourceDictionary dictionary)
     {

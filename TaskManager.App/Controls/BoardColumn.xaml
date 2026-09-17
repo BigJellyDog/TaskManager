@@ -59,7 +59,7 @@
                                                 </DataTrigger>
                                             </controls:Icon.Triggers>
                                         </controls:Icon>
-                                        <Label Text="{Binding BoardDeadlineText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                        <Label Text="{Binding BoardDeadlineText}" Margin="0,0,5,0" LineBreakMode="NoWrap" FontFamily="{StaticResource MonoFont}" FontSize="12"
                                                TextColor="{DynamicResource InkMuted}" VerticalOptions="Center">
                                             <Label.Triggers>
                                                 <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">

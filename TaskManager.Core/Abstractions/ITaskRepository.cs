@@ -1,5 +1,6 @@
-using TaskManager.Core.Domain;
+﻿using TaskManager.Core.Domain;
 using TaskManager.Core.Querying;
+using TaskManager.Core.Specifications;
 
 namespace TaskManager.Core.Abstractions;
 
@@ -13,6 +14,9 @@ public interface ITaskRepository
     Task<TaskItem?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken cancellationToken = default);
 
     /// <summary>Задача вместе с родителем, подзадачами, тегами и зависимостями в обе стороны.</summary>
+    /// <summary>Сколько задач подходит под условие. Один запрос COUNT, без загрузки задач.</summary>
+    Task<int> CountAsync(ISpecification<TaskItem> filter, CancellationToken cancellationToken = default);
+
     Task<TaskItem?> GetWithDetailsAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -1,8 +1,9 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Abstractions;
 using TaskManager.Core.Domain;
 using TaskManager.Core.Querying;
+using TaskManager.Core.Specifications;
 using TaskManager.Infrastructure.Persistence;
 using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
@@ -23,6 +24,9 @@ public class TaskRepository : ITaskRepository
         return await query.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
+    public Task<int> CountAsync(ISpecification<TaskItem> filter, CancellationToken cancellationToken = default) =>
+        _context.Tasks.AsNoTracking().Where(filter.ToExpression()).CountAsync(cancellationToken);
+
     public Task<TaskItem?> GetWithDetailsAsync(int id, CancellationToken cancellationToken = default) =>
         _context.Tasks
             .Include(t => t.Parent)
@@ -37,7 +41,8 @@ public class TaskRepository : ITaskRepository
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        var filtered = _context.Tasks.Where(query.Filter.ToExpression());
+        // Список только для показа: отслеживание изменений не нужно, без него загрузка заметно быстрее.
+        var filtered = _context.Tasks.AsNoTracking().Where(query.Filter.ToExpression());
         var total = await filtered.CountAsync(cancellationToken);
 
         var items = await ApplySort(filtered, query.Sort)

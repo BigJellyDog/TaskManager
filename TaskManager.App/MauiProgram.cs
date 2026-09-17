@@ -44,6 +44,26 @@ public static class MauiProgram
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit();
 
+		// Списки и календари раскрываются системным окном: оно должно быть в теме приложения, а не Windows.
+		Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("Theme", (handler, view) =>
+		{
+#if WINDOWS
+			Services.ThemeManager.Register(handler.PlatformView);
+#endif
+		});
+		Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("Theme", (handler, view) =>
+		{
+#if WINDOWS
+			Services.ThemeManager.Register(handler.PlatformView);
+#endif
+		});
+		Microsoft.Maui.Handlers.TimePickerHandler.Mapper.AppendToMapping("Theme", (handler, view) =>
+		{
+#if WINDOWS
+			Services.ThemeManager.Register(handler.PlatformView);
+#endif
+		});
+
 		// Поля ввода без штатной рамки WinUI: рамку и подсветку фокуса рисует наша оболочка (Signal).
 		Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
 		{

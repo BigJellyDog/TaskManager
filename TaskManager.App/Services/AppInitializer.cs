@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManager.Core.Abstractions;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Reminders;
@@ -41,6 +41,32 @@ public sealed class AppInitializer
         // Первая проверка напоминаний выполняется сразу при запуске сервиса.
         await _reminders.StartAsync(CancellationToken.None);
         _logger.LogInformation("Приложение запущено");
+
+        // Первый запрос каждого вида медленный (EF строит и компилирует запрос). Прогреваем их в фоне, пока пользователь
+        // смотрит на первый экран, чтобы первый заход на каждую вкладку не подтормаживал.
+        _ = Task.Run(WarmUpAsync);
+    }
+
+    private async Task WarmUpAsync()
+    {
+        try
+        {
+            await using var scope = _scopes.CreateAsyncScope();
+            var sp = scope.ServiceProvider;
+            var tasks = sp.GetRequiredService<TaskManager.Core.Services.TaskService>();
+
+            await tasks.SearchAsync(new TaskManager.Core.Querying.TaskFilter(), pageSize: 1);
+            await tasks.CountAsync(new TaskManager.Core.Querying.TaskFilter(OnlyOverdue: true));
+            await sp.GetRequiredService<TaskManager.Core.Services.StatisticsService>().GetAsync();
+            await sp.GetRequiredService<TaskManager.Core.Services.TrashService>().ListAsync();
+            await sp.GetRequiredService<TaskManager.Core.Services.TagService>().ListAsync();
+        }
+#pragma warning disable CA1031 // Прогрев необязателен: любая ошибка здесь не должна мешать работе.
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            _logger.LogDebug(ex, "Прогрев запросов не удался");
+        }
     }
 
     /// <summary>Останавливает фоновый сервис. Вызывается при закрытии окна, поэтому синхронно и с ограничением по времени.</summary>

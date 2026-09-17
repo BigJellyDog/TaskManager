@@ -95,10 +95,12 @@ public sealed partial class SidebarViewModel : ObservableObject
     {
         try
         {
-            var page = await _runner.RunAsync(sp => sp.GetRequiredService<TaskService>().SearchAsync(new TaskFilter(), pageSize: 1));
-            Items[0].Count = page.TotalCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            // Оба числа в одной области зависимостей и дешёвыми запросами COUNT.
+            var (tasks, trashed) = await _runner.RunAsync(async sp =>
+                (await sp.GetRequiredService<TaskService>().CountAsync(new TaskFilter()),
+                    await sp.GetRequiredService<TrashService>().CountAsync()));
 
-            var trashed = await _runner.RunAsync(sp => sp.GetRequiredService<TrashService>().CountAsync());
+            Items[0].Count = tasks.ToString(System.Globalization.CultureInfo.InvariantCulture);
             Items[3].Count = trashed == 0 ? string.Empty : trashed.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 #pragma warning disable CA1031 // Счётчик в панели не должен ронять приложение.

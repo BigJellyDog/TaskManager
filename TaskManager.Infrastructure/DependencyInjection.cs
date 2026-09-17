@@ -22,7 +22,7 @@ public static class DependencyInjection
         ArgumentNullException.ThrowIfNull(services);
         ArgumentException.ThrowIfNullOrWhiteSpace(databasePath);
 
-        services.AddDbContext<TaskManagerDbContext>(options => options.UseSqlite($"Data Source={databasePath}"));
+        services.AddDbContext<TaskManagerDbContext>(options => options.UseSqlite($"Data Source={databasePath}").AddInterceptors(new SqliteTuningInterceptor()));
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();

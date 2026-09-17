@@ -79,7 +79,11 @@ public sealed class Icon : GraphicsView
             canvas.SaveState();
             canvas.Scale(dirtyRect.Width / 24f, dirtyRect.Height / 24f);
             canvas.StrokeColor = Color;
-            canvas.StrokeSize = 2f;
+            // Толщину штриха задаём в экранных пикселях, а не в долях сетки 24×24: на мелких размерах 2/24 даёт
+            // 1,2-1,3 px, и линии размазываются в серое. Здесь они держат 1,5-2 px.
+            var size = Math.Min(dirtyRect.Width, dirtyRect.Height);
+            var pixels = size <= 14.5f ? 1.5f : size <= 16.5f ? 1.6f : size <= 18.5f ? 1.75f : 2f;
+            canvas.StrokeSize = pixels * 24f / size;
             canvas.StrokeLineCap = LineCap.Round;
             canvas.StrokeLineJoin = LineJoin.Round;
 
@@ -139,7 +143,7 @@ internal static class IconPaths
             ["cancelled"] = [("M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0", false), ("m15 9-6 6", false), ("m9 9 6 6", false)], // circle-x
             ["chart"] = [("M18 20L18 10", false), ("M12 20L12 4", false), ("M6 20L6 14", false)], // chart-no-axes-column
             ["database"] = [("M3 5a9 3 0 1 0 18 0a9 3 0 1 0 -18 0", false), ("M3 5V19A9 3 0 0 0 21 19V5", false), ("M3 12A9 3 0 0 0 21 12", false)], // database
-            ["board"] = [("M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2z", false), ("M8 7v7", false), ("M12 7v4", false), ("M16 7v9", false)], // square-kanban
+            ["board"] = [("M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2z", false), ("M9 3v18", false), ("M15 3v18", false)], // columns-3: доска из колонок
             ["refresh"] = [("M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", false), ("M21 3v5h-5", false), ("M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", false), ("M8 16H3v5", false)], // refresh-cw
             ["link"] = [("M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71", false), ("M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", false)], // link
             ["x"] = [("M18 6 6 18", false), ("m6 6 12 12", false)], // x

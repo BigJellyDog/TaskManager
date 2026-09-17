@@ -462,6 +462,12 @@ public sealed partial class TasksViewModel : ViewModelBase
         var tags = await _runner.RunAsync(sp => sp.GetRequiredService<ITagRepository>().ListAsync());
         var selectedName = SelectedTag?.Value;
 
+        // Список тегов не изменился: выпадающий список не трогаем, иначе он перестраивается при каждом заходе на вкладку.
+        if (TagOptions.Count == tags.Count + 1 && tags.Select(t => t.Name).SequenceEqual(TagOptions.Skip(1).Select(o => o.Title)))
+        {
+            return;
+        }
+
         _suppressReload = true;
         try
         {
@@ -603,7 +609,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         {
             var service = sp.GetRequiredService<TaskService>();
 
-            async Task<int> CountAsync(TaskFilter filter) => (await service.SearchAsync(filter, pageSize: 1)).TotalCount;
+            Task<int> CountAsync(TaskFilter filter) => service.CountAsync(filter);
 
             return (
                 Overdue: await CountAsync(new TaskFilter(OnlyOverdue: true)),

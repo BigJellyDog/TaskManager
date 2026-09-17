@@ -94,6 +94,31 @@ public partial class App : Application
         return loaded.Task;
     }
 
+    /// <summary>
+    /// Создаёт по одной запасной странице каждого раздела с паузами: первое создание страницы (JIT, разбор разметки)
+    /// заметно дольше следующих, и без этого первый переход на вкладку подтормаживал бы.
+    /// </summary>
+    private async Task WarmUpPagesAsync()
+    {
+        await Task.Delay(1500);
+
+        foreach (var type in new[] { typeof(Pages.StatisticsPage), typeof(Pages.DataPage), typeof(Pages.TrashPage), typeof(Pages.TagsPage), typeof(Pages.SettingsPage) })
+        {
+            try
+            {
+                _ = _services.GetRequiredService(type);
+            }
+#pragma warning disable CA1031 // Прогрев необязателен.
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                return;
+            }
+
+            await Task.Delay(200);
+        }
+    }
+
     private async Task StartAsync(Window window, LoadingPage loading)
     {
         try
@@ -101,6 +126,7 @@ public partial class App : Application
             await _services.GetRequiredService<AppInitializer>().InitializeAsync();
             var shell = new AppShell();
             window.Page = shell;
+            _ = WarmUpPagesAsync();
 
             if (_services.GetRequiredService<AppInitializer>().StartupNotice is { } notice)
             {

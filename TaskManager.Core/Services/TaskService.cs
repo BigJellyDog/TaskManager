@@ -1,4 +1,4 @@
-using TaskManager.Core.Abstractions;
+﻿using TaskManager.Core.Abstractions;
 using TaskManager.Core.Domain;
 using TaskManager.Core.Querying;
 using TaskStatus = TaskManager.Core.Domain.TaskStatus;
@@ -61,6 +61,13 @@ public class TaskService
     {
         ArgumentNullException.ThrowIfNull(filter);
         return _tasks.ListAsync(new TaskQuery(filter.ToSpecification(_clock), sort, page, pageSize), cancellationToken);
+    }
+
+    /// <summary>Сколько задач подходит под фильтр. Дешевле <see cref="SearchAsync"/>, когда нужно только число.</summary>
+    public Task<int> CountAsync(TaskFilter filter, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
+        return _tasks.CountAsync(filter.ToSpecification(_clock), cancellationToken);
     }
 
     public Task<TaskItem> CreateAsync(CreateTaskRequest request, CancellationToken cancellationToken = default)
