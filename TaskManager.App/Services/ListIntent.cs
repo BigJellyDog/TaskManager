@@ -10,15 +10,15 @@ public static class ListIntent
 
     public const string Blocked = "blocked";
 
-    private static string? _pending;
+    private static string? s_pending;
 
-    public static void Request(string intent) => _pending = intent;
+    public static void Request(string intent) => s_pending = intent;
 
     /// <summary>Возвращает просьбу и сразу забывает её.</summary>
     public static string? Take()
     {
-        var intent = _pending;
-        _pending = null;
+        var intent = s_pending;
+        s_pending = null;
         return intent;
     }
 }

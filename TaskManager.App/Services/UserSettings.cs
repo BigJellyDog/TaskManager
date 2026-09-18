@@ -79,7 +79,7 @@ public sealed class UserSettings
         }
     }
 
-    /// <summary>Язык интерфейса: «ru», «en», «de» или «uk».</summary>
+    /// <summary>Язык интерфейса: «ru», «en», «de» или «ua».</summary>
     public string Language
     {
         get => _data.Language;

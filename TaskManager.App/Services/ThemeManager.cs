@@ -81,14 +81,26 @@ public static class ThemeManager
         _mode = mode;
 #if WINDOWS
         var theme = ElementThemeNow();
-        if ((_window ?? Application.Current?.Windows.FirstOrDefault())?.Handler?.PlatformView is Microsoft.UI.Xaml.Window native
-            && native.Content is Microsoft.UI.Xaml.FrameworkElement root)
+        Window? first = null;
+        if (Application.Current?.Windows != null)
+        {
+            foreach (var window in Application.Current?.Windows!)
+            {
+                first = window;
+                break;
+            }
+        }
+
+        if ((_window ?? first)?.Handler?.PlatformView is Microsoft.UI.Xaml.Window
+            {
+                Content: Microsoft.UI.Xaml.FrameworkElement root
+            })
         {
             root.RequestedTheme = theme;
         }
 
-        _native.RemoveAll(reference => !reference.TryGetTarget(out _));
-        foreach (var reference in _native)
+        Native.RemoveAll(reference => !reference.TryGetTarget(out _));
+        foreach (var reference in Native)
         {
             if (reference.TryGetTarget(out var element))
             {
@@ -101,7 +113,7 @@ public static class ThemeManager
     private static ThemeMode _mode = ThemeMode.Dark;
 
 #if WINDOWS
-    private static readonly List<WeakReference<Microsoft.UI.Xaml.FrameworkElement>> _native = [];
+    private static readonly List<WeakReference<Microsoft.UI.Xaml.FrameworkElement>> Native = [];
 
     private static Microsoft.UI.Xaml.ElementTheme ElementThemeNow() =>
         _followSystem
@@ -114,7 +126,7 @@ public static class ThemeManager
     /// <summary>Подключает системный элемент с раскрывающимся окном (список, календарь) к теме приложения.</summary>
     public static void Register(Microsoft.UI.Xaml.FrameworkElement element)
     {
-        _native.Add(new WeakReference<Microsoft.UI.Xaml.FrameworkElement>(element));
+        Native.Add(new WeakReference<Microsoft.UI.Xaml.FrameworkElement>(element));
         element.RequestedTheme = ElementThemeNow();
     }
 #endif

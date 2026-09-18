@@ -28,7 +28,7 @@
                             <TapGestureRecognizer Command="{Binding CancelCommand}" />
                         </HorizontalStackLayout.GestureRecognizers>
                         <controls:Icon Kind="chevron-left" Size="14" Color="{DynamicResource InkMuted}" />
-                        <Label Text="{loc:T 'Задачи'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                        <Label Text="{loc:Extension 'Задачи'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                     <Label Text="/" FontSize="13" TextColor="{DynamicResource InkMuted}" />
                     <Label Text="{Binding PageTitle}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource InkMuted}" />
@@ -36,7 +36,7 @@
 
                 <VerticalStackLayout>
                     <Label Text="{Binding PageTitle}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
-                    <Label Text="{loc:T 'Поля со знаком * обязательны'}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
+                    <Label Text="{loc:Extension 'Поля со знаком * обязательны'}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
                     <Label Text="{Binding ParentText}" IsVisible="{Binding HasParent}" FontSize="13" TextColor="{DynamicResource Accent}" Margin="0,4,0,0" />
                 </VerticalStackLayout>
 
@@ -47,23 +47,23 @@
 
                         <VerticalStackLayout Spacing="6">
                             <Grid ColumnDefinitions="*,Auto">
-                                <Label Text="{loc:T 'Название *'}" Style="{StaticResource FieldLabel}" />
+                                <Label Text="{loc:Extension 'Название *'}" Style="{StaticResource FieldLabel}" />
                                 <Label Grid.Column="1" Text="{Binding TitleCounter}" Style="{StaticResource MonoLabel}" CharacterSpacing="0" />
                             </Grid>
                             <controls:InputBox HeightRequest="38">
-                                <Entry Text="{Binding Title}" Placeholder="{loc:T 'Что нужно сделать'}" MaxLength="200" FontSize="14" VerticalOptions="Center" />
+                                <Entry Text="{Binding Title}" Placeholder="{loc:Extension 'Что нужно сделать'}" MaxLength="200" FontSize="14" VerticalOptions="Center" />
                             </controls:InputBox>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{loc:T 'Описание'}" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{loc:Extension 'Описание'}" Style="{StaticResource FieldLabel}" />
                             <controls:InputBox HeightRequest="78" Padding="10,4">
-                                <Editor Text="{Binding Description}" Placeholder="{loc:T 'Что нужно сделать и где лежат материалы'}" AutoSize="Disabled" FontSize="14" />
+                                <Editor Text="{Binding Description}" Placeholder="{loc:Extension 'Что нужно сделать и где лежат материалы'}" AutoSize="Disabled" FontSize="14" />
                             </controls:InputBox>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{loc:T 'Приоритет'}" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{loc:Extension 'Приоритет'}" Style="{StaticResource FieldLabel}" />
                             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
                                 <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
                                     <Border.Triggers>
@@ -78,7 +78,7 @@
                                     </Border.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
                                         <controls:PriorityBars Level="4" Color="{DynamicResource PCrit}" />
-                                        <Label Text="{loc:T 'Критический'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PCrit}" />
+                                        <Label Text="{loc:Extension 'Критический'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PCrit}" />
                                     </HorizontalStackLayout>
                                 </Border>
                                 <Border Grid.Column="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
@@ -94,7 +94,7 @@
                                     </Border.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
                                         <controls:PriorityBars Level="3" Color="{DynamicResource PHigh}" />
-                                        <Label Text="{loc:T 'Высокий'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PHigh}" />
+                                        <Label Text="{loc:Extension 'Высокий'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PHigh}" />
                                     </HorizontalStackLayout>
                                 </Border>
                                 <Border Grid.Column="2" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
@@ -110,7 +110,7 @@
                                     </Border.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
                                         <controls:PriorityBars Level="2" Color="{DynamicResource PMed}" />
-                                        <Label Text="{loc:T 'Средний'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PMed}" />
+                                        <Label Text="{loc:Extension 'Средний'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PMed}" />
                                     </HorizontalStackLayout>
                                 </Border>
                                 <Border Grid.Column="3" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
@@ -126,14 +126,14 @@
                                     </Border.GestureRecognizers>
                                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
                                         <controls:PriorityBars Level="1" Color="{DynamicResource PLow}" />
-                                        <Label Text="{loc:T 'Низкий'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PLow}" />
+                                        <Label Text="{loc:Extension 'Низкий'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PLow}" />
                                     </HorizontalStackLayout>
                                 </Border>
                             </Grid>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{loc:T 'Дедлайн'}" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{loc:Extension 'Дедлайн'}" Style="{StaticResource FieldLabel}" />
                             <HorizontalStackLayout Spacing="10">
                                 <!-- Переключатель «есть дедлайн» -->
                                 <Border WidthRequest="36" HeightRequest="20" StrokeShape="RoundRectangle 10" StrokeThickness="1" Padding="2"
@@ -164,15 +164,15 @@
                                     </HorizontalStackLayout>
                                 </controls:InputBox>
                                 <controls:InputBox HeightRequest="38" WidthRequest="100" IsEnabled="{Binding HasDeadline}">
-                                    <Entry Text="{Binding DeadlineTimeText}" Placeholder="{loc:T 'ЧЧ:ММ'}" MaxLength="5" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalOptions="Center" />
+                                    <Entry Text="{Binding DeadlineTimeText}" Placeholder="{loc:Extension 'ЧЧ:ММ'}" MaxLength="5" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalOptions="Center" />
                                 </controls:InputBox>
-                                <Label Text="{loc:T 'по умолчанию — завтра 18:00'}" Style="{StaticResource MonoLabel}" CharacterSpacing="0" TextTransform="None"
+                                <Label Text="{loc:Extension 'по умолчанию — завтра 18:00'}" Style="{StaticResource MonoLabel}" CharacterSpacing="0" TextTransform="None"
                                        VerticalOptions="Center" />
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{loc:T 'Теги'}" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{loc:Extension 'Теги'}" Style="{StaticResource FieldLabel}" />
                             <controls:InputBox HeightRequest="38" Padding="8,0">
                                 <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
                                     <HorizontalStackLayout Spacing="6" BindableLayout.ItemsSource="{Binding TagList}" VerticalOptions="Center">
@@ -194,12 +194,12 @@
                                             </DataTemplate>
                                         </BindableLayout.ItemTemplate>
                                     </HorizontalStackLayout>
-                                    <Entry Text="{Binding NewTag}" Placeholder="{loc:T '+ тег'}" ReturnCommand="{Binding AddTagCommand}"
+                                    <Entry Text="{Binding NewTag}" Placeholder="{loc:Extension '+ тег'}" ReturnCommand="{Binding AddTagCommand}"
                                            FontFamily="{StaticResource MonoFont}" FontSize="12" WidthRequest="110" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </controls:InputBox>
                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding HasExistingTags}">
-                                <Label Grid.Column="0" Text="{loc:T 'Уже есть:'}" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                                <Label Grid.Column="0" Text="{loc:Extension 'Уже есть:'}" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
                                 <FlexLayout Grid.Column="1" Wrap="Wrap" BindableLayout.ItemsSource="{Binding ExistingTags}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="x:String">
@@ -222,11 +222,11 @@
 
                         <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
                             <VerticalStackLayout Spacing="10">
-                                <Label Text="{loc:T 'Повторение'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" CharacterSpacing="1" />
+                                <Label Text="{loc:Extension 'Повторение'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" CharacterSpacing="1" />
                                 <controls:DropField ItemsSource="{Binding RecurrenceOptions}" SelectedItem="{Binding SelectedRecurrence}" />
 
                                 <VerticalStackLayout IsVisible="{Binding HasRecurrence}" Spacing="10">
-                                    <Label Text="{loc:T 'Шаг'}" Style="{StaticResource FieldLabel}" />
+                                    <Label Text="{loc:Extension 'Шаг'}" Style="{StaticResource FieldLabel}" />
                                     <HorizontalStackLayout Spacing="10">
                                         <Grid ColumnDefinitions="32,44,32" HeightRequest="34">
                                             <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5,0,5,0" Padding="0">
@@ -251,54 +251,54 @@
                                     </HorizontalStackLayout>
 
                                     <VerticalStackLayout IsVisible="{Binding IsWeekly}" Spacing="6">
-                                        <Label Text="{loc:T 'Дни недели'}" Style="{StaticResource FieldLabel}" />
+                                        <Label Text="{loc:Extension 'Дни недели'}" Style="{StaticResource FieldLabel}" />
                                         <Grid ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="6">
                                             <Border Grid.Column="0" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Monday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Mon" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Пн'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Пн'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Monday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
                                             <Border Grid.Column="1" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Tuesday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Tue" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Вт'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Вт'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Tuesday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
                                             <Border Grid.Column="2" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Wednesday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Wed" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Ср'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Ср'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Wednesday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
                                             <Border Grid.Column="3" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Thursday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Thu" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Чт'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Чт'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Thursday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
                                             <Border Grid.Column="4" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Friday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Fri" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Пт'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Пт'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Friday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
                                             <Border Grid.Column="5" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Saturday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Sat" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Сб'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Сб'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Saturday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
                                             <Border Grid.Column="6" StrokeShape="RoundRectangle 4" Style="{StaticResource CardBorder}" Padding="0" HeightRequest="30">
                                                 <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Sunday}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource Accent}" /><Setter Property="Stroke" Value="{DynamicResource AccentBrush}" /></DataTrigger></Border.Triggers>
                                                 <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ToggleDayCommand}" CommandParameter="Sun" /></Border.GestureRecognizers>
-                                                <Label Text="{loc:T 'Вс'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
+                                                <Label Text="{loc:Extension 'Вс'}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource InkMuted}">
                                                     <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding Sunday}" Value="True"><Setter Property="TextColor" Value="{DynamicResource OnAccent}" /></DataTrigger></Label.Triggers>
                                                 </Label>
                                             </Border>
@@ -319,7 +319,7 @@
                                             </Border.Triggers>
                                             <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="{DynamicResource Accent}" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsModeAfter}" />
                                         </Border>
-                                        <Label Text="{loc:T 'После выполнения'}" FontSize="13" VerticalOptions="Center" />
+                                        <Label Text="{loc:Extension 'После выполнения'}" FontSize="13" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                     <HorizontalStackLayout Spacing="10">
                                         <HorizontalStackLayout.GestureRecognizers>
@@ -334,7 +334,7 @@
                                             </Border.Triggers>
                                             <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="{DynamicResource Accent}" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsModeCalendar}" />
                                         </Border>
-                                        <Label Text="{loc:T 'По календарю (нужен дедлайн)'}" FontSize="13" VerticalOptions="Center" />
+                                        <Label Text="{loc:Extension 'По календарю (нужен дедлайн)'}" FontSize="13" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </VerticalStackLayout>
@@ -343,7 +343,7 @@
                         <!-- Предпросмотр карточки -->
                         <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
                             <VerticalStackLayout Spacing="10">
-                                <Label Text="{loc:T 'Предпросмотр'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" CharacterSpacing="1" />
+                                <Label Text="{loc:Extension 'Предпросмотр'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" CharacterSpacing="1" />
                                 <Border StrokeThickness="1" StrokeDashArray="3,3" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 6" Padding="10" BackgroundColor="Transparent">
                                     <Border StrokeShape="RoundRectangle 5" BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}" Padding="12,10">
                                         <VerticalStackLayout Spacing="6">
@@ -378,8 +378,8 @@
         <VerticalStackLayout Grid.Row="1" Spacing="12">
             <BoxView HeightRequest="1" />
             <HorizontalStackLayout Spacing="10">
-                <controls:SignalButton Variant="Primary" Icon="check" Text="{loc:T 'Сохранить'}" Hint="{loc:T 'Ctrl+Enter'}" Command="{Binding SaveCommand}" />
-                <controls:SignalButton Variant="Secondary" Text="{loc:T 'Отмена'}" Hint="Esc" Command="{Binding CancelCommand}" />
+                <controls:SignalButton Variant="Primary" Icon="check" Text="{loc:Extension 'Сохранить'}" Hint="{loc:Extension 'Ctrl+Enter'}" Command="{Binding SaveCommand}" />
+                <controls:SignalButton Variant="Secondary" Text="{loc:Extension 'Отмена'}" Hint="Esc" Command="{Binding CancelCommand}" />
                 <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" HeightRequest="20" />
             </HorizontalStackLayout>
         </VerticalStackLayout>

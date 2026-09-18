@@ -5,6 +5,6 @@
              x:Class="TaskManager.App.Pages.SoonPage">
     <VerticalStackLayout Padding="28,20" Spacing="6">
         <Label x:Name="TitleLabel" Style="{StaticResource DisplayLabel}" TextTransform="Uppercase" />
-        <Label Text="{loc:T 'Раздел ещё в работе'}" Style="{StaticResource MonoLabel}" />
+        <Label Text="{loc:Extension 'Раздел ещё в работе'}" Style="{StaticResource MonoLabel}" />
     </VerticalStackLayout>
 </ContentPage>

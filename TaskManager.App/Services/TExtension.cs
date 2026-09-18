@@ -5,7 +5,7 @@ namespace TaskManager.App.Services;
 /// создании страницы; при смене языка окно пересобирается, и страницы создаются заново на новом языке.
 /// </summary>
 [ContentProperty(nameof(Key))]
-public sealed class TExtension : IMarkupExtension<string>
+public sealed class Extension : IMarkupExtension<string>
 {
     public string Key { get; set; } = string.Empty;
 

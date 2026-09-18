@@ -8,7 +8,7 @@
     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="32">
         <ActivityIndicator x:Name="Indicator" IsRunning="True" WidthRequest="40" HeightRequest="40" />
         <Label x:Name="StatusLabel"
-               Text="{loc:T 'Запуск…'}"
+               Text="{loc:Extension 'Запуск…'}"
                HorizontalTextAlignment="Center"
                Style="{StaticResource SubHeadline}" />
     </VerticalStackLayout>

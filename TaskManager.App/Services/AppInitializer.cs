@@ -6,22 +6,13 @@ using TaskManager.Infrastructure.Reminders;
 namespace TaskManager.App.Services;
 
 /// <summary>Запуск и остановка приложения: схема базы данных и фоновый сервис напоминаний.</summary>
-public sealed class AppInitializer
+public sealed class AppInitializer(
+    IServiceScopeFactory scopes,
+    ReminderService reminders,
+    IDatabaseBackup backup,
+    ILogger<AppInitializer> logger)
 {
     private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(5);
-
-    private readonly IServiceScopeFactory _scopes;
-    private readonly ReminderService _reminders;
-    private readonly IDatabaseBackup _backup;
-    private readonly ILogger<AppInitializer> _logger;
-
-    public AppInitializer(IServiceScopeFactory scopes, ReminderService reminders, IDatabaseBackup backup, ILogger<AppInitializer> logger)
-    {
-        _scopes = scopes;
-        _reminders = reminders;
-        _backup = backup;
-        _logger = logger;
-    }
 
     /// <summary>Сообщение для пользователя о том, что произошло при запуске (например, база восстановлена из копии).</summary>
     public string? StartupNotice { get; private set; }
@@ -30,17 +21,17 @@ public sealed class AppInitializer
     public async Task InitializeAsync()
     {
         // Восстановление из копии подменяет файл базы, поэтому оно выполняется первым, пока база ещё никем не открыта.
-        StartupNotice = await _backup.ApplyPendingRestoreAsync();
+        StartupNotice = await backup.ApplyPendingRestoreAsync();
 
-        await using (var scope = _scopes.CreateAsyncScope())
+        await using (var scope = scopes.CreateAsyncScope())
         {
             var database = scope.ServiceProvider.GetRequiredService<TaskManagerDbContext>().Database;
             await database.MigrateAsync();
         }
 
         // Первая проверка напоминаний выполняется сразу при запуске сервиса.
-        await _reminders.StartAsync(CancellationToken.None);
-        _logger.LogInformation("Приложение запущено");
+        await reminders.StartAsync(CancellationToken.None);
+        logger.LogInformation("Приложение запущено");
 
         // Первый запрос каждого вида медленный (EF строит и компилирует запрос). Прогреваем их в фоне, пока пользователь
         // смотрит на первый экран, чтобы первый заход на каждую вкладку не подтормаживал.
@@ -51,7 +42,7 @@ public sealed class AppInitializer
     {
         try
         {
-            await using var scope = _scopes.CreateAsyncScope();
+            await using var scope = scopes.CreateAsyncScope();
             var sp = scope.ServiceProvider;
             var tasks = sp.GetRequiredService<TaskManager.Core.Services.TaskService>();
 
@@ -65,7 +56,7 @@ public sealed class AppInitializer
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            _logger.LogDebug(ex, "Прогрев запросов не удался");
+            logger.LogDebug(ex, "Прогрев запросов не удался");
         }
     }
 
@@ -75,14 +66,14 @@ public sealed class AppInitializer
         try
         {
             using var timeout = new CancellationTokenSource(StopTimeout);
-            _reminders.StopAsync(timeout.Token).GetAwaiter().GetResult();
-            _logger.LogInformation("Приложение остановлено");
+            reminders.StopAsync(timeout.Token).GetAwaiter().GetResult();
+            logger.LogInformation("Приложение остановлено");
         }
 #pragma warning disable CA1031 // При закрытии приложения любая ошибка остановки не должна мешать выходу.
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            _logger.LogWarning(ex, "Не удалось корректно остановить сервис напоминаний");
+            logger.LogWarning(ex, "Не удалось корректно остановить сервис напоминаний");
         }
     }
 }

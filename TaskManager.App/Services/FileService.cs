@@ -5,20 +5,13 @@ using TaskManager.Core.Domain;
 
 namespace TaskManager.App.Services;
 
-public sealed class FileService : IFileService
+public sealed class FileService(ILogger<FileService> logger) : IFileService
 {
     // Слишком большой файл для импорта почти наверняка не файл экспорта: не читаем его в память целиком.
     private const long MaxImportBytes = 50 * 1024 * 1024;
 
     // UTF-8 без BOM: JSON и Markdown так читаются любыми редакторами.
     private static readonly UTF8Encoding Utf8NoBom = new(encoderShouldEmitUTF8Identifier: false);
-
-    private readonly ILogger<FileService> _logger;
-
-    public FileService(ILogger<FileService> logger)
-    {
-        _logger = logger;
-    }
 
     public async Task<string?> SaveWithDialogAsync(string suggestedFileName, string content, CancellationToken cancellationToken = default)
     {
@@ -31,7 +24,7 @@ public sealed class FileService : IFileService
         }
 
         // Пользователь закрыл окно (самый частый случай) или файл не удалось записать: подробности только в журнал.
-        _logger.LogInformation(result.Exception, "Файл не сохранён через диалог: {FileName}", suggestedFileName);
+        logger.LogInformation(result.Exception, "Файл не сохранён через диалог: {FileName}", suggestedFileName);
         return null;
     }
 
@@ -70,7 +63,7 @@ public sealed class FileService : IFileService
             return result.FilePath;
         }
 
-        _logger.LogInformation(result.Exception, "Файл не сохранён через диалог: {FileName}", suggestedFileName);
+        logger.LogInformation(result.Exception, "Файл не сохранён через диалог: {FileName}", suggestedFileName);
         return null;
     }
 

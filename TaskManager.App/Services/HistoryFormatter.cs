@@ -60,12 +60,9 @@ public static class HistoryFormatter
 
     private static string Value(string field, string? value, TimeZoneInfo zone)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            return Dash;
-        }
-
-        return field switch
+        return string.IsNullOrEmpty(value)
+            ? Dash
+            : field switch
         {
             "Priority" when Enum.TryParse<DomainPriority>(value, out var priority) => DisplayNames.PriorityName(priority),
             "Status" when Enum.TryParse<DomainTaskStatus>(value, out var status) => DisplayNames.StatusName(status),

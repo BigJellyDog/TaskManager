@@ -13,8 +13,8 @@
         <VerticalStackLayout Spacing="0">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" Margin="0,0,0,6">
                 <controls:Icon Grid.Column="0" Kind="bell" Size="15" Color="{DynamicResource Ink}" />
-                <Label Grid.Column="1" Text="{loc:T 'Напоминания'}" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
-                <Label Grid.Column="2" Text="{loc:T 'Скрыть'}" FontSize="12" TextColor="{DynamicResource Accent}"
+                <Label Grid.Column="1" Text="{loc:Extension 'Напоминания'}" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
+                <Label Grid.Column="2" Text="{loc:Extension 'Скрыть'}" FontSize="12" TextColor="{DynamicResource Accent}"
                        TextDecorations="Underline" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding DismissCommand}" />

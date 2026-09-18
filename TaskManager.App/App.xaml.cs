@@ -11,6 +11,7 @@ public partial class App : Application
     private readonly IServiceProvider _services;
     private Window? _window;
     private Label? _languageLabel;
+    private Controls.Flag? _languageFlag;
 
     public App(IServiceProvider services)
     {
@@ -75,8 +76,7 @@ public partial class App : Application
         var label = new Label { Text = "TaskManager", FontFamily = "Consolas", FontSize = 11, CharacterSpacing = 0.4, VerticalOptions = LayoutOptions.Center };
         label.SetDynamicResource(Label.TextColorProperty, "InkMuted");
 
-        var globe = new Controls.Icon { Kind = "globe", Size = 14 };
-        globe.SetDynamicResource(Controls.Icon.ColorProperty, "Ink");
+        _languageFlag = new Controls.Flag { Code = Loc.Current.Code };
         _languageLabel = new Label { FontFamily = "Consolas", FontSize = 11, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center };
         _languageLabel.SetDynamicResource(Label.TextColorProperty, "Ink");
         UpdateLanguageLabel();
@@ -102,16 +102,17 @@ public partial class App : Application
             Padding = new Thickness(8, 0),
             InputTransparent = true,
             VerticalOptions = LayoutOptions.Center,
-            Children = { globe, _languageLabel },
+            Children = { _languageFlag, _languageLabel },
         };
 
+        // Нажимаемая кнопка лежит сверху на всю площадь: под ней только рисунок, который нажатия не принимает.
         var button = new Grid
         {
             HeightRequest = 22,
             VerticalOptions = LayoutOptions.Center,
             HorizontalOptions = LayoutOptions.End,
             Margin = new Thickness(0, 0, 14, 0),
-            Children = { hit, face },
+            Children = { face, hit },
         };
 
         var content = new Grid { ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }, Padding = new Thickness(12, 0, 0, 0), VerticalOptions = LayoutOptions.Center };
@@ -128,6 +129,7 @@ public partial class App : Application
     {
         if (_languageLabel is not null)
         {
+            _languageFlag!.Code = Loc.Current.Code;
             _languageLabel.Text = Loc.Current.Label + " ▾";
         }
     }

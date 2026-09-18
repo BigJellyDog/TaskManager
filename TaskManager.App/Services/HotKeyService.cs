@@ -21,16 +21,9 @@ public enum HotKeyAction
 /// Alt+← возвращает назад. Остальные (Ctrl+K, Ctrl+Enter, Esc, Ctrl+D) сервис передаёт открытой странице событием
 /// <see cref="Pressed"/>: у неё есть нужные команды.
 /// </summary>
-public sealed class HotKeyService
+public sealed class HotKeyService(INavigationService navigation)
 {
     private static readonly string[] Sections = ["tasks", "statistics", "data", "trash", "tags", "settings"];
-
-    private readonly INavigationService _navigation;
-
-    public HotKeyService(INavigationService navigation)
-    {
-        _navigation = navigation;
-    }
 
     /// <summary>Нажата клавиша, которую обрабатывает страница.</summary>
     public event Action<HotKeyAction>? Pressed;
@@ -92,7 +85,7 @@ public sealed class HotKeyService
         }
         else if (alt && !ctrl && key == Windows.System.VirtualKey.Left)
         {
-            _ = _navigation.GoBackAsync();
+            _ = navigation.GoBackAsync();
             e.Handled = true;
         }
         else if (!ctrl && !alt && key == Windows.System.VirtualKey.Escape)
@@ -104,5 +97,5 @@ public sealed class HotKeyService
 
     private void Raise(HotKeyAction action) => Pressed?.Invoke(action);
 
-    private void Navigate(string route) => _ = _navigation.GoToAsync(route);
+    private void Navigate(string route) => _ = navigation.GoToAsync(route);
 }

@@ -6,7 +6,7 @@
              xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.DataPage"
              x:DataType="vm:DataViewModel"
-             Title="{loc:T 'Данные'}">
+             Title="{loc:Extension 'Данные'}">
 
     <ContentPage.Resources>
         <Style x:Key="Panel" TargetType="Border" BasedOn="{StaticResource CardBorder}">
@@ -41,8 +41,8 @@
 
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                 <VerticalStackLayout VerticalOptions="Center">
-                    <Label Text="{loc:T 'Данные'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
-                    <Label Text="{loc:T 'Экспорт · резервная копия · импорт'}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
+                    <Label Text="{loc:Extension 'Данные'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                    <Label Text="{loc:Extension 'Экспорт · резервная копия · импорт'}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
                 </VerticalStackLayout>
                 <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
             </Grid>
@@ -52,20 +52,20 @@
                 <!-- Резервная копия -->
                 <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Panel}" Stroke="{DynamicResource AccentBrush}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{loc:T 'Резервная копия'}" Style="{StaticResource PanelTitle}" />
-                        <Label Text="{loc:T 'Копия всей базы: история, теги, повторения, напоминания.'}" Style="{StaticResource PanelNote}" />
+                        <Label Text="{loc:Extension 'Резервная копия'}" Style="{StaticResource PanelTitle}" />
+                        <Label Text="{loc:Extension 'Копия всей базы: история, теги, повторения, напоминания.'}" Style="{StaticResource PanelNote}" />
                         <Border Style="{StaticResource ActionRow}">
                             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
-                                <Label Text="{loc:T 'Создать копию'}" Style="{StaticResource ActionName}" />
-                                <controls:SignalButton Grid.Column="1" Variant="Primary" Compact="True" Text="{loc:T 'В «Документы»'}" Command="{Binding BackupQuickCommand}" />
-                                <controls:SignalButton Grid.Column="2" Compact="True" Text="{loc:T 'Сохранить как…'}" Command="{Binding BackupAsCommand}" />
+                                <Label Text="{loc:Extension 'Создать копию'}" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Variant="Primary" Compact="True" Text="{loc:Extension 'В «Документы»'}" Command="{Binding BackupQuickCommand}" />
+                                <controls:SignalButton Grid.Column="2" Compact="True" Text="{loc:Extension 'Сохранить как…'}" Command="{Binding BackupAsCommand}" />
                             </Grid>
                         </Border>
                         <HorizontalStackLayout Spacing="10" IsVisible="{Binding HasStatus}">
                             <controls:Icon Kind="check" Size="14" Color="{DynamicResource SDone}" />
                             <Label Text="{Binding StatusMessage}" FontFamily="{StaticResource MonoFont}" FontSize="12"
                                    TextColor="{DynamicResource SDone}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
-                            <Label Text="{loc:T 'Показать в папке'}" IsVisible="{Binding HasSavedPath}" FontSize="12" TextColor="{DynamicResource Accent}" TextDecorations="Underline" VerticalOptions="Center">
+                            <Label Text="{loc:Extension 'Показать в папке'}" IsVisible="{Binding HasSavedPath}" FontSize="12" TextColor="{DynamicResource Accent}" TextDecorations="Underline" VerticalOptions="Center">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding RevealSavedCommand}" />
                                 </Label.GestureRecognizers>
@@ -77,24 +77,24 @@
                 <!-- Экспорт -->
                 <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource Panel}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{loc:T 'Экспорт'}" Style="{StaticResource PanelTitle}" />
-                        <Label Text="{loc:T 'JSON — для переноса и импорта, Markdown — для чтения. История не экспортируется.'}" Style="{StaticResource PanelNote}" />
+                        <Label Text="{loc:Extension 'Экспорт'}" Style="{StaticResource PanelTitle}" />
+                        <Label Text="{loc:Extension 'JSON — для переноса и импорта, Markdown — для чтения. История не экспортируется.'}" Style="{StaticResource PanelNote}" />
                         <HorizontalStackLayout Spacing="10">
                             <controls:SwitchToggle IsOn="{Binding IncludeDeleted}" />
-                            <Label Text="{loc:T 'Включить удалённые задачи'}" FontSize="13" VerticalOptions="Center" />
+                            <Label Text="{loc:Extension 'Включить удалённые задачи'}" FontSize="13" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Border Style="{StaticResource ActionRow}">
                             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
                                 <Label Text="JSON" Style="{StaticResource ActionName}" />
-                                <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:T 'В «Документы»'}" Command="{Binding ExportJsonQuickCommand}" />
-                                <controls:SignalButton Grid.Column="2" Compact="True" Text="{loc:T 'Сохранить как…'}" Command="{Binding ExportJsonAsCommand}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:Extension 'В «Документы»'}" Command="{Binding ExportJsonQuickCommand}" />
+                                <controls:SignalButton Grid.Column="2" Compact="True" Text="{loc:Extension 'Сохранить как…'}" Command="{Binding ExportJsonAsCommand}" />
                             </Grid>
                         </Border>
                         <Border Style="{StaticResource ActionRow}">
                             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
                                 <Label Text="Markdown" Style="{StaticResource ActionName}" />
-                                <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:T 'В «Документы»'}" Command="{Binding ExportMarkdownQuickCommand}" />
-                                <controls:SignalButton Grid.Column="2" Compact="True" Text="{loc:T 'Сохранить как…'}" Command="{Binding ExportMarkdownAsCommand}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:Extension 'В «Документы»'}" Command="{Binding ExportMarkdownQuickCommand}" />
+                                <controls:SignalButton Grid.Column="2" Compact="True" Text="{loc:Extension 'Сохранить как…'}" Command="{Binding ExportMarkdownAsCommand}" />
                             </Grid>
                         </Border>
                     </VerticalStackLayout>
@@ -103,13 +103,13 @@
                 <!-- Восстановление -->
                 <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource Panel}" Stroke="{DynamicResource PCritBrush}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{loc:T 'Восстановление'}" Style="{StaticResource PanelTitle}" TextColor="{DynamicResource PCrit}" />
-                        <Label Text="{loc:T 'Заменит текущие данные и применится после перезапуска. Прежняя база сохранится как страховочная копия.'}"
+                        <Label Text="{loc:Extension 'Восстановление'}" Style="{StaticResource PanelTitle}" TextColor="{DynamicResource PCrit}" />
+                        <Label Text="{loc:Extension 'Заменит текущие данные и применится после перезапуска. Прежняя база сохранится как страховочная копия.'}"
                                Style="{StaticResource PanelNote}" />
                         <Border Style="{StaticResource ActionRow}">
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                                <Label Text="{loc:T 'Восстановить из копии…'}" Style="{StaticResource ActionName}" />
-                                <controls:SignalButton Grid.Column="1" Compact="True" Variant="Danger" Icon="undo" Text="{loc:T 'Выбрать файл'}" Command="{Binding RestoreCommand}" />
+                                <Label Text="{loc:Extension 'Восстановить из копии…'}" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Variant="Danger" Icon="undo" Text="{loc:Extension 'Выбрать файл'}" Command="{Binding RestoreCommand}" />
                             </Grid>
                         </Border>
                     </VerticalStackLayout>
@@ -118,12 +118,12 @@
                 <!-- Импорт -->
                 <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Panel}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{loc:T 'Импорт'}" Style="{StaticResource PanelTitle}" />
-                        <Label Text="{loc:T 'Новые задачи добавляются к существующим, повторы (то же название и дедлайн) пропускаются.'}" Style="{StaticResource PanelNote}" />
+                        <Label Text="{loc:Extension 'Импорт'}" Style="{StaticResource PanelTitle}" />
+                        <Label Text="{loc:Extension 'Новые задачи добавляются к существующим, повторы (то же название и дедлайн) пропускаются.'}" Style="{StaticResource PanelNote}" />
                         <Border Style="{StaticResource ActionRow}">
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                                <Label Text="{loc:T 'Файл JSON'}" Style="{StaticResource ActionName}" />
-                                <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:T 'Выбрать файл…'}" Command="{Binding ImportCommand}" />
+                                <Label Text="{loc:Extension 'Файл JSON'}" Style="{StaticResource ActionName}" />
+                                <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:Extension 'Выбрать файл…'}" Command="{Binding ImportCommand}" />
                             </Grid>
                         </Border>
 
@@ -148,11 +148,11 @@
                 <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Panel}">
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <VerticalStackLayout VerticalOptions="Center">
-                            <Label Text="{loc:T 'Демо-данные'}" FontSize="13" FontAttributes="Bold" />
-                            <Label Text="{loc:T 'Набор примеров с тегом «демо»: ваши задачи не затрагиваются.'}" Style="{StaticResource PanelNote}" />
+                            <Label Text="{loc:Extension 'Демо-данные'}" FontSize="13" FontAttributes="Bold" />
+                            <Label Text="{loc:Extension 'Набор примеров с тегом «демо»: ваши задачи не затрагиваются.'}" Style="{StaticResource PanelNote}" />
                         </VerticalStackLayout>
-                        <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:T 'Заполнить демо-данными'}" Command="{Binding SeedDemoCommand}" />
-                        <controls:SignalButton Grid.Column="2" Compact="True" Variant="Danger" Text="{loc:T 'Удалить демо-данные'}" Command="{Binding RemoveDemoCommand}" />
+                        <controls:SignalButton Grid.Column="1" Compact="True" Text="{loc:Extension 'Заполнить демо-данными'}" Command="{Binding SeedDemoCommand}" />
+                        <controls:SignalButton Grid.Column="2" Compact="True" Variant="Danger" Text="{loc:Extension 'Удалить демо-данные'}" Command="{Binding RemoveDemoCommand}" />
                     </Grid>
                 </Border>
             </Grid>

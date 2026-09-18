@@ -5,20 +5,13 @@ namespace TaskManager.App.Services;
 /// живут долго, поэтому каждое действие пользователя получает свой чистый DbContext: данные всегда свежие,
 /// а отслеживаемые объекты не накапливаются.
 /// </summary>
-public sealed class ServiceRunner
+public sealed class ServiceRunner(IServiceScopeFactory scopes)
 {
-    private readonly IServiceScopeFactory _scopes;
-
-    public ServiceRunner(IServiceScopeFactory scopes)
-    {
-        _scopes = scopes;
-    }
-
     public async Task<T> RunAsync<T>(Func<IServiceProvider, Task<T>> action)
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        await using var scope = _scopes.CreateAsyncScope();
+        await using var scope = scopes.CreateAsyncScope();
         return await action(scope.ServiceProvider);
     }
 
@@ -26,7 +19,7 @@ public sealed class ServiceRunner
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        await using var scope = _scopes.CreateAsyncScope();
+        await using var scope = scopes.CreateAsyncScope();
         await action(scope.ServiceProvider);
     }
 }
