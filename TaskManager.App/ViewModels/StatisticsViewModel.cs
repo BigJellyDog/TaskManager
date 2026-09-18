@@ -29,7 +29,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
     private const double MinBarHeight = 3;
 
     // Названия дней и десятичный разделитель как в макете, независимо от языка системы.
-    private static readonly CultureInfo Ru = CultureInfo.GetCultureInfo("ru-RU");
+    private static CultureInfo Ru => Loc.Culture;
 
     private readonly ServiceRunner _runner;
     private readonly INavigationService _navigation;
@@ -149,8 +149,8 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         OnTimeText = stats.OnTimePercent is { } percent ? percent.ToString("0.#", Ru) + "%" : "—";
         OnTimeBlocks = stats.OnTimePercent is { } share ? (int)Math.Round(share / 20) : 0;
         OnTimeNote = stats.CompletedWithDeadline == 0
-            ? "нет выполненных с дедлайном"
-            : $"{stats.CompletedOnTime} из {stats.CompletedWithDeadline} с дедлайном";
+            ? Loc.T("нет выполненных с дедлайном")
+            : Loc.F("{0} из {1} с дедлайном", stats.CompletedOnTime, stats.CompletedWithDeadline);
         AverageText = stats.AverageCompletionTime is { } average ? FormatDuration(average) : "—";
 
         FillPriorities(stats);
@@ -159,7 +159,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         FillDeadlines(stats);
         FillTags(stats);
 
-        Subtitle = $"СВОДКА НА {DateTime.Now:dd.MM.yyyy} · {Plural(stats.OpenCount, "ОТКРЫТАЯ ЗАДАЧА", "ОТКРЫТЫЕ ЗАДАЧИ", "ОТКРЫТЫХ ЗАДАЧ")}";
+        Subtitle = Loc.F("СВОДКА НА {0:dd.MM.yyyy} · {1}", DateTime.Now, Loc.Count(stats.OpenCount, "ОТКРЫТАЯ ЗАДАЧА|ОТКРЫТЫЕ ЗАДАЧИ|ОТКРЫТЫХ ЗАДАЧ"));
         IsEmpty = stats.OpenCount == 0 && stats.CompletedLastMonth == 0 && stats.AverageCompletionTime is null;
     }
 
@@ -218,7 +218,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         var total = days.Sum(d => d.Count);
         if (total == 0)
         {
-            CompletedHint = "За этот период нет выполненных задач";
+            CompletedHint = Loc.T("За этот период нет выполненных задач");
             return;
         }
 
@@ -226,7 +226,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         var peakText = weekly
             ? peak.Day.ToDateTime(TimeOnly.MinValue).ToString("dddd", Ru)
             : peak.Day.ToString("dd.MM", Ru);
-        CompletedHint = $"Среднее: {((double)total / days.Count).ToString("0.0", Ru)} в день · пик: {peakText}";
+        CompletedHint = Loc.F("Среднее: {0} в день · пик: {1}", ((double)total / days.Count).ToString("0.0", Ru), peakText);
     }
 
     private void FillDeadlines(TaskStatistics stats)
@@ -241,7 +241,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         DeadlineColumns.Clear();
         DeadlineColumns.Add(new ChartColumnViewModel(
             stats.OverdueCount.ToString(Ru),
-            "Проср.",
+            Loc.T("Проср."),
             BarHeight(stats.OverdueCount, max),
             stats.OverdueCount == 0 ? line : crit,
             stats.OverdueCount == 0 ? muted : crit));
@@ -257,7 +257,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         }
 
         var upcoming = days.Sum(d => d.Count);
-        DeadlinesHint = $"Всего: {upcoming + stats.OverdueCount} · из них просрочено {stats.OverdueCount}";
+        DeadlinesHint = Loc.F("Всего: {0} · из них просрочено {1}", upcoming + stats.OverdueCount, stats.OverdueCount);
     }
 
     private void FillTags(TaskStatistics stats)
@@ -293,14 +293,14 @@ public sealed partial class StatisticsViewModel : ViewModelBase
     {
         if (value.TotalDays >= 1)
         {
-            return $"{(int)value.TotalDays}д {value.Hours}ч";
+            return Loc.F("{0}д {1}ч", (int)value.TotalDays, value.Hours);
         }
 
         if (value.TotalHours >= 1)
         {
-            return $"{(int)value.TotalHours}ч {value.Minutes}мин";
+            return Loc.F("{0}ч {1}мин", (int)value.TotalHours, value.Minutes);
         }
 
-        return $"{Math.Max(1, (int)value.TotalMinutes)}мин";
+        return Loc.F("{0}мин", Math.Max(1, (int)value.TotalMinutes));
     }
 }

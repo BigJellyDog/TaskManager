@@ -92,7 +92,7 @@ public sealed class TaskRowViewModel
     public bool HasDeadline => DeadlineText.Length > 0;
 
     /// <summary>Дедлайн на карточке доски: у просроченных с пометкой «просрочено».</summary>
-    public string BoardDeadlineText => IsOverdue ? "просрочено · " + DeadlineText : DeadlineText;
+    public string BoardDeadlineText => IsOverdue ? Loc.T("просрочено · ") + DeadlineText : DeadlineText;
 
     public string TagsText { get; }
 

@@ -1,4 +1,4 @@
-using DomainPriority = TaskManager.Core.Domain.Priority;
+﻿using DomainPriority = TaskManager.Core.Domain.Priority;
 using DomainTaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.Services;
@@ -8,20 +8,20 @@ public static class DisplayNames
 {
     public static string StatusName(DomainTaskStatus status) => status switch
     {
-        DomainTaskStatus.Todo => "К выполнению",
-        DomainTaskStatus.InProgress => "В работе",
-        DomainTaskStatus.Blocked => "Заблокирована",
-        DomainTaskStatus.Done => "Выполнена",
-        DomainTaskStatus.Cancelled => "Отменена",
+        DomainTaskStatus.Todo => Loc.T("К выполнению"),
+        DomainTaskStatus.InProgress => Loc.T("В работе"),
+        DomainTaskStatus.Blocked => Loc.T("Заблокирована"),
+        DomainTaskStatus.Done => Loc.T("Выполнена"),
+        DomainTaskStatus.Cancelled => Loc.T("Отменена"),
         _ => status.ToString(),
     };
 
     public static string PriorityName(DomainPriority priority) => priority switch
     {
-        DomainPriority.Low => "Низкий",
-        DomainPriority.Medium => "Средний",
-        DomainPriority.High => "Высокий",
-        DomainPriority.Critical => "Критический",
+        DomainPriority.Low => Loc.T("Низкий"),
+        DomainPriority.Medium => Loc.T("Средний"),
+        DomainPriority.High => Loc.T("Высокий"),
+        DomainPriority.Critical => Loc.T("Критический"),
         _ => priority.ToString(),
     };
 }

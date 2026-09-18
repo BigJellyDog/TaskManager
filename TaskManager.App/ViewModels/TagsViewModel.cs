@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskManager.App.Services;
@@ -32,7 +32,7 @@ public sealed partial class TagRowViewModel : ObservableObject
     /// <summary>Длина полосы относительно самого частого тега (0–1).</summary>
     public double Fraction { get; }
 
-    public string EditHint => TaskCount == 0 ? "Не используется" : $"Изменит {TaskCount} {PluralTask(TaskCount)}";
+    public string EditHint => TaskCount == 0 ? Loc.T("Не используется") : Loc.F("Изменит {0} {1}", TaskCount, Loc.Plural(TaskCount, "задачу|задачи|задач"));
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotEditing))]
@@ -67,7 +67,7 @@ public sealed partial class TagsViewModel : ViewModelBase
     [ObservableProperty]
     private string subtitleText = string.Empty;
 
-    public Task LoadAsync() => RunAsync(LoadCoreAsync, "Не удалось загрузить теги");
+    public Task LoadAsync() => RunAsync(LoadCoreAsync, Loc.T("Не удалось загрузить теги"));
 
     partial void OnSearchTextChanged(string value) => Rebuild();
 
@@ -76,8 +76,8 @@ public sealed partial class TagsViewModel : ViewModelBase
         _all = await _runner.RunAsync(sp => sp.GetRequiredService<TagService>().ListAsync());
         var unused = _all.Count(t => t.TaskCount == 0);
         SubtitleText = _all.Count == 0
-            ? "ТЕГОВ ПОКА НЕТ"
-            : $"{Plural(_all.Count, "ТЕГ", "ТЕГА", "ТЕГОВ")} · {unused} НЕ ИСПОЛЬЗУЮТСЯ";
+            ? Loc.T("ТЕГОВ ПОКА НЕТ")
+            : Loc.F("{0} · {1} НЕ ИСПОЛЬЗУЮТСЯ", Loc.Count(_all.Count, "ТЕГ|ТЕГА|ТЕГОВ"), unused);
         Rebuild();
     }
 
@@ -125,7 +125,7 @@ public sealed partial class TagsViewModel : ViewModelBase
 
         var done = await RunAsync(
             () => _runner.RunAsync(sp => sp.GetRequiredService<TagService>().RenameAsync(row.Id, name)),
-            "Не удалось переименовать тег");
+            Loc.T("Не удалось переименовать тег"));
 
         if (done)
         {
@@ -141,14 +141,14 @@ public sealed partial class TagsViewModel : ViewModelBase
             return;
         }
 
-        if (!await Dialogs.ConfirmAsync("Удалить тег", $"Тег «#{row.Name}» нигде не используется. Удалить его?", "Удалить", "Отмена"))
+        if (!await Dialogs.ConfirmAsync(Loc.T("Удалить тег"), Loc.F("Тег «#{0}» нигде не используется. Удалить его?", row.Name), Loc.T("Удалить"), Loc.T("Отмена")))
         {
             return;
         }
 
         var done = await RunAsync(
             () => _runner.RunAsync(sp => sp.GetRequiredService<TagService>().DeleteAsync(row.Id)),
-            "Не удалось удалить тег");
+            Loc.T("Не удалось удалить тег"));
 
         if (done)
         {

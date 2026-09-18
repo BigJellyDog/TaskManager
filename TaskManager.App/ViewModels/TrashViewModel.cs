@@ -26,7 +26,7 @@ public sealed partial class TrashRowViewModel : ObservableObject
             _ => "circle",
         };
         DeletedText = entry.DeletedAt is { } at ? at.ToLocalTime().ToString("dd.MM HH:mm", CultureInfo.InvariantCulture) : "—";
-        SubtasksText = entry.DeletedSubtasks == 0 ? "нет" : Plural(entry.DeletedSubtasks, "подзадача", "подзадачи", "подзадач");
+        SubtasksText = entry.DeletedSubtasks == 0 ? Loc.T("нет") : Loc.Count(entry.DeletedSubtasks, "подзадача|подзадачи|подзадач");
     }
 
     public int Id { get; }
@@ -81,9 +81,9 @@ public sealed partial class TrashViewModel : ViewModelBase
 
     public bool HasSelection => SelectedCount > 0;
 
-    public string SubtitleText => Count == 0 ? "КОРЗИНА ПУСТА" : $"{Plural(Count, "УДАЛЁННАЯ ЗАДАЧА", "УДАЛЁННЫЕ ЗАДАЧИ", "УДАЛЁННЫХ ЗАДАЧ")}";
+    public string SubtitleText => Count == 0 ? Loc.T("КОРЗИНА ПУСТА") : Loc.Count(Count, "УДАЛЁННАЯ ЗАДАЧА|УДАЛЁННЫЕ ЗАДАЧИ|УДАЛЁННЫХ ЗАДАЧ");
 
-    public Task LoadAsync() => RunAsync(LoadCoreAsync, "Не удалось загрузить корзину");
+    public Task LoadAsync() => RunAsync(LoadCoreAsync, Loc.T("Не удалось загрузить корзину"));
 
     private async Task LoadCoreAsync()
     {
@@ -137,7 +137,7 @@ public sealed partial class TrashViewModel : ViewModelBase
     {
         var done = await RunAsync(
             () => _runner.RunAsync(sp => sp.GetRequiredService<TrashService>().RestoreAsync(ids)),
-            "Не удалось восстановить задачи");
+            Loc.T("Не удалось восстановить задачи"));
 
         if (done)
         {
@@ -148,8 +148,8 @@ public sealed partial class TrashViewModel : ViewModelBase
     [RelayCommand]
     private async Task PurgeOneAsync(TrashRowViewModel row)
     {
-        var extra = row.SubtasksText == "нет" ? string.Empty : $" вместе с подзадачами ({row.SubtasksText})";
-        if (!await Dialogs.ConfirmAsync("Удалить навсегда", $"Задача «{row.Title}»{extra} будет удалена безвозвратно. Продолжить?", "Удалить", "Отмена"))
+        var extra = row.SubtasksText == Loc.T("нет") ? string.Empty : Loc.F(" вместе с подзадачами ({0})", row.SubtasksText);
+        if (!await Dialogs.ConfirmAsync(Loc.T("Удалить навсегда"), Loc.F("Задача «{0}»{1} будет удалена безвозвратно. Продолжить?", row.Title, extra), Loc.T("Удалить"), Loc.T("Отмена")))
         {
             return;
         }
@@ -167,10 +167,10 @@ public sealed partial class TrashViewModel : ViewModelBase
 
         var total = Rows.Count;
         if (!await Dialogs.ConfirmAsync(
-                "Очистить корзину",
-                $"Будет удалено навсегда: {Plural(total, "задача", "задачи", "задач")} (и их подзадачи). Это нельзя отменить. Продолжить?",
-                "Очистить",
-                "Отмена"))
+                Loc.T("Очистить корзину"),
+                Loc.F("Будет удалено навсегда: {0} (и их подзадачи). Это нельзя отменить. Продолжить?", Loc.Count(total, "задача|задачи|задач")),
+                Loc.T("Очистить"),
+                Loc.T("Отмена")))
         {
             return;
         }
@@ -182,7 +182,7 @@ public sealed partial class TrashViewModel : ViewModelBase
     {
         var done = await RunAsync(
             () => _runner.RunAsync(sp => sp.GetRequiredService<TrashService>().PurgeAsync(ids)),
-            "Не удалось удалить задачи");
+            Loc.T("Не удалось удалить задачи"));
 
         if (done)
         {

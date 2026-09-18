@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage
+             xmlns:loc="clr-namespace:TaskManager.App.Services" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
              xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.StatisticsPage"
              x:DataType="vm:StatisticsViewModel"
-             Title="Статистика">
+             Title="{loc:T 'Статистика'}">
 
     <ContentPage.Resources>
         <!-- Плитка с показателем -->
@@ -51,7 +52,7 @@
         <!-- Заголовок, переключатель периода, обновление -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="Статистика" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{loc:T 'Статистика'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
                 <Label Text="{Binding Subtitle}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
             </VerticalStackLayout>
 
@@ -59,7 +60,7 @@
                     StrokeShape="RoundRectangle 5" Padding="3" VerticalOptions="Center">
                 <HorizontalStackLayout Spacing="2">
                     <Border Style="{StaticResource PeriodItem}">
-                        <Label Text="7 дней" FontSize="13" TextColor="{DynamicResource InkMuted}">
+                        <Label Text="{loc:T '7 дней'}" FontSize="13" TextColor="{DynamicResource InkMuted}">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsWeek}" Value="True">
                                     <Setter Property="TextColor" Value="{DynamicResource Ink}" />
@@ -77,7 +78,7 @@
                         </Border.GestureRecognizers>
                     </Border>
                     <Border Style="{StaticResource PeriodItem}">
-                        <Label Text="30 дней" FontSize="13" TextColor="{DynamicResource InkMuted}">
+                        <Label Text="{loc:T '30 дней'}" FontSize="13" TextColor="{DynamicResource InkMuted}">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsMonth}" Value="True">
                                     <Setter Property="TextColor" Value="{DynamicResource Ink}" />
@@ -95,7 +96,7 @@
                         </Border.GestureRecognizers>
                     </Border>
                     <Border Style="{StaticResource PeriodItem}">
-                        <Label Text="Всё время" FontSize="13" TextColor="{DynamicResource InkMuted}">
+                        <Label Text="{loc:T 'Всё время'}" FontSize="13" TextColor="{DynamicResource InkMuted}">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsAllTime}" Value="True">
                                     <Setter Property="TextColor" Value="{DynamicResource Ink}" />
@@ -115,30 +116,30 @@
                 </HorizontalStackLayout>
             </Border>
 
-            <controls:SignalButton Grid.Column="2" Icon="refresh" Text="Обновить" Command="{Binding RefreshCommand}" />
+            <controls:SignalButton Grid.Column="2" Icon="refresh" Text="{loc:T 'Обновить'}" Command="{Binding RefreshCommand}" />
         </Grid>
 
         <!-- Шесть показателей -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
-                    <Label Text="Выполнено за неделю" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{loc:T 'Выполнено за неделю'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding CompletedLastWeek}" Style="{StaticResource MetricValue}" />
-                    <Label Text="последние 7 суток" Style="{StaticResource MetricNote}" />
+                    <Label Text="{loc:T 'последние 7 суток'}" Style="{StaticResource MetricNote}" />
                 </VerticalStackLayout>
             </Border>
 
             <Border Grid.Column="1" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
-                    <Label Text="Выполнено за месяц" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{loc:T 'Выполнено за месяц'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding CompletedLastMonth}" Style="{StaticResource MetricValue}" />
-                    <Label Text="последние 30 суток" Style="{StaticResource MetricNote}" />
+                    <Label Text="{loc:T 'последние 30 суток'}" Style="{StaticResource MetricNote}" />
                 </VerticalStackLayout>
             </Border>
 
             <Border Grid.Column="2" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
-                    <Label Text="Вовремя" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{loc:T 'Вовремя'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding OnTimeText}" Style="{StaticResource MetricValue}" />
                     <Label Text="{Binding OnTimeNote}" Style="{StaticResource MetricNote}" />
                     <controls:Segments Count="5" Filled="{Binding OnTimeBlocks}" Margin="0,4,0,0" />
@@ -147,15 +148,15 @@
 
             <Border Grid.Column="3" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
-                    <Label Text="Среднее время" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{loc:T 'Среднее время'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding AverageText}" Style="{StaticResource MetricValue}" />
-                    <Label Text="от создания до выполнения" Style="{StaticResource MetricNote}" />
+                    <Label Text="{loc:T 'от создания до выполнения'}" Style="{StaticResource MetricNote}" />
                 </VerticalStackLayout>
             </Border>
 
             <Border Grid.Column="4" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
-                    <Label Text="Просрочено" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{loc:T 'Просрочено'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding OverdueCount}" Style="{StaticResource MetricValue}">
                         <Label.Triggers>
                             <!-- Просроченные задачи подсвечиваются красным, пока они есть -->
@@ -164,8 +165,8 @@
                             </DataTrigger>
                         </Label.Triggers>
                     </Label>
-                    <Label Text="открытые с дедлайном в прошлом" Style="{StaticResource MetricNote}" />
-                    <Label Text="Показать в списке →" FontSize="11" TextColor="{DynamicResource Accent}" Margin="0,4,0,0">
+                    <Label Text="{loc:T 'открытые с дедлайном в прошлом'}" Style="{StaticResource MetricNote}" />
+                    <Label Text="{loc:T 'Показать в списке →'}" FontSize="11" TextColor="{DynamicResource Accent}" Margin="0,4,0,0">
                         <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowOverdueCommand}" /></Label.GestureRecognizers>
                     </Label>
                 </VerticalStackLayout>
@@ -173,10 +174,10 @@
 
             <Border Grid.Column="5" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
-                    <Label Text="Заблокировано" Style="{StaticResource MetricCaption}" />
+                    <Label Text="{loc:T 'Заблокировано'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding BlockedCount}" Style="{StaticResource MetricValue}" />
-                    <Label Text="ждут выполнения зависимостей" Style="{StaticResource MetricNote}" />
-                    <Label Text="Показать в списке →" FontSize="11" TextColor="{DynamicResource Accent}" Margin="0,4,0,0">
+                    <Label Text="{loc:T 'ждут выполнения зависимостей'}" Style="{StaticResource MetricNote}" />
+                    <Label Text="{loc:T 'Показать в списке →'}" FontSize="11" TextColor="{DynamicResource Accent}" Margin="0,4,0,0">
                         <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowBlockedCommand}" /></Label.GestureRecognizers>
                     </Label>
                 </VerticalStackLayout>
@@ -187,7 +188,7 @@
         <Grid x:Name="ChartsRow" Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Открытые по приоритетам" Style="{StaticResource PanelTitle}" />
+                    <Label Text="{loc:T 'Открытые по приоритетам'}" Style="{StaticResource PanelTitle}" />
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Bars}" Spacing="10">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:PriorityBarViewModel">
@@ -211,7 +212,7 @@
 
             <Border Grid.Column="1" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Выполнено по дням" Style="{StaticResource PanelTitle}" />
+                    <Label Text="{loc:T 'Выполнено по дням'}" Style="{StaticResource PanelTitle}" />
                     <FlexLayout BindableLayout.ItemsSource="{Binding CompletedColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:ChartColumnViewModel">
@@ -233,7 +234,7 @@
 
             <Border x:Name="DeadlinesPanel" Grid.Column="2" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Дедлайны на 7 дней" Style="{StaticResource PanelTitle}" />
+                    <Label Text="{loc:T 'Дедлайны на 7 дней'}" Style="{StaticResource PanelTitle}" />
                     <FlexLayout BindableLayout.ItemsSource="{Binding DeadlineColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:ChartColumnViewModel">
@@ -258,7 +259,7 @@
         <Grid x:Name="BottomRow" Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Открытые по статусам" Style="{StaticResource PanelTitle}" />
+                    <Label Text="{loc:T 'Открытые по статусам'}" Style="{StaticResource PanelTitle}" />
                     <FlexLayout BindableLayout.ItemsSource="{Binding StatusSegments}" Direction="Row" HeightRequest="18">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:StatusSegmentViewModel">
@@ -283,7 +284,7 @@
 
             <Border Grid.Column="1" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Теги в открытых задачах" Style="{StaticResource PanelTitle}" />
+                    <Label Text="{loc:T 'Теги в открытых задачах'}" Style="{StaticResource PanelTitle}" />
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Tags}" Spacing="6">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:TagBarViewModel">

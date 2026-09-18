@@ -100,14 +100,51 @@ public static class SignalMenu
             };
 
             // Приоритет: четыре столбика и подпись в цвете приоритета, как в списке и на карточках.
+            // Как в макете: слева место под галочку выбранного пункта, справа приглушённая подпись.
+            var check = new TextBlock
+            {
+                Text = isSelected ? "✓" : string.Empty,
+                Width = 14,
+                Foreground = Brush("Accent"),
+                FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
             UIElement content = text;
+            var line = new Grid { ColumnSpacing = 8 };
+            line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            line.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            Grid.SetColumn(check, 0);
+            line.Children.Add(check);
+
             if (entry.Level > 0)
             {
-                var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
-                row.Children.Add(PriorityBars(entry.Level, colorKey));
-                row.Children.Add(text);
-                content = row;
+                var bars = PriorityBars(entry.Level, colorKey);
+                Grid.SetColumn(bars, 1);
+                line.Children.Add(bars);
             }
+
+            Grid.SetColumn((FrameworkElement)text, 2);
+            line.Children.Add(text);
+
+            if (!string.IsNullOrEmpty(entry.Hint))
+            {
+                var hint = new TextBlock
+                {
+                    Text = entry.Hint,
+                    Foreground = Brush("InkMuted"),
+                    FontFamily = new FontFamily("Consolas"),
+                    FontSize = 11,
+                    Margin = new Thickness(14, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                Grid.SetColumn(hint, 3);
+                line.Children.Add(hint);
+            }
+
+            content = line;
 
             // Обычный Border, а не Button: шаблон кнопки красит наведение своим цветом.
             var item = new Border

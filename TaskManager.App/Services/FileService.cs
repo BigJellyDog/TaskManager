@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using CommunityToolkit.Maui.Storage;
 using TaskManager.Core.Domain;
@@ -83,7 +83,7 @@ public sealed class FileService : IFileService
 
         var file = await FilePicker.Default.PickAsync(new PickOptions
         {
-            PickerTitle = "Выберите файл экспорта (JSON)",
+            PickerTitle = Loc.T("Выберите файл экспорта (JSON)"),
             FileTypes = jsonType,
         });
 

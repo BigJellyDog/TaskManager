@@ -79,6 +79,13 @@ public sealed class UserSettings
         }
     }
 
+    /// <summary>Язык интерфейса: «ru», «en», «de» или «uk».</summary>
+    public string Language
+    {
+        get => _data.Language;
+        set => Set(ref _data.Language, value);
+    }
+
     public bool ShowReminderBanner
     {
         get => _data.ShowReminderBanner;
@@ -150,5 +157,6 @@ public sealed class UserSettings
         public bool DefaultBoard = true;
         public int ReminderMinutes = 1;
         public bool ShowReminderBanner = true;
+        public string Language = "ru";
     }
 }

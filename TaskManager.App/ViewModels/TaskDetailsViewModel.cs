@@ -100,7 +100,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     private string deadlineValueText = string.Empty;
 
     [ObservableProperty]
-    private string recurrenceValueText = "Нет";
+    private string recurrenceValueText = Loc.T("Нет");
 
     [ObservableProperty]
     private string createdText = string.Empty;
@@ -159,7 +159,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     public Color PriorityTint => PriorityColor.WithAlpha(0.1f);
 
     /// <summary>Подпись выпадающего списка зависимостей: выбранная задача или подсказка.</summary>
-    public string CandidateText => SelectedCandidate?.Title ?? "Добавить зависимость…";
+    public string CandidateText => SelectedCandidate?.Title ?? Loc.T("Добавить зависимость…");
 
     public bool HasDeadlineChip => DeadlineChipText.Length > 0;
 
@@ -185,7 +185,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     /// <summary>Загружает карточку. Вызывается при каждом показе страницы: после правки в форме данные нужно обновить.</summary>
     public async Task LoadAsync()
     {
-        var ok = await RunAsync(LoadCoreAsync, "Не удалось загрузить задачу");
+        var ok = await RunAsync(LoadCoreAsync, Loc.T("Не удалось загрузить задачу"));
 
         // Задачи нет (удалена, неверный номер): показывать пустую карточку бессмысленно.
         if (!ok && !_loadedOnce)
@@ -204,7 +204,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
             service => row.IsClosed
                 ? service.ReopenAsync(row.TaskId, row.RowVersion)
                 : service.ChangeStatusAsync(row.TaskId, TaskStatus.Done, row.RowVersion),
-            "Не удалось изменить статус подзадачи");
+            Loc.T("Не удалось изменить статус подзадачи"));
     }
 
     [RelayCommand]
@@ -229,10 +229,10 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     private async Task DeleteAsync()
     {
         var message = _hasSubtasksForDelete
-            ? $"Удалить задачу «{Title}» вместе со всеми её подзадачами?"
-            : $"Удалить задачу «{Title}»?";
+            ? Loc.F("Удалить задачу «{0}» вместе со всеми её подзадачами?", Title)
+            : Loc.F("Удалить задачу «{0}»?", Title);
 
-        if (!await Dialogs.ConfirmAsync("Удаление", message, "Удалить", "Отмена"))
+        if (!await Dialogs.ConfirmAsync(Loc.T("Удаление"), message, Loc.T("Удалить"), Loc.T("Отмена")))
         {
             return;
         }
@@ -250,7 +250,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
                     throw new OperationCanceledException();
                 }
             },
-            "Не удалось удалить задачу");
+            Loc.T("Не удалось удалить задачу"));
 
         if (deleted)
         {
@@ -274,7 +274,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
 
         await MutateAsync(
             service => service.AddDependencyAsync(_taskId, candidate.Value),
-            "Не удалось добавить зависимость");
+            Loc.T("Не удалось добавить зависимость"));
     }
 
     /// <summary>Выполняет изменение задачи и перезагружает карточку. Конфликт версий объясняется и обновляет данные.</summary>
@@ -299,8 +299,8 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     private async Task HandleConflictAsync()
     {
         await Dialogs.AlertAsync(
-            "Задача изменена",
-            "Эту задачу уже изменили в другом месте. Показаны актуальные данные, повторите действие.");
+            Loc.T("Задача изменена"),
+            Loc.T("Эту задачу уже изменили в другом месте. Показаны актуальные данные, повторите действие."));
         await LoadCoreAsync();
     }
 
@@ -350,15 +350,15 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
 
         IsOverdue = !finished && task.Deadline is { } deadline && deadline < now;
         DeadlineText = task.Deadline is { } d
-            ? "Дедлайн: " + TimeZoneInfo.ConvertTime(d, zone).ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture)
-            : "Дедлайна нет";
+            ? Loc.T("Дедлайн: ") + TimeZoneInfo.ConvertTime(d, zone).ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture)
+            : Loc.T("Дедлайна нет");
 
         TagsText = string.Join("  ", task.Tags.Select(t => "#" + t.Name).Order(StringComparer.CurrentCultureIgnoreCase));
         RecurrenceText = task.Recurrence is { } rule ? Describe(rule) : string.Empty;
 
         var progress = task.GetProgress();
-        ProgressText = progress.HasSubtasks ? $"Подзадачи: {progress} ({progress.Percent}%)" : string.Empty;
-        ParentText = task.Parent is { } parent ? $"Подзадача задачи: {parent.Title}" : string.Empty;
+        ProgressText = progress.HasSubtasks ? Loc.F("Подзадачи: {0} ({1}%)", progress, progress.Percent) : string.Empty;
+        ParentText = task.Parent is { } parent ? Loc.F("Подзадача задачи: {0}", parent.Title) : string.Empty;
 
         StatusIcon = StatusIcons.For(task.Status);
         PriorityLevel = task.Priority switch
@@ -370,18 +370,18 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
         };
 
         var deadlineLocal = task.Deadline is { } due ? TimeZoneInfo.ConvertTime(due, zone) : (DateTimeOffset?)null;
-        DeadlineValueText = deadlineLocal?.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture) ?? "Нет";
+        DeadlineValueText = deadlineLocal?.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture) ?? Loc.T("Нет");
         DeadlineChipText = deadlineLocal is { } local
-            ? "до " + local.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture) + RemainingText(task, finished, now)
+            ? Loc.T("до ") + local.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture) + RemainingText(task, finished, now)
             : string.Empty;
-        RecurrenceValueText = task.Recurrence is { } recurrence ? Describe(recurrence).Replace("Повторяется ", string.Empty, StringComparison.Ordinal) : "Нет";
+        RecurrenceValueText = task.Recurrence is { } recurrence ? Describe(recurrence).Replace(Loc.T("Повторяется "), string.Empty, StringComparison.Ordinal) : Loc.T("Нет");
         CreatedText = TimeZoneInfo.ConvertTime(task.CreatedAt, zone).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
         ParentTitle = task.Parent?.Title ?? string.Empty;
         OnPropertyChanged(nameof(HasDeadlineChip));
 
         var directChildren = subtasks.Where(e => e.Level == 1).ToList();
         var doneChildren = directChildren.Count(e => e.Task.Status == TaskStatus.Done);
-        SubtasksCountText = directChildren.Count > 0 ? $"{doneChildren} из {directChildren.Count}" : string.Empty;
+        SubtasksCountText = directChildren.Count > 0 ? Loc.F("{0} из {1}", doneChildren, directChildren.Count) : string.Empty;
         SubtasksFraction = directChildren.Count > 0 ? (double)doneChildren / directChildren.Count : 0;
         OnPropertyChanged(nameof(HasSubtasksCount));
         OnPropertyChanged(nameof(SubtasksBarWidth));
@@ -398,7 +398,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
                 OpenCommand(x.DependsOnTaskId),
                 new AsyncRelayCommand(() => MutateAsync(
                     service => service.RemoveDependencyAsync(_taskId, x.DependsOnTaskId),
-                    "Не удалось убрать зависимость"))));
+                    Loc.T("Не удалось убрать зависимость")))));
         Replace(DependsOn, dependsOnRows);
 
         var blocksRows = task.Dependents
@@ -438,12 +438,12 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
         var left = deadline - now;
         if (left <= TimeSpan.Zero)
         {
-            return " · просрочено";
+            return Loc.T(" · просрочено");
         }
 
         return left.TotalHours < 48
-            ? $" · осталось {Math.Max(1, (int)Math.Round(left.TotalHours))} ч"
-            : $" · осталось {(int)left.TotalDays} д";
+            ? Loc.F(" · осталось {0} ч", Math.Max(1, (int)Math.Round(left.TotalHours)))
+            : Loc.F(" · осталось {0} д", (int)left.TotalDays);
     }
 
     /// <summary>
@@ -454,7 +454,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     /// <summary>Ctrl+D: выполняет задачу, если сейчас доступно действие «Выполнить» (а не «В работу» или «Переоткрыть»).</summary>
     public void TryComplete()
     {
-        if (PrimaryAction is { Title: "Выполнить", IsEnabled: true } action && action.Command.CanExecute(null))
+        if (PrimaryAction is { IsEnabled: true } action && action.Title == Loc.T("Выполнить") && action.Command.CanExecute(null))
         {
             action.Command.Execute(null);
         }
@@ -469,32 +469,32 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
         ActionButtonViewModel Move(string title, string icon, TaskStatus to, ButtonVariant variant = ButtonVariant.Secondary, bool enabled = true) =>
             new(title, icon, new AsyncRelayCommand(() => MutateAsync(
                 service => service.ChangeStatusAsync(_taskId, to, _rowVersion),
-                "Не удалось сменить статус")), variant, enabled);
+                Loc.T("Не удалось сменить статус"))), variant, enabled);
 
         // Причина, по которой нельзя выполнить.
         var directChildren = subtasks.Where(e => e.Level == 1).ToList();
         var openChildren = directChildren.Count(e => e.Task.Status is not (TaskStatus.Done or TaskStatus.Cancelled));
         var unmet = task.Dependencies.Count(x => x.DependsOnTask is { Status: not TaskStatus.Done });
         var reason = openChildren > 0
-            ? $"Не завершены подзадачи ({directChildren.Count(e => e.Task.Status == TaskStatus.Done)}/{directChildren.Count})"
-            : unmet > 0 ? "Есть невыполненные зависимости" : string.Empty;
+            ? Loc.F("Не завершены подзадачи ({0}/{1})", directChildren.Count(e => e.Task.Status == TaskStatus.Done), directChildren.Count)
+            : unmet > 0 ? Loc.T("Есть невыполненные зависимости") : string.Empty;
 
         ActionButtonViewModel? primary = null;
         if (allowed.Contains(TaskStatus.Done))
         {
-            primary = Move("Выполнить", "check", TaskStatus.Done, ButtonVariant.Primary, reason.Length == 0);
+            primary = Move(Loc.T("Выполнить"), "check", TaskStatus.Done, ButtonVariant.Primary, reason.Length == 0);
         }
         else if (allowed.Contains(TaskStatus.InProgress))
         {
-            primary = Move("В работу", "half", TaskStatus.InProgress, ButtonVariant.Primary);
+            primary = Move(Loc.T("В работу"), "half", TaskStatus.InProgress, ButtonVariant.Primary);
             reason = string.Empty;
         }
         else if (reopen)
         {
             primary = new ActionButtonViewModel(
-                "Переоткрыть",
+                Loc.T("Переоткрыть"),
                 "undo",
-                new AsyncRelayCommand(() => MutateAsync(service => service.ReopenAsync(_taskId, _rowVersion), "Не удалось переоткрыть задачу")),
+                new AsyncRelayCommand(() => MutateAsync(service => service.ReopenAsync(_taskId, _rowVersion), Loc.T("Не удалось переоткрыть задачу"))),
                 ButtonVariant.Primary);
             reason = string.Empty;
         }
@@ -513,25 +513,25 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
         var secondary = new List<ActionButtonViewModel>();
         if (allowed.Contains(TaskStatus.Blocked))
         {
-            secondary.Add(Move("Заблокировать", "blocked", TaskStatus.Blocked));
+            secondary.Add(Move(Loc.T("Заблокировать"), "blocked", TaskStatus.Blocked));
         }
 
         if (allowed.Contains(TaskStatus.Todo))
         {
-            secondary.Add(Move("К выполнению", "undo", TaskStatus.Todo));
+            secondary.Add(Move(Loc.T("К выполнению"), "undo", TaskStatus.Todo));
         }
 
-        if (allowed.Contains(TaskStatus.InProgress) && primary?.Title != "В работу")
+        if (allowed.Contains(TaskStatus.InProgress) && primary?.Title != Loc.T("В работу"))
         {
-            secondary.Add(Move("В работу", "half", TaskStatus.InProgress));
+            secondary.Add(Move(Loc.T("В работу"), "half", TaskStatus.InProgress));
         }
 
-        secondary.Add(new ActionButtonViewModel("Изменить", "edit", EditCommand));
-        secondary.Add(new ActionButtonViewModel("Подзадача", "subtask", AddSubtaskCommand));
+        secondary.Add(new ActionButtonViewModel(Loc.T("Изменить"), "edit", EditCommand));
+        secondary.Add(new ActionButtonViewModel(Loc.T("Подзадача"), "subtask", AddSubtaskCommand));
         Replace(SecondaryActions, secondary);
 
         OnPropertyChanged(nameof(HasCancelAction));
-        CancelAction = allowed.Contains(TaskStatus.Cancelled) ? Move("Отменить задачу", "x", TaskStatus.Cancelled, ButtonVariant.Ghost) : null;
+        CancelAction = allowed.Contains(TaskStatus.Cancelled) ? Move(Loc.T("Отменить задачу"), "x", TaskStatus.Cancelled, ButtonVariant.Ghost) : null;
     }
 
     private AsyncRelayCommand OpenCommand(int taskId) =>
@@ -550,24 +550,24 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     {
         var unit = rule.Frequency switch
         {
-            RecurrenceFrequency.Daily => "дн.",
-            RecurrenceFrequency.Weekly => "нед.",
-            RecurrenceFrequency.Monthly => "мес.",
-            _ => "г.",
+            RecurrenceFrequency.Daily => Loc.T("дн."),
+            RecurrenceFrequency.Weekly => Loc.T("нед."),
+            RecurrenceFrequency.Monthly => Loc.T("мес."),
+            _ => Loc.T("г."),
         };
 
-        var text = $"Повторяется раз в {rule.Interval} {unit}";
+        var text = Loc.F("Повторяется раз в {0} {1}", rule.Interval, unit);
 
         if (rule.WeekDays != WeekDays.None)
         {
             var days = new (WeekDays Flag, string Name)[]
             {
-                (WeekDays.Monday, "пн"), (WeekDays.Tuesday, "вт"), (WeekDays.Wednesday, "ср"), (WeekDays.Thursday, "чт"),
-                (WeekDays.Friday, "пт"), (WeekDays.Saturday, "сб"), (WeekDays.Sunday, "вс"),
+                (WeekDays.Monday, Loc.T("пн")), (WeekDays.Tuesday, Loc.T("вт")), (WeekDays.Wednesday, Loc.T("ср")), (WeekDays.Thursday, Loc.T("чт")),
+                (WeekDays.Friday, Loc.T("пт")), (WeekDays.Saturday, Loc.T("сб")), (WeekDays.Sunday, Loc.T("вс")),
             };
             text += " (" + string.Join(", ", days.Where(x => rule.WeekDays.HasFlag(x.Flag)).Select(x => x.Name)) + ")";
         }
 
-        return text + (rule.Mode == RecurrenceMode.ByCalendar ? ", по календарю" : ", после выполнения");
+        return text + (rule.Mode == RecurrenceMode.ByCalendar ? Loc.T(", по календарю") : Loc.T(", после выполнения"));
     }
 }

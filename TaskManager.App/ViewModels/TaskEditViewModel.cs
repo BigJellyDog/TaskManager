@@ -45,16 +45,16 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         ];
         RecurrenceOptions =
         [
-            new FilterOption<RecurrenceFrequency?>("Не повторять", null),
-            new FilterOption<RecurrenceFrequency?>("Каждый день", RecurrenceFrequency.Daily),
-            new FilterOption<RecurrenceFrequency?>("Каждую неделю", RecurrenceFrequency.Weekly),
-            new FilterOption<RecurrenceFrequency?>("Каждый месяц", RecurrenceFrequency.Monthly),
-            new FilterOption<RecurrenceFrequency?>("Каждый год", RecurrenceFrequency.Yearly),
+            new FilterOption<RecurrenceFrequency?>(Loc.T("Не повторять"), null),
+            new FilterOption<RecurrenceFrequency?>(Loc.T("Каждый день"), RecurrenceFrequency.Daily),
+            new FilterOption<RecurrenceFrequency?>(Loc.T("Каждую неделю"), RecurrenceFrequency.Weekly),
+            new FilterOption<RecurrenceFrequency?>(Loc.T("Каждый месяц"), RecurrenceFrequency.Monthly),
+            new FilterOption<RecurrenceFrequency?>(Loc.T("Каждый год"), RecurrenceFrequency.Yearly),
         ];
         ModeOptions =
         [
-            new FilterOption<RecurrenceMode>("Следующая после выполнения", RecurrenceMode.AfterCompletion),
-            new FilterOption<RecurrenceMode>("По календарю (даже если не закрыта)", RecurrenceMode.ByCalendar),
+            new FilterOption<RecurrenceMode>(Loc.T("Следующая после выполнения"), RecurrenceMode.AfterCompletion),
+            new FilterOption<RecurrenceMode>(Loc.T("По календарю (даже если не закрыта)"), RecurrenceMode.ByCalendar),
         ];
 
         SelectedPriority = PriorityOptions.Single(o => o.Value == Priority.Medium);
@@ -106,7 +106,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     public bool IsModeCalendar => SelectedMode?.Value == RecurrenceMode.ByCalendar;
 
     /// <summary>Предпросмотр карточки: показывает задачу так, как она будет выглядеть на доске.</summary>
-    public string PreviewTitle => string.IsNullOrWhiteSpace(Title) ? "Название задачи" : Title.Trim();
+    public string PreviewTitle => string.IsNullOrWhiteSpace(Title) ? Loc.T("Название задачи") : Title.Trim();
 
     public string PreviewPriorityText => SelectedPriority?.Title ?? string.Empty;
 
@@ -143,7 +143,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
 
             var days = new (bool On, string Name)[]
             {
-                (Monday, "пн"), (Tuesday, "вт"), (Wednesday, "ср"), (Thursday, "чт"), (Friday, "пт"), (Saturday, "сб"), (Sunday, "вс"),
+                (Monday, Loc.T("пн")), (Tuesday, Loc.T("вт")), (Wednesday, Loc.T("ср")), (Thursday, Loc.T("чт")), (Friday, Loc.T("пт")), (Saturday, Loc.T("сб")), (Sunday, Loc.T("вс")),
             };
             return string.Join(", ", days.Where(d => d.On).Select(d => d.Name));
         }
@@ -353,7 +353,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     private bool sunday;
 
     [ObservableProperty]
-    private string pageTitle = "Новая задача";
+    private string pageTitle = Loc.T("Новая задача");
 
     [ObservableProperty]
     private string parentText = string.Empty;
@@ -370,14 +370,14 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         {
             var unit = SelectedRecurrence?.Value switch
             {
-                RecurrenceFrequency.Daily => "дн.",
-                RecurrenceFrequency.Weekly => "нед.",
-                RecurrenceFrequency.Monthly => "мес.",
-                RecurrenceFrequency.Yearly => "г.",
+                RecurrenceFrequency.Daily => Loc.T("дн."),
+                RecurrenceFrequency.Weekly => Loc.T("нед."),
+                RecurrenceFrequency.Monthly => Loc.T("мес."),
+                RecurrenceFrequency.Yearly => Loc.T("г."),
                 _ => string.Empty,
             };
 
-            return $"Повторять раз в {(int)IntervalValue} {unit}";
+            return Loc.F("Повторять раз в {0} {1}", (int)IntervalValue, unit);
         }
     }
 
@@ -390,14 +390,14 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     }
 
     /// <summary>Загружает данные формы: список существующих тегов, а при редактировании ещё и саму задачу.</summary>
-    public Task LoadAsync() => RunAsync(LoadCoreAsync, "Не удалось загрузить задачу");
+    public Task LoadAsync() => RunAsync(LoadCoreAsync, Loc.T("Не удалось загрузить задачу"));
 
     partial void OnParentTextChanged(string value) => OnPropertyChanged(nameof(HasParent));
 
     private bool CanSave() => !string.IsNullOrWhiteSpace(Title);
 
     [RelayCommand(CanExecute = nameof(CanSave))]
-    private async Task SaveAsync() => await RunAsync(SaveCoreAsync, "Не удалось сохранить задачу");
+    private async Task SaveAsync() => await RunAsync(SaveCoreAsync, Loc.T("Не удалось сохранить задачу"));
 
     [RelayCommand]
     private Task CancelAsync() => _navigation.GoBackAsync();
@@ -410,7 +410,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     private async Task LoadCoreAsync()
     {
         var tags = await _runner.RunAsync(sp => sp.GetRequiredService<ITagRepository>().ListAsync());
-        ExistingTagsHint = tags.Count == 0 ? string.Empty : "Уже есть: " + string.Join(", ", tags.Select(t => t.Name));
+        ExistingTagsHint = tags.Count == 0 ? string.Empty : Loc.T("Уже есть: ") + string.Join(", ", tags.Select(t => t.Name));
         ExistingTags.Clear();
         foreach (var tag in tags)
         {
@@ -426,22 +426,22 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
             return;
         }
 
-        PageTitle = "Новая задача";
+        PageTitle = Loc.T("Новая задача");
 
         if (_parentId is { } parentId)
         {
             var parent = await _runner.RunAsync(sp => sp.GetRequiredService<TaskService>().GetAsync(parentId));
-            ParentText = $"Подзадача задачи: {parent.Title}";
-            PageTitle = "Новая подзадача";
+            ParentText = Loc.F("Подзадача задачи: {0}", parent.Title);
+            PageTitle = Loc.T("Новая подзадача");
         }
     }
 
     private void Fill(TaskItem task)
     {
-        PageTitle = $"Редактирование задачи #{task.Id}";
+        PageTitle = Loc.F("Редактирование задачи #{0}", task.Id);
         _loadedRowVersion = task.RowVersion;
         _parentId = task.ParentId;
-        ParentText = task.Parent is { } parent ? $"Подзадача задачи: {parent.Title}" : string.Empty;
+        ParentText = task.Parent is { } parent ? Loc.F("Подзадача задачи: {0}", parent.Title) : string.Empty;
 
         Title = task.Title;
         Description = task.Description;
@@ -501,10 +501,10 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         {
             // Задачу изменили, пока форма была открыта. Правки в форме потеряются, поэтому спрашиваем.
             var reload = await Dialogs.ConfirmAsync(
-                "Задача изменена",
-                "Эту задачу уже изменили в другом месте. Загрузить актуальные данные? Несохранённые правки в форме будут потеряны.",
-                "Загрузить",
-                "Оставить как есть");
+                Loc.T("Задача изменена"),
+                Loc.T("Эту задачу уже изменили в другом месте. Загрузить актуальные данные? Несохранённые правки в форме будут потеряны."),
+                Loc.T("Загрузить"),
+                Loc.T("Оставить как есть"));
 
             if (reload)
             {

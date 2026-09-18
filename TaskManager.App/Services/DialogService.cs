@@ -1,4 +1,4 @@
-namespace TaskManager.App.Services;
+﻿namespace TaskManager.App.Services;
 
 public sealed class DialogService : IDialogService
 {
@@ -6,8 +6,8 @@ public sealed class DialogService : IDialogService
     private static Page? CurrentPage => Application.Current?.Windows is { Count: > 0 } windows ? windows[0].Page : null;
 
     public Task AlertAsync(string title, string message) =>
-        CurrentPage?.DisplayAlertAsync(title, message, "OK") ?? Task.CompletedTask;
+        CurrentPage?.DisplayAlertAsync(Loc.T(title), Loc.Message(message), "OK") ?? Task.CompletedTask;
 
     public Task<bool> ConfirmAsync(string title, string message, string accept = "Да", string cancel = "Нет") =>
-        CurrentPage?.DisplayAlertAsync(title, message, accept, cancel) ?? Task.FromResult(false);
+        CurrentPage?.DisplayAlertAsync(Loc.T(title), Loc.Message(message), Loc.T(accept), Loc.T(cancel)) ?? Task.FromResult(false);
 }

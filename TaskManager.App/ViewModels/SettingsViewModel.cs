@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,13 +22,24 @@ public sealed partial class SettingsViewModel : ObservableObject
         hideClosed = settings.HideClosed;
         themeIndex = (int)settings.Theme;
         defaultViewIndex = settings.DefaultBoard ? 0 : 1;
-        reminderIndex = Math.Max(0, UserSettings.ReminderMinutesOptions.ToList().IndexOf(settings.ReminderMinutes));
         showBanner = settings.ShowReminderBanner;
+        selectedReminder = ReminderOptions[Math.Max(0, UserSettings.ReminderMinutesOptions.ToList().IndexOf(settings.ReminderMinutes))];
     }
 
     public string PageSizeItems => string.Join('|', UserSettings.PageSizes);
 
-    public string ReminderItems => string.Join('|', UserSettings.ReminderMinutesOptions.Select(m => $"{m} мин"));
+    /// <summary>Интервалы проверки напоминаний для выпадающего поля: «1 минута», «5 минут» ...</summary>
+    public IList<string> ReminderOptions { get; } =
+        UserSettings.ReminderMinutesOptions.Select(m => Loc.T($"{m} {(m == 1 ? "минута" : "минут")}")).ToList();
+
+    /// <summary>Названия языков на самих языках: Русский, English, Deutsch, Українська.</summary>
+    public IList<string> LanguageNames { get; } = Loc.Languages.Select(l => l.Name).ToList();
+
+    [ObservableProperty]
+    private string selectedLanguage = Loc.Current.Name;
+
+    [ObservableProperty]
+    private string selectedReminder = string.Empty;
 
     /// <summary>Полный путь к файлу базы данных.</summary>
     public string DatabasePath => Path.Combine(AppPaths.DataDirectory, _options.Value.DatabaseFileName);
@@ -46,9 +57,6 @@ public sealed partial class SettingsViewModel : ObservableObject
     private int defaultViewIndex;
 
     [ObservableProperty]
-    private int reminderIndex;
-
-    [ObservableProperty]
     private bool showBanner;
 
     partial void OnPageSizeIndexChanged(int value) => _settings.PageSize = UserSettings.PageSizes[Math.Clamp(value, 0, UserSettings.PageSizes.Count - 1)];
@@ -59,8 +67,23 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     partial void OnDefaultViewIndexChanged(int value) => _settings.DefaultBoard = value == 0;
 
-    partial void OnReminderIndexChanged(int value) =>
-        _settings.ReminderMinutes = UserSettings.ReminderMinutesOptions[Math.Clamp(value, 0, UserSettings.ReminderMinutesOptions.Count - 1)];
+    partial void OnSelectedReminderChanged(string value)
+    {
+        var index = ReminderOptions.IndexOf(value);
+        if (index >= 0)
+        {
+            _settings.ReminderMinutes = UserSettings.ReminderMinutesOptions[index];
+        }
+    }
+
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        var language = Loc.Languages.FirstOrDefault(l => l.Name == value);
+        if (language is not null)
+        {
+            _settings.Language = language.Code;
+        }
+    }
 
     partial void OnShowBannerChanged(bool value) => _settings.ShowReminderBanner = value;
 

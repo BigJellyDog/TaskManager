@@ -48,7 +48,7 @@
                                 <FlexLayout Wrap="Wrap" AlignItems="Center">
                                     <HorizontalStackLayout Spacing="5" Margin="0,0,10,0">
                                         <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
-                                        <Label Text="{Binding PriorityText}" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
+                                        <Label Text="{Binding PriorityText}" Margin="0,0,4,0" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
                                                TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                     <HorizontalStackLayout Spacing="5" Margin="0,0,10,0" IsVisible="{Binding HasDeadline}">

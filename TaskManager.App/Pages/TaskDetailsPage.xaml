@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage
+             xmlns:loc="clr-namespace:TaskManager.App.Services" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
              xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.TaskDetailsPage"
              x:DataType="vm:TaskDetailsViewModel"
              Shell.BackButtonBehavior="{BackButtonBehavior IsVisible=False}"
-             Title="Задача">
+             Title="{loc:T 'Задача'}">
 
     <ScrollView>
         <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,340" ColumnSpacing="20" RowSpacing="14" Padding="28,20,28,20">
@@ -18,7 +19,7 @@
                         <TapGestureRecognizer Command="{Binding BackToTasksCommand}" />
                     </HorizontalStackLayout.GestureRecognizers>
                     <controls:Icon Kind="chevron-left" Size="14" Color="{DynamicResource InkMuted}" />
-                    <Label Text="Задачи" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                    <Label Text="{loc:T 'Задачи'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
                 </HorizontalStackLayout>
                 <Label Text="/" FontSize="13" TextColor="{DynamicResource InkMuted}" IsVisible="{Binding HasParent}" />
                 <Label Text="{Binding ParentTitle}" FontSize="13" TextColor="{DynamicResource InkMuted}" IsVisible="{Binding HasParent}">
@@ -79,7 +80,7 @@
                 <!-- Подзадачи -->
                 <VerticalStackLayout IsVisible="{Binding HasSubtasks}" Spacing="4">
                     <HorizontalStackLayout Spacing="10" Margin="0,0,0,4">
-                        <Label Text="Подзадачи" FontSize="15" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Text="{loc:T 'Подзадачи'}" FontSize="15" FontAttributes="Bold" VerticalOptions="Center" />
                         <Border StrokeShape="RoundRectangle 9" StrokeThickness="0" BackgroundColor="{DynamicResource SurfaceRaised}" Padding="6,0" VerticalOptions="Center">
                             <Label Text="{Binding SubtasksCountText}" FontSize="11" FontAttributes="Bold" />
                         </Border>
@@ -87,7 +88,7 @@
                             <BoxView Color="{DynamicResource Line}" CornerRadius="3" />
                             <BoxView Color="{DynamicResource Accent}" CornerRadius="3" WidthRequest="{Binding SubtasksBarWidth}" HorizontalOptions="Start" />
                         </Grid>
-                        <controls:SignalButton Variant="Ghost" Icon="plus" Text="Добавить" Command="{Binding AddSubtaskCommand}" Compact="True" />
+                        <controls:SignalButton Variant="Ghost" Icon="plus" Text="{loc:T 'Добавить'}" Command="{Binding AddSubtaskCommand}" Compact="True" />
                     </HorizontalStackLayout>
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Subtasks}" Spacing="6">
@@ -140,10 +141,10 @@
 
                 <!-- Зависимости -->
                 <VerticalStackLayout Spacing="6">
-                    <Label Text="Зависимости" FontSize="15" FontAttributes="Bold" />
+                    <Label Text="{loc:T 'Зависимости'}" FontSize="15" FontAttributes="Bold" />
 
                     <Grid ColumnDefinitions="84,*" ColumnSpacing="10">
-                        <Label Grid.Column="0" Text="Зависит от" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Start" Margin="0,10,0,0" />
+                        <Label Grid.Column="0" Text="{loc:T 'Зависит от'}" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Start" Margin="0,10,0,0" />
                         <VerticalStackLayout Grid.Column="1" Spacing="6">
                             <VerticalStackLayout BindableLayout.ItemsSource="{Binding DependsOn}" Spacing="6">
                                 <BindableLayout.ItemTemplate>
@@ -169,12 +170,12 @@
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>
                             </VerticalStackLayout>
-                            <Label Text="Зависимостей нет." IsVisible="{Binding HasNoDependsOn}" FontSize="13" TextColor="{DynamicResource InkMuted}" Margin="0,10,0,0" />
+                            <Label Text="{loc:T 'Зависимостей нет.'}" IsVisible="{Binding HasNoDependsOn}" FontSize="13" TextColor="{DynamicResource InkMuted}" Margin="0,10,0,0" />
                         </VerticalStackLayout>
                     </Grid>
 
                     <Grid ColumnDefinitions="84,*" ColumnSpacing="10" IsVisible="{Binding HasBlocks}">
-                        <Label Grid.Column="0" Text="Блокирует" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Start" Margin="0,10,0,0" />
+                        <Label Grid.Column="0" Text="{loc:T 'Блокирует'}" FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Start" Margin="0,10,0,0" />
                         <VerticalStackLayout Grid.Column="1" Spacing="6" BindableLayout.ItemsSource="{Binding Blocks}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DependencyRowViewModel">
@@ -207,7 +208,7 @@
                                         Opacity="0.011" BackgroundColor="Transparent" />
                             </Grid>
                         </Border>
-                        <controls:SignalButton Grid.Column="1" Variant="Secondary" Text="Добавить" Command="{Binding AddDependencyCommand}" />
+                        <controls:SignalButton Grid.Column="1" Variant="Secondary" Text="{loc:T 'Добавить'}" Command="{Binding AddDependencyCommand}" />
                     </Grid>
                 </VerticalStackLayout>
             </VerticalStackLayout>
@@ -231,7 +232,7 @@
                         <Grid ColumnDefinitions="*,Auto">
                             <controls:SignalButton Grid.Column="0" Variant="Ghost" Icon="{Binding CancelAction.Icon}" Text="{Binding CancelAction.Title}"
                                                    Command="{Binding CancelAction.Command}" IsVisible="{Binding HasCancelAction}" />
-                            <controls:SignalButton Grid.Column="1" Variant="Ghost" Icon="trash" Text="Удалить" Command="{Binding DeleteCommand}" HorizontalOptions="End">
+                            <controls:SignalButton Grid.Column="1" Variant="Ghost" Icon="trash" Text="{loc:T 'Удалить'}" Command="{Binding DeleteCommand}" HorizontalOptions="End">
                             </controls:SignalButton>
                         </Grid>
                         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="20" />
@@ -240,23 +241,23 @@
 
                 <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Свойства" Style="{StaticResource MonoLabel}" FontAttributes="Bold" />
+                        <Label Text="{loc:T 'Свойства'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" />
                         <Grid ColumnDefinitions="92,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="8">
-                            <Label Grid.Row="0" Text="Статус" FontSize="13" TextColor="{DynamicResource InkMuted}" />
+                            <Label Grid.Row="0" Text="{loc:T 'Статус'}" FontSize="13" TextColor="{DynamicResource InkMuted}" />
                             <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="5">
                                 <controls:Icon Kind="{Binding StatusIcon}" Size="14" Color="{Binding StatusColor}" />
                                 <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="13" FontAttributes="Bold" />
                             </HorizontalStackLayout>
-                            <Label Grid.Row="1" Text="Приоритет" FontSize="13" TextColor="{DynamicResource InkMuted}" />
+                            <Label Grid.Row="1" Text="{loc:T 'Приоритет'}" FontSize="13" TextColor="{DynamicResource InkMuted}" />
                             <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="5">
                                 <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
                                 <Label Text="{Binding PriorityText}" TextColor="{Binding PriorityColor}" FontSize="13" FontAttributes="Bold" />
                             </HorizontalStackLayout>
-                            <Label Grid.Row="2" Text="Дедлайн" FontSize="13" TextColor="{DynamicResource InkMuted}" />
+                            <Label Grid.Row="2" Text="{loc:T 'Дедлайн'}" FontSize="13" TextColor="{DynamicResource InkMuted}" />
                             <Label Grid.Row="2" Grid.Column="1" Text="{Binding DeadlineValueText}" FontSize="13" FontAttributes="Bold" />
-                            <Label Grid.Row="3" Text="Повторение" FontSize="13" TextColor="{DynamicResource InkMuted}" />
+                            <Label Grid.Row="3" Text="{loc:T 'Повторение'}" FontSize="13" TextColor="{DynamicResource InkMuted}" />
                             <Label Grid.Row="3" Grid.Column="1" Text="{Binding RecurrenceValueText}" FontSize="13" FontAttributes="Bold" LineBreakMode="WordWrap" />
-                            <Label Grid.Row="4" Text="Создана" FontSize="13" TextColor="{DynamicResource InkMuted}" />
+                            <Label Grid.Row="4" Text="{loc:T 'Создана'}" FontSize="13" TextColor="{DynamicResource InkMuted}" />
                             <Label Grid.Row="4" Grid.Column="1" Text="{Binding CreatedText}" FontSize="13" FontAttributes="Bold" />
                         </Grid>
                     </VerticalStackLayout>
@@ -264,7 +265,7 @@
 
                 <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="История" Style="{StaticResource MonoLabel}" FontAttributes="Bold" Margin="0,0,0,4" />
+                        <Label Text="{loc:T 'История'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" Margin="0,0,0,4" />
                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding History}" Spacing="0">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:HistoryRowViewModel">

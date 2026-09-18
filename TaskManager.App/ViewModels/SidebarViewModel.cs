@@ -12,14 +12,27 @@ public sealed partial class NavItemViewModel : ObservableObject
 {
     public NavItemViewModel(string title, string icon, string route, string hint, bool separatorAbove = false)
     {
-        Title = title;
+        _titleKey = title;
         Icon = icon;
         Route = route;
         Hint = hint;
         SeparatorAbove = separatorAbove;
     }
 
-    public string Title { get; }
+    private readonly string _titleKey;
+
+    /// <summary>Название раздела на текущем языке.</summary>
+    public string Title => Loc.T(_titleKey);
+
+    /// <summary>Подсказка горячей клавиши: по-немецки «Strg».</summary>
+    public string HintText => Loc.T(Hint);
+
+    /// <summary>Пересчитать подписи после смены языка.</summary>
+    public void Relocalize()
+    {
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(HintText));
+    }
 
     public string Icon { get; }
 
@@ -84,6 +97,15 @@ public sealed partial class SidebarViewModel : ObservableObject
         foreach (var item in Items)
         {
             item.IsSelected = item.Route == segment;
+        }
+    }
+
+    /// <summary>Язык сменился: названия разделов перечитываются.</summary>
+    public void Relocalize()
+    {
+        foreach (var item in Items)
+        {
+            item.Relocalize();
         }
     }
 

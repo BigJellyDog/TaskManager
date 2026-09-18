@@ -9,6 +9,8 @@ public partial class App : Application
     private const double CompactWidth = 1100;
 
     private readonly IServiceProvider _services;
+    private Window? _window;
+    private Label? _languageLabel;
 
     public App(IServiceProvider services)
     {
@@ -16,8 +18,14 @@ public partial class App : Application
         _services = services;
 
         var settings = services.GetRequiredService<UserSettings>();
+        Loc.Set(settings.Language);
         ThemeManager.Apply(settings.Theme);
-        settings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(() => ThemeManager.Apply(settings.Theme));
+        settings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ThemeManager.Apply(settings.Theme);
+            Loc.Set(settings.Language);
+        });
+        Loc.Changed += () => MainThread.BeginInvokeOnMainThread(async () => await OnLanguageChangedAsync());
         RequestedThemeChanged += (_, _) =>
         {
             if (settings.Theme == ThemeChoice.System)
@@ -32,6 +40,7 @@ public partial class App : Application
         // Сначала экран загрузки: пока применяются миграции, интерфейс не должен обращаться к базе.
         var loading = new LoadingPage();
         var window = new Window(loading) { Title = "TaskManager", TitleBar = CreateTitleBar() };
+        _window = window;
 
         // Узкое окно (около 1024): боковая панель сворачивается до значков, как в макете.
         window.SizeChanged += (_, _) =>
@@ -58,22 +67,103 @@ public partial class App : Application
         return window;
     }
 
-    /// <summary>Заголовок окна как в макете Signal: цвет боковой панели, галочка и моноширинное название.</summary>
-    private static TitleBar CreateTitleBar()
+    /// <summary>Заголовок окна как в макете Signal: галочка, моноширинное название и справа кнопка языка «RU ▾».</summary>
+    private TitleBar CreateTitleBar()
     {
         var icon = new Controls.Icon { Kind = "check", Size = 14 };
         icon.SetDynamicResource(Controls.Icon.ColorProperty, "InkMuted");
         var label = new Label { Text = "TaskManager", FontFamily = "Consolas", FontSize = 11, CharacterSpacing = 0.4, VerticalOptions = LayoutOptions.Center };
         label.SetDynamicResource(Label.TextColorProperty, "InkMuted");
 
-        var titleBar = new TitleBar
+        var globe = new Controls.Icon { Kind = "globe", Size = 14 };
+        globe.SetDynamicResource(Controls.Icon.ColorProperty, "Ink");
+        _languageLabel = new Label { FontFamily = "Consolas", FontSize = 11, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center };
+        _languageLabel.SetDynamicResource(Label.TextColorProperty, "Ink");
+        UpdateLanguageLabel();
+
+        // Обычная кнопка, а не рамка с жестом: заголовок окна считает перетаскиваемой всю свою область, кроме настоящих
+        // кнопок. Прозрачная кнопка лежит под значком и подписью и принимает нажатие.
+        var hit = new Button
         {
-            HeightRequest = 32,
-            Content = new HorizontalStackLayout { Spacing = 8, Padding = new Thickness(12, 0), Children = { icon, label }, VerticalOptions = LayoutOptions.Center },
+            Text = string.Empty,
+            BackgroundColor = Colors.Transparent,
+            BorderWidth = 1,
+            CornerRadius = 4,
+            Padding = new Thickness(0),
+            HeightRequest = 22,
+            MinimumHeightRequest = 0,
         };
+        hit.SetDynamicResource(Button.BorderColorProperty, "Line");
+        hit.Clicked += (_, _) => OpenLanguageMenu(hit);
+
+        var face = new HorizontalStackLayout
+        {
+            Spacing = 6,
+            Padding = new Thickness(8, 0),
+            InputTransparent = true,
+            VerticalOptions = LayoutOptions.Center,
+            Children = { globe, _languageLabel },
+        };
+
+        var button = new Grid
+        {
+            HeightRequest = 22,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.End,
+            Margin = new Thickness(0, 0, 14, 0),
+            Children = { hit, face },
+        };
+
+        var content = new Grid { ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }, Padding = new Thickness(12, 0, 0, 0), VerticalOptions = LayoutOptions.Center };
+        content.Add(new HorizontalStackLayout { Spacing = 8, Children = { icon, label }, VerticalOptions = LayoutOptions.Center }, 0, 0);
+        content.Add(button, 1, 0);
+
+        var titleBar = new TitleBar { HeightRequest = 32, Content = content };
         titleBar.SetDynamicResource(VisualElement.BackgroundColorProperty, "Side");
         titleBar.SetDynamicResource(TitleBar.ForegroundColorProperty, "InkMuted");
         return titleBar;
+    }
+
+    private void UpdateLanguageLabel()
+    {
+        if (_languageLabel is not null)
+        {
+            _languageLabel.Text = Loc.Current.Label + " ▾";
+        }
+    }
+
+    private void OpenLanguageMenu(VisualElement anchor)
+    {
+        var entries = Loc.Languages.Select(l => new Controls.DropEntry(l.Name, Hint: l.Label)).ToList();
+        var selected = Loc.Languages.ToList().FindIndex(l => l.Code == Loc.Current.Code);
+        Controls.DropMenu.Show(anchor, entries, selected, index => _services.GetRequiredService<UserSettings>().Language = Loc.Languages[index].Code, mono: false);
+    }
+
+    /// <summary>
+    /// Язык сменили: окно пересобирается, страницы создаются заново на новом языке, и открытый раздел остаётся тем же.
+    /// </summary>
+    private async Task OnLanguageChangedAsync()
+    {
+        UpdateLanguageLabel();
+        if (_window is null || _window.Page is not AppShell)
+        {
+            return;
+        }
+
+        var location = Shell.Current?.CurrentState?.Location.OriginalString ?? "//tasks";
+        var route = location.TrimStart('/').Split('/', '?')[0];
+
+        var shell = new AppShell();
+        _window.Page = shell;
+        ThemeManager.AttachWindow(_window);
+        _services.GetRequiredService<ViewModels.SidebarViewModel>().Relocalize();
+
+        await WaitUntilLoadedAsync(shell);
+        shell.FlyoutWidth = _services.GetRequiredService<ViewModels.SidebarViewModel>().IsCompact ? 56 : 207;
+        if (route.Length > 0 && route != "tasks")
+        {
+            await Shell.Current!.GoToAsync("//" + route);
+        }
     }
 
     private static Task WaitUntilLoadedAsync(VisualElement element)
@@ -132,7 +222,7 @@ public partial class App : Application
             {
                 // Диалог нельзя показывать, пока оболочка не загрузилась: у окна ещё нет корня XAML, и WinUI падает.
                 await WaitUntilLoadedAsync(shell);
-                await _services.GetRequiredService<IDialogService>().AlertAsync("Восстановление данных", notice);
+                await _services.GetRequiredService<IDialogService>().AlertAsync(Loc.T("Восстановление данных"), Loc.Message(notice));
             }
         }
 #pragma warning disable CA1031 // Запуск не должен падать молча: показываем причину на экране и пишем в журнал.
@@ -140,7 +230,7 @@ public partial class App : Application
 #pragma warning restore CA1031
         {
             _services.GetRequiredService<ILogger<App>>().LogCritical(ex, "Не удалось запустить приложение");
-            loading.ShowError($"Не удалось запустить приложение: {ex.Message}");
+            loading.ShowError(Loc.F("Не удалось запустить приложение: {0}", ex.Message));
         }
     }
 }

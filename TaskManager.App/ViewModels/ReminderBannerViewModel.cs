@@ -34,6 +34,7 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
     {
         _settings = settings;
         settings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(Refresh);
+        Loc.Changed += () => MainThread.BeginInvokeOnMainThread(Refresh);
         _clock = clock;
         _navigation = navigation;
         _logger = logger;
@@ -107,11 +108,11 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
         }
 
         IsVisible = ordered.Count > 0 && _settings.ShowReminderBanner;
-        Title = $"Напоминания ({ordered.Count})";
+        Title = Loc.F("Напоминания ({0})", ordered.Count);
         Count = ordered.Count;
         OnPropertyChanged(nameof(HasCount));
         HasMore = ordered.Count > MaxVisible;
-        MoreText = HasMore ? $"… и ещё {ordered.Count - MaxVisible}" : string.Empty;
+        MoreText = HasMore ? Loc.F("… и ещё {0}", ordered.Count - MaxVisible) : string.Empty;
     }
 
     private async Task OpenAsync(Reminder reminder)
@@ -137,11 +138,11 @@ public sealed partial class ReminderBannerViewModel : ObservableObject
         // Коротко, как в макете: срок виден на карточке задачи, в баннере важна только срочность.
         var state = reminder.Kind switch
         {
-            ReminderKind.Overdue => "просрочена",
-            ReminderKind.DueIn1Hour => "меньше часа",
-            _ => "меньше суток",
+            ReminderKind.Overdue => Loc.T("просрочена"),
+            ReminderKind.DueIn1Hour => Loc.T("меньше часа"),
+            _ => Loc.T("меньше суток"),
         };
 
-        return $"«{reminder.Title}»: {state}";
+        return Loc.F("«{0}»: {1}", reminder.Title, state);
     }
 }

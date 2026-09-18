@@ -49,22 +49,22 @@ public sealed partial class TasksViewModel : ViewModelBase
 
         StatusOptions =
         [
-            new FilterOption<TaskStatus?>("Все статусы", null),
+            new FilterOption<TaskStatus?>(Loc.T("Все статусы"), null),
             .. Enum.GetValues<TaskStatus>().Select(s => new FilterOption<TaskStatus?>(DisplayNames.StatusName(s), s)),
         ];
         PriorityOptions =
         [
-            new FilterOption<Priority?>("Все приоритеты", null),
+            new FilterOption<Priority?>(Loc.T("Все приоритеты"), null),
             .. Enum.GetValues<Priority>().Reverse().Select(p => new FilterOption<Priority?>(DisplayNames.PriorityName(p), p)),
         ];
         SortOptions =
         [
-            new FilterOption<IReadOnlyList<TaskSort>?>("Сначала важные и срочные", null),
-            new FilterOption<IReadOnlyList<TaskSort>?>("Ближайший дедлайн", [new TaskSort(TaskSortField.Deadline)]),
-            new FilterOption<IReadOnlyList<TaskSort>?>("Название А–Я", [new TaskSort(TaskSortField.Title)]),
-            new FilterOption<IReadOnlyList<TaskSort>?>("Недавно созданные", [new TaskSort(TaskSortField.CreatedAt, Descending: true)]),
+            new FilterOption<IReadOnlyList<TaskSort>?>(Loc.T("Сначала важные и срочные"), null),
+            new FilterOption<IReadOnlyList<TaskSort>?>(Loc.T("Ближайший дедлайн"), [new TaskSort(TaskSortField.Deadline)]),
+            new FilterOption<IReadOnlyList<TaskSort>?>(Loc.T("Название А–Я"), [new TaskSort(TaskSortField.Title)]),
+            new FilterOption<IReadOnlyList<TaskSort>?>(Loc.T("Недавно созданные"), [new TaskSort(TaskSortField.CreatedAt, Descending: true)]),
             new FilterOption<IReadOnlyList<TaskSort>?>(
-                "По статусу",
+                Loc.T("По статусу"),
                 [new TaskSort(TaskSortField.Status), new TaskSort(TaskSortField.Priority, Descending: true)]),
         ];
         TagOptions = [AllTags];
@@ -72,7 +72,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         ResetFilterValues();
     }
 
-    private static FilterOption<string?> AllTags { get; } = new("Все теги", null);
+    private static FilterOption<string?> AllTags => new(Loc.T("Все теги"), null);
 
     public IReadOnlyList<FilterOption<TaskStatus?>> StatusOptions { get; }
 
@@ -193,43 +193,43 @@ public sealed partial class TasksViewModel : ViewModelBase
     {
         get
         {
-            var parts = new List<string> { $"{AllCount} {Plural(AllCount, "задача", "задачи", "задач")}" };
+            var parts = new List<string> { Loc.Count(AllCount, Loc.T("задача|задачи|задач")) };
             if (OverdueCount > 0)
             {
-                parts.Add($"{OverdueCount} просрочено");
+                parts.Add(Loc.F("{0} просрочено", OverdueCount));
             }
 
             if (BlockedCount > 0)
             {
-                parts.Add($"{BlockedCount} {(BlockedCount == 1 ? "заблокирована" : "заблокировано")}");
+                parts.Add($"{BlockedCount} {Loc.Plural(BlockedCount, "заблокирована|заблокировано|заблокировано")}");
             }
 
             if (!IsBoard)
             {
                 parts.Clear();
-                parts.Add($"{AllCount} {Plural(AllCount, "задача", "задачи", "задач")}");
-                parts.Add("сортировка: " + (SelectedSort?.Title ?? string.Empty).ToLower(System.Globalization.CultureInfo.CurrentCulture));
+                parts.Add(Loc.Count(AllCount, Loc.T("задача|задачи|задач")));
+                parts.Add(Loc.T("сортировка: ") + (SelectedSort?.Title ?? string.Empty).ToLower(Loc.Culture));
             }
 
             return string.Join(" · ", parts);
         }
     }
 
-    public string OverdueChipText => $"Просрочено · {OverdueCount}";
+    public string OverdueChipText => Loc.F("Просрочено · {0}", OverdueCount);
 
-    public string TodayChipText => $"Сегодня · {TodayCount}";
+    public string TodayChipText => Loc.F("Сегодня · {0}", TodayCount);
 
-    public string WeekChipText => $"Неделя · {WeekCount}";
+    public string WeekChipText => Loc.F("Неделя · {0}", WeekCount);
 
-    public string SummaryText => TotalCount == 0 ? "Задач не найдено" : $"Найдено задач: {TotalCount}";
+    public string SummaryText => TotalCount == 0 ? Loc.T("Задач не найдено") : Loc.F("Найдено задач: {0}", TotalCount);
 
-    public string PageText => $"Страница {Page} из {Math.Max(TotalPages, 1)}";
+    public string PageText => Loc.F("Страница {0} из {1}", Page, Math.Max(TotalPages, 1));
 
     /// <summary>Вызывается при показе страницы: подгружает теги и список (данные могли измениться на других экранах).</summary>
     public async Task LoadAsync()
     {
         ApplyListIntent();
-        await RunAsync(LoadTagsAsync, "Не удалось загрузить теги");
+        await RunAsync(LoadTagsAsync, Loc.T("Не удалось загрузить теги"));
         await ReloadAsync();
     }
 
@@ -278,11 +278,11 @@ public sealed partial class TasksViewModel : ViewModelBase
     }
 
     // Заголовки колонок таблицы: стрелка стоит у колонки, по которой сейчас отсортировано.
-    public string TitleHeader => "Название" + Arrow(2);
+    public string TitleHeader => Loc.T("Название") + Arrow(2);
 
-    public string PriorityHeader => "Приоритет" + Arrow(0);
+    public string PriorityHeader => Loc.T("Приоритет") + Arrow(0);
 
-    public string DeadlineHeader => "Дедлайн" + Arrow(1);
+    public string DeadlineHeader => Loc.T("Дедлайн") + Arrow(1);
 
     private string Arrow(int sortOptionIndex) => ReferenceEquals(SelectedSort, SortOptions[sortOptionIndex]) ? " ↓" : string.Empty;
 
@@ -378,7 +378,7 @@ public sealed partial class TasksViewModel : ViewModelBase
             () => _runner.RunAsync(sp => row.IsClosed
                 ? sp.GetRequiredService<TaskService>().ReopenAsync(row.Id, row.RowVersion)
                 : sp.GetRequiredService<TaskService>().ChangeStatusAsync(row.Id, TaskStatus.Done, expectedRowVersion: row.RowVersion)),
-            "Не удалось изменить статус");
+            Loc.T("Не удалось изменить статус"));
 
         // При ошибке строка осталась прежней, но список всё равно обновляем: возможно, задачу изменили в другом месте.
         _ = changed;
@@ -505,7 +505,7 @@ public sealed partial class TasksViewModel : ViewModelBase
             do
             {
                 _reloadRequested = false;
-                await RunAsync(LoadPageAsync, "Не удалось загрузить задачи");
+                await RunAsync(LoadPageAsync, Loc.T("Не удалось загрузить задачи"));
             }
             while (_reloadRequested);
         }

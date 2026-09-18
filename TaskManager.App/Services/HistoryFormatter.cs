@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using TaskManager.Core.Domain;
 using TaskManager.Core.Services;
 using DomainPriority = TaskManager.Core.Domain.Priority;
@@ -26,18 +26,18 @@ public static class HistoryFormatter
 
         var text = entry.FieldName switch
         {
-            "Created" => "Задача создана",
-            "IsDeleted" => entry.NewValue == "True" ? "Задача удалена" : "Задача восстановлена",
-            "NextOccurrence" => $"Создана следующая копия: {entry.NewValue}",
+            "Created" => Loc.T("Задача создана"),
+            "IsDeleted" => entry.NewValue == "True" ? Loc.T("Задача удалена") : Loc.T("Задача восстановлена"),
+            "NextOccurrence" => Loc.F("Создана следующая копия: {0}", entry.NewValue),
             _ => $"{FieldName(entry.FieldName)}: {Value(entry.FieldName, entry.OldValue, zone)} → {Value(entry.FieldName, entry.NewValue, zone)}",
         };
 
         // Пометка, если изменение сделано не пользователем напрямую.
         var origin = entry.Command switch
         {
-            TaskService.AutoBlockCommand or TaskService.AutoUnblockCommand => " (автоматически из-за зависимостей)",
-            TaskService.RecurrenceCommand => " (повторение)",
-            "import" => " (импорт)",
+            TaskService.AutoBlockCommand or TaskService.AutoUnblockCommand => Loc.T(" (автоматически из-за зависимостей)"),
+            TaskService.RecurrenceCommand => Loc.T(" (повторение)"),
+            "import" => Loc.T(" (импорт)"),
             _ => string.Empty,
         };
 
@@ -46,15 +46,15 @@ public static class HistoryFormatter
 
     private static string FieldName(string field) => field switch
     {
-        "Title" => "Название",
-        "Description" => "Описание",
-        "Priority" => "Приоритет",
-        "Status" => "Статус",
-        "Deadline" => "Дедлайн",
-        "Tags" => "Теги",
-        "Recurrence" => "Повторение",
-        "ParentId" => "Родительская задача",
-        "DependsOn" => "Зависимость",
+        "Title" => Loc.T("Название"),
+        "Description" => Loc.T("Описание"),
+        "Priority" => Loc.T("Приоритет"),
+        "Status" => Loc.T("Статус"),
+        "Deadline" => Loc.T("Дедлайн"),
+        "Tags" => Loc.T("Теги"),
+        "Recurrence" => Loc.T("Повторение"),
+        "ParentId" => Loc.T("Родительская задача"),
+        "DependsOn" => Loc.T("Зависимость"),
         _ => field,
     };
 

@@ -1,23 +1,24 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+             xmlns:loc="clr-namespace:TaskManager.App.Services" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
              xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.TrashPage"
              x:DataType="vm:TrashViewModel"
-             Title="Корзина">
+             Title="{loc:T 'Корзина'}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
 
         <!-- Заголовок и действия -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="Корзина" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{loc:T 'Корзина'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
                 <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
             </VerticalStackLayout>
-            <controls:SignalButton Grid.Column="1" Icon="undo" Text="Восстановить выбранные"
+            <controls:SignalButton Grid.Column="1" Icon="undo" Text="{loc:T 'Восстановить выбранные'}"
                                    Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding HasSelection}" />
-            <controls:SignalButton Grid.Column="2" Variant="Danger" Icon="trash" Text="Очистить корзину"
+            <controls:SignalButton Grid.Column="2" Variant="Danger" Icon="trash" Text="{loc:T 'Очистить корзину'}"
                                    Command="{Binding EmptyCommand}" IsEnabled="{Binding HasRows}" />
         </Grid>
 
@@ -25,7 +26,7 @@
         <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="14,10">
             <HorizontalStackLayout Spacing="10">
                 <controls:Icon Kind="bell" Size="16" Color="{DynamicResource InkMuted}" />
-                <Label Text="Удалённые задачи скрыты из списка и статистики. Восстановление возвращает задачу вместе с подзадачами."
+                <Label Text="{loc:T 'Удалённые задачи скрыты из списка и статистики. Восстановление возвращает задачу вместе с подзадачами.'}"
                        FontSize="13" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
             </HorizontalStackLayout>
         </Border>
@@ -35,15 +36,15 @@
             <Grid RowDefinitions="Auto,Auto">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
                       ColumnDefinitions="28,*,150,120,140,250">
-                    <Label Grid.Column="1" Text="Название" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
-                    <Label Grid.Column="2" Text="Был статус" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
-                    <Label Grid.Column="3" Text="Удалена" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
-                    <Label Grid.Column="4" Text="Подзадачи" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{loc:T 'Название'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="{loc:T 'Был статус'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="{loc:T 'Удалена'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="4" Text="{loc:T 'Подзадачи'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                 </Grid>
 
                 <VerticalStackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Rows}">
                     <BindableLayout.EmptyView>
-                        <Label Text="В корзине пусто" HorizontalOptions="Center" Margin="0,28" Style="{StaticResource CaptionLabel}" />
+                        <Label Text="{loc:T 'В корзине пусто'}" HorizontalOptions="Center" Margin="0,28" Style="{StaticResource CaptionLabel}" />
                     </BindableLayout.EmptyView>
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="vm:TrashRowViewModel">
@@ -78,10 +79,10 @@
                                        TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
 
                                 <HorizontalStackLayout Grid.Column="5" Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
-                                    <controls:SignalButton Text="Восстановить" Compact="True"
+                                    <controls:SignalButton Text="{loc:T 'Восстановить'}" Compact="True"
                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TrashViewModel}}, Path=RestoreOneCommand}"
                                                            CommandParameter="{Binding .}" />
-                                    <controls:SignalButton Text="Удалить навсегда" Compact="True" Variant="Danger"
+                                    <controls:SignalButton Text="{loc:T 'Удалить навсегда'}" Compact="True" Variant="Danger"
                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TrashViewModel}}, Path=PurgeOneCommand}"
                                                            CommandParameter="{Binding .}" />
                                 </HorizontalStackLayout>
@@ -94,7 +95,7 @@
             </Grid>
         </Border>
 
-        <Label Grid.Row="3" Text="Удаление навсегда необратимо: перед ним программа спросит подтверждение с числом задач."
+        <Label Grid.Row="3" Text="{loc:T 'Удаление навсегда необратимо: перед ним программа спросит подтверждение с числом задач.'}"
                Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" />
     </Grid>
 </ContentPage>

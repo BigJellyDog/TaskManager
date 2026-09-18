@@ -60,7 +60,7 @@
                                 <Label Grid.Column="2" Margin="10,0,0,0" Text="{Binding Count}" IsVisible="{Binding HasCount}"
                                        FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
                                 <Border Grid.Column="3" Margin="10,0,0,0" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:SidebarViewModel}}, Path=IsExpanded}" Padding="5,0" StrokeShape="RoundRectangle 4" VerticalOptions="Center">
-                                    <Label Text="{Binding Hint}" FontFamily="{StaticResource MonoFont}" FontSize="11"
+                                    <Label Text="{Binding HintText}" FontFamily="{StaticResource MonoFont}" FontSize="11"
                                            TextColor="{DynamicResource InkMuted}" />
                                 </Border>
                             </Grid>

@@ -1,18 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage
+             xmlns:loc="clr-namespace:TaskManager.App.Services" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TaskManager.App.ViewModels"
              xmlns:controls="clr-namespace:TaskManager.App.Controls"
              x:Class="TaskManager.App.Pages.TasksPage"
              x:DataType="vm:TasksViewModel"
-             Title="Задачи">
+             Title="{loc:T 'Задачи'}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
 
         <!-- Заголовок: название, сводка, переключатель Доска/Список, главная кнопка -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="Задачи" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{loc:T 'Задачи'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
                 <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
             </VerticalStackLayout>
 
@@ -21,7 +22,7 @@
                     <Border x:Name="BoardTab" Grid.Column="0" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
                         <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
                             <controls:Icon x:Name="BoardIcon" Kind="board" Size="16" />
-                            <Label x:Name="BoardLabel" Text="Доска" FontSize="12" VerticalOptions="Center" />
+                            <Label x:Name="BoardLabel" Text="{loc:T 'Доска'}" FontSize="12" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowBoardCommand}" />
@@ -30,7 +31,7 @@
                     <Border x:Name="ListTab" Grid.Column="1" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
                         <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
                             <controls:Icon x:Name="ListIcon" Kind="list" Size="16" />
-                            <Label x:Name="ListLabel" Text="Список" FontSize="12" VerticalOptions="Center" />
+                            <Label x:Name="ListLabel" Text="{loc:T 'Список'}" FontSize="12" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ShowListCommand}" />
@@ -39,7 +40,7 @@
                 </Grid>
             </Border>
 
-            <controls:SignalButton Grid.Column="2" Variant="Primary" Icon="plus" Text="Новая задача" Hint="Ctrl+N"
+            <controls:SignalButton Grid.Column="2" Variant="Primary" Icon="plus" Text="{loc:T 'Новая задача'}" Hint="{loc:T 'Ctrl+N'}"
                                    Command="{Binding NewTaskCommand}" />
         </Grid>
 
@@ -48,11 +49,11 @@
             <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,0" HeightRequest="34">
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                     <controls:Icon Grid.Column="0" Kind="search" Size="15" Color="{DynamicResource InkMuted}" />
-                    <Entry x:Name="SearchEntry" Grid.Column="1" Text="{Binding SearchText}" Placeholder="Поиск по названию и описанию"
+                    <Entry x:Name="SearchEntry" Grid.Column="1" Text="{Binding SearchText}" Placeholder="{loc:T 'Поиск по названию и описанию'}"
                            ReturnCommand="{Binding SearchCommand}" FontSize="13" VerticalOptions="Center"
                            MinimumHeightRequest="0" BackgroundColor="Transparent" />
                     <Border Grid.Column="2" Padding="5,0" StrokeShape="RoundRectangle 4" VerticalOptions="Center">
-                        <Label Text="Ctrl K" FontFamily="{StaticResource MonoFont}" FontSize="11" TextColor="{DynamicResource InkMuted}" />
+                        <Label Text="{loc:T 'Ctrl K'}" FontFamily="{StaticResource MonoFont}" FontSize="11" TextColor="{DynamicResource InkMuted}" />
                     </Border>
                 </Grid>
             </Border>
@@ -63,19 +64,19 @@
                                  Command="{Binding ToggleTodayCommand}" />
             <controls:ToggleChip Grid.Column="3" Text="{Binding WeekChipText}" IsActive="{Binding DueThisWeek}"
                                  Command="{Binding ToggleWeekCommand}" />
-            <controls:DropChip Grid.Column="4" Title="Статус" IsVisible="{Binding IsList}" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding SelectedStatus}" />
-            <controls:DropChip Grid.Column="5" Title="Тег" Kind="tag" ItemsSource="{Binding TagOptions}" SelectedItem="{Binding SelectedTag}" />
-            <controls:DropChip Grid.Column="6" Title="Приоритет" Kind="priority" IsVisible="{Binding IsBoard}" ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriority}" />
-            <controls:ToggleChip Grid.Column="7" IsVisible="{Binding IsList}" Text="Скрыть закрытые" IsActive="{Binding HideClosed}"
+            <controls:DropChip Grid.Column="4" Title="{loc:T 'Статус'}" IsVisible="{Binding IsList}" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding SelectedStatus}" />
+            <controls:DropChip Grid.Column="5" Title="{loc:T 'Тег'}" Kind="tag" ItemsSource="{Binding TagOptions}" SelectedItem="{Binding SelectedTag}" />
+            <controls:DropChip Grid.Column="6" Title="{loc:T 'Приоритет'}" Kind="priority" IsVisible="{Binding IsBoard}" ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriority}" />
+            <controls:ToggleChip Grid.Column="7" IsVisible="{Binding IsList}" Text="{loc:T 'Скрыть закрытые'}" IsActive="{Binding HideClosed}"
                                  Command="{Binding ToggleHideClosedCommand}" />
         </Grid>
 
         <!-- Доска: колонки по статусам -->
         <Grid Grid.Row="2" IsVisible="{Binding IsBoard}" ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
-            <controls:BoardColumn Grid.Column="0" ColumnTitle="К выполнению" ColumnIcon="circle" Count="{Binding TodoCount}" ItemsSource="{Binding TodoColumn}" />
-            <controls:BoardColumn Grid.Column="1" ColumnTitle="В работе" ColumnIcon="half" Count="{Binding InProgressCount}" ItemsSource="{Binding InProgressColumn}" />
-            <controls:BoardColumn Grid.Column="2" ColumnTitle="Заблокирована" ColumnIcon="blocked" Count="{Binding BlockedColumnCount}" ItemsSource="{Binding BlockedColumn}" />
-            <controls:BoardColumn Grid.Column="3" ColumnTitle="Выполнена" ColumnIcon="done" Count="{Binding DoneCount}" ItemsSource="{Binding DoneColumn}" />
+            <controls:BoardColumn Grid.Column="0" ColumnTitle="{loc:T 'К выполнению'}" ColumnIcon="circle" Count="{Binding TodoCount}" ItemsSource="{Binding TodoColumn}" />
+            <controls:BoardColumn Grid.Column="1" ColumnTitle="{loc:T 'В работе'}" ColumnIcon="half" Count="{Binding InProgressCount}" ItemsSource="{Binding InProgressColumn}" />
+            <controls:BoardColumn Grid.Column="2" ColumnTitle="{loc:T 'Заблокирована'}" ColumnIcon="blocked" Count="{Binding BlockedColumnCount}" ItemsSource="{Binding BlockedColumn}" />
+            <controls:BoardColumn Grid.Column="3" ColumnTitle="{loc:T 'Выполнена'}" ColumnIcon="done" Count="{Binding DoneCount}" ItemsSource="{Binding DoneColumn}" />
         </Grid>
 
         <!-- Таблица задач -->
@@ -86,7 +87,7 @@
                     <Label Grid.Column="2" Text="{Binding TitleHeader}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center">
                         <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SortByCommand}" CommandParameter="title" /></Label.GestureRecognizers>
                     </Label>
-                    <Label Grid.Column="3" Text="Теги" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="3" Text="{loc:T 'Теги'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                     <Label Grid.Column="4" Text="{Binding PriorityHeader}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center">
                         <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SortByCommand}" CommandParameter="priority" /></Label.GestureRecognizers>
                     </Label>
@@ -155,7 +156,7 @@
 
                                 <HorizontalStackLayout Grid.Column="4" Spacing="5" VerticalOptions="Center">
                                     <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
-                                    <Label Text="{Binding PriorityText}" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
+                                    <Label Text="{Binding PriorityText}" Margin="0,0,4,0" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
                                            TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
 
@@ -192,10 +193,10 @@
         <!-- Низ: сколько найдено, обновить и переключение страниц -->
         <Grid Grid.Row="3" IsVisible="{Binding IsList}" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="12">
             <Label Grid.Column="0" Text="{Binding SummaryText}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
-            <controls:SignalButton Grid.Column="1" Variant="Ghost" Icon="refresh" Text="Обновить" Command="{Binding RefreshCommand}" Compact="True" />
-            <controls:SignalButton Grid.Column="3" Variant="Secondary" Icon="chevron-left" Text="Назад" Command="{Binding PreviousPageCommand}" Compact="True" />
+            <controls:SignalButton Grid.Column="1" Variant="Ghost" Icon="refresh" Text="{loc:T 'Обновить'}" Command="{Binding RefreshCommand}" Compact="True" />
+            <controls:SignalButton Grid.Column="3" Variant="Secondary" Icon="chevron-left" Text="{loc:T 'Назад'}" Command="{Binding PreviousPageCommand}" Compact="True" />
             <Label Grid.Column="4" Text="{Binding PageText}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
-            <controls:SignalButton Grid.Column="5" Variant="Secondary" Icon="chevron-right" IconAfter="True" Text="Вперёд" Command="{Binding NextPageCommand}" Compact="True" />
+            <controls:SignalButton Grid.Column="5" Variant="Secondary" Icon="chevron-right" IconAfter="True" Text="{loc:T 'Вперёд'}" Command="{Binding NextPageCommand}" Compact="True" />
         </Grid>
     </Grid>
 
