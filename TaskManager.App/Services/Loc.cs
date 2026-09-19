@@ -150,7 +150,7 @@ public static class Loc
     private static Dictionary<string, string[]> BuildTable()
     {
         var table = new Dictionary<string, string[]>(StringComparer.Ordinal);
-        foreach (var rows in new[] { Translations.Interface, Translations.Dialogs, Translations.Messages })
+        foreach (var rows in new[] { Translations.Interface, Translations.Dialogs, Translations.Messages, Translations.Demo })
         {
             foreach (var row in rows)
             {

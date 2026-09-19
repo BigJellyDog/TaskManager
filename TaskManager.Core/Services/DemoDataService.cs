@@ -9,10 +9,14 @@ namespace TaskManager.Core.Services;
 /// Демо-данные для знакомства с программой и для скриншотов. Всё создаётся обычными сервисами (поэтому история,
 /// автоблокировки и повторения настоящие), а время сдвигается подставными часами: "20 дней назад" создаётся задача,
 /// "15 дней назад" она завершается. Все демо-задачи отмечены тегом <see cref="DemoTag"/>.
+/// Тексты написаны по-русски; чтобы создать набор на другом языке, в <see cref="SeedAsync"/> передаётся функция перевода.
 /// </summary>
 public class DemoDataService
 {
     public const string DemoTag = "демо";
+
+    /// <summary>Названия демо-тега на всех языках приложения: набор, созданный на одном языке, находится и удаляется на другом.</summary>
+    public static readonly string[] KnownDemoTags = [DemoTag, "demo"];
 
     private readonly ITaskRepository _tasks;
     private readonly ITagRepository _tags;
@@ -30,21 +34,34 @@ public class DemoDataService
     /// <summary>Есть ли уже (не удалённые) демо-задачи.</summary>
     public async Task<bool> HasDemoDataAsync(CancellationToken cancellationToken = default)
     {
-        var page = await RealService().SearchAsync(new TaskFilter(Tag: DemoTag), pageSize: 1, cancellationToken: cancellationToken);
-        return page.TotalCount > 0;
+        foreach (var tag in KnownDemoTags)
+        {
+            var page = await RealService().SearchAsync(new TaskFilter(Tag: tag), pageSize: 1, cancellationToken: cancellationToken);
+            if (page.TotalCount > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Удаляет (в корзину) все демо-задачи. Возвращает, сколько задач удалено.</summary>
     public async Task<int> RemoveDemoDataAsync(CancellationToken cancellationToken = default)
     {
         var service = RealService();
-        var demo = await service.SearchAsync(
-            new TaskFilter(Tag: DemoTag),
-            pageSize: TaskQuery.MaxPageSize,
-            cancellationToken: cancellationToken);
+        var found = new List<TaskItem>();
+        foreach (var tag in KnownDemoTags)
+        {
+            var demo = await service.SearchAsync(
+                new TaskFilter(Tag: tag),
+                pageSize: TaskQuery.MaxPageSize,
+                cancellationToken: cancellationToken);
+            found.AddRange(demo.Items);
+        }
 
         var removed = 0;
-        foreach (var task in demo.Items.OrderBy(t => t.Id))
+        foreach (var task in found.DistinctBy(t => t.Id).OrderBy(t => t.Id))
         {
             try
             {
@@ -61,9 +78,14 @@ public class DemoDataService
         return removed;
     }
 
-    /// <summary>Создаёт демо-набор. Возвращает, сколько задач создано (повторы и копии повторяющихся не считаются).</summary>
-    public async Task<int> SeedAsync(CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Создаёт демо-набор. <paramref name="translate"/> переводит русский текст (название, описание, тег) на язык
+    /// интерфейса; без неё набор получается русским. Возвращает, сколько задач создано (повторы и копии не считаются).
+    /// </summary>
+    public async Task<int> SeedAsync(Func<string, string>? translate = null, CancellationToken cancellationToken = default)
     {
+        string T(string text) => translate?.Invoke(text) ?? text;
+
         var now = _clock.GetUtcNow();
         var zone = _clock.LocalTimeZone;
         var clock = new SimulatedClock(_clock);
@@ -99,11 +121,11 @@ public class DemoDataService
             Step(at, async () =>
             {
                 var request = new CreateTaskRequest(
-                    title,
+                    T(title),
                     priority,
-                    description,
+                    description is null ? null : T(description),
                     deadline,
-                    [DemoTag, .. tags],
+                    [T(DemoTag), .. tags.Select(T)],
                     rule,
                     parent is null ? null : ids[parent]);
                 ids[key] = (await service.CreateAsync(request, cancellationToken)).Id;

@@ -158,7 +158,7 @@ public sealed partial class DataViewModel : ViewModelBase
                 Loc.T("Отмена"))
             : await Dialogs.ConfirmAsync(
                 Loc.T("Демо-данные"),
-                Loc.F("К вашим задачам будет добавлено около 25 демо-задач с тегом «{0}»: проект с подзадачами и зависимостями, просроченные и ближайшие дедлайны, повторения, выполненные задачи с историей. Продолжить?", DemoDataService.DemoTag),
+                Loc.F("К вашим задачам будет добавлено около 25 демо-задач с тегом «{0}»: проект с подзадачами и зависимостями, просроченные и ближайшие дедлайны, повторения, выполненные задачи с историей. Продолжить?", Loc.T(DemoDataService.DemoTag)),
                 Loc.T("Добавить"),
                 Loc.T("Отмена"));
         if (!confirmed)
@@ -174,11 +174,11 @@ public sealed partial class DataViewModel : ViewModelBase
                 await demo.RemoveDemoDataAsync();
             }
 
-            return await demo.SeedAsync();
+            return await demo.SeedAsync(Loc.T);
         });
 
         LastSavedPath = null;
-        StatusMessage = Loc.F("Добавлено демо-задач: {0}. Они отмечены тегом «{1}».", count, DemoDataService.DemoTag);
+        StatusMessage = Loc.F("Добавлено демо-задач: {0}. Они отмечены тегом «{1}».", count, Loc.T(DemoDataService.DemoTag));
     }
 
     private async Task RemoveDemoCoreAsync()
@@ -193,7 +193,7 @@ public sealed partial class DataViewModel : ViewModelBase
 
         var confirmed = await Dialogs.ConfirmAsync(
             Loc.T("Удалить демо-данные"),
-            Loc.F("Все задачи с тегом «{0}» будут удалены (в корзину). Продолжить?", DemoDataService.DemoTag),
+            Loc.F("Все задачи с тегом «{0}» будут удалены (в корзину). Продолжить?", Loc.T(DemoDataService.DemoTag)),
             Loc.T("Удалить"),
             Loc.T("Отмена"));
         if (!confirmed)
