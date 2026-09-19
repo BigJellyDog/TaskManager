@@ -15,7 +15,7 @@
                 <controls:Icon Grid.Column="0" Kind="bell" Size="15" Color="{DynamicResource Ink}" />
                 <Label Grid.Column="1" Text="{loc:Extension 'Напоминания'}" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
                 <Label Grid.Column="2" Text="{loc:Extension 'Скрыть'}" FontSize="12" TextColor="{DynamicResource Accent}"
-                       TextDecorations="Underline" VerticalOptions="Center">
+                       VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding DismissCommand}" />
                     </Label.GestureRecognizers>
@@ -27,7 +27,7 @@
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="vm:ReminderRowViewModel">
                         <Label Text="{Binding Text}" FontSize="12" TextColor="{DynamicResource InkMuted}"
-                               TextDecorations="Underline" LineBreakMode="WordWrap">
+                               LineBreakMode="WordWrap">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
                                     <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
