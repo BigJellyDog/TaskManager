@@ -32,4 +32,7 @@ public class ReminderRepository : IReminderRepository
 
     public async Task AddSentAsync(IEnumerable<SentReminder> reminders, CancellationToken cancellationToken = default) =>
         await _context.SentReminders.AddRangeAsync(reminders, cancellationToken);
+
+    public async Task ClearSentAsync(CancellationToken cancellationToken = default) =>
+        await _context.SentReminders.ExecuteDeleteAsync(cancellationToken);
 }

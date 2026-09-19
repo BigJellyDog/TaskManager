@@ -11,4 +11,7 @@ public interface IReminderRepository
     Task<IReadOnlyList<SentReminder>> GetSentAsync(IReadOnlyCollection<int> taskIds, CancellationToken cancellationToken = default);
 
     Task AddSentAsync(IEnumerable<SentReminder> reminders, CancellationToken cancellationToken = default);
+
+    /// <summary>Забывает все показанные напоминания: при следующем запуске приложения они показываются снова.</summary>
+    Task ClearSentAsync(CancellationToken cancellationToken = default);
 }
