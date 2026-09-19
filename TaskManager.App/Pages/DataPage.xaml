@@ -65,7 +65,7 @@
                             <controls:Icon Kind="check" Size="14" Color="{DynamicResource SDone}" />
                             <Label Text="{Binding StatusMessage}" FontFamily="{StaticResource MonoFont}" FontSize="12"
                                    TextColor="{DynamicResource SDone}" LineBreakMode="TailTruncation" VerticalOptions="Center" />
-                            <Label Text="{loc:Extension 'Показать в папке'}" IsVisible="{Binding HasSavedPath}" FontSize="12" TextColor="{DynamicResource Accent}" TextDecorations="Underline" VerticalOptions="Center">
+                            <Label Text="{loc:Extension 'Показать в папке'}" IsVisible="{Binding HasSavedPath}" FontSize="12" TextColor="{DynamicResource Accent}" VerticalOptions="Center">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding RevealSavedCommand}" />
                                 </Label.GestureRecognizers>
