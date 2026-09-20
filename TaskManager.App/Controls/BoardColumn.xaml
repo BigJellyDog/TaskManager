@@ -18,11 +18,14 @@
                        FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
             </Grid>
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding ItemsSource, Source={x:Reference Root}}" SelectionMode="None"
-                            ItemsLayout="VerticalList">
+            <!-- Отступ между карточками задаёт сам список: поле у карточки в списке WinUI считалось неровно. Значение 3 даёт видимые 8 пикселей, как в макете. -->
+            <CollectionView Grid.Row="1" ItemsSource="{Binding ItemsSource, Source={x:Reference Root}}" SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="3" />
+                </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:TaskRowViewModel">
-                        <Border Margin="0,0,0,8" Padding="12,10" StrokeShape="RoundRectangle 5" StrokeThickness="1"
+                        <Border Padding="12,10" StrokeShape="RoundRectangle 5" StrokeThickness="1"
                                 BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}">
                             <Border.Behaviors>
                                 <controls:HoverBehavior HoverStroke="AccentBrush" RestStroke="LineBrush" IsSuppressed="{Binding IsOverdue}" />
