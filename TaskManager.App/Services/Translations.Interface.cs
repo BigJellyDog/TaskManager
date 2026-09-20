@@ -7,6 +7,7 @@ internal static partial class Translations
     [
         // Разделы и общие слова
         ["Задачи", "Tasks", "Aufgaben", "Завдання"],
+        ["Экспорт от", "Exported on", "Exportiert am", "Експортовано"],
         ["Статистика", "Statistics", "Statistik", "Статистика"],
         ["Данные", "Data", "Daten", "Дані"],
         ["Корзина", "Trash", "Papierkorb", "Кошик"],

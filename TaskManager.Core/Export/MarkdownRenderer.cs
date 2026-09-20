@@ -10,10 +10,15 @@ public static class MarkdownRenderer
 {
     /// <param name="document">Что выводить.</param>
     /// <param name="zone">Часовой пояс, в котором показываются дедлайны.</param>
-    public static string Render(ExportDocument document, TimeZoneInfo zone)
+    /// <param name="translate">
+    /// Перевод русских подписей («Задачи», «в работе», «Высокий» и других) на язык пользователя. Без неё документ русский.
+    /// </param>
+    public static string Render(ExportDocument document, TimeZoneInfo zone, Func<string, string>? translate = null)
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(zone);
+
+        var t = translate ?? (text => text);
 
         var ids = document.Tasks.Select(t => t.Id).ToHashSet();
         var childrenOf = document.Tasks
@@ -24,12 +29,12 @@ public static class MarkdownRenderer
         var roots = document.Tasks.Where(t => t.ParentId is not { } p || !ids.Contains(p));
 
         var text = new StringBuilder();
-        text.Append("# Задачи\n\n");
-        text.Append(CultureInfo.InvariantCulture, $"Экспорт от {TimeZoneInfo.ConvertTime(document.ExportedAt, zone):yyyy-MM-dd HH:mm}\n\n");
+        text.Append(CultureInfo.InvariantCulture, $"# {t("Задачи")}\n\n");
+        text.Append(CultureInfo.InvariantCulture, $"{t("Экспорт от")} {TimeZoneInfo.ConvertTime(document.ExportedAt, zone):yyyy-MM-dd HH:mm}\n\n");
 
         foreach (var root in roots)
         {
-            AppendTask(text, root, childrenOf, zone, depth: 0);
+            AppendTask(text, root, childrenOf, zone, t, depth: 0);
         }
 
         return text.ToString();
@@ -40,6 +45,7 @@ public static class MarkdownRenderer
         ExportTask task,
         ILookup<int, ExportTask> childrenOf,
         TimeZoneInfo zone,
+        Func<string, string> t,
         int depth)
     {
         var indent = new string(' ', depth * 2);
@@ -51,7 +57,14 @@ public static class MarkdownRenderer
 
         text.Append(CultureInfo.InvariantCulture, $"{indent}- [{box}] {shown}");
 
-        var details = new List<string> { task.Priority.ToString() };
+        var priority = task.Priority switch
+        {
+            Priority.Critical => "Критический",
+            Priority.High => "Высокий",
+            Priority.Medium => "Средний",
+            _ => "Низкий",
+        };
+        var details = new List<string> { t(priority) };
 
         var state = task.Status switch
         {
@@ -62,12 +75,12 @@ public static class MarkdownRenderer
         };
         if (state is not null)
         {
-            details.Add(state);
+            details.Add(t(state));
         }
 
         if (task.Deadline is { } deadline)
         {
-            details.Add($"до {TimeZoneInfo.ConvertTime(deadline, zone):yyyy-MM-dd HH:mm}");
+            details.Add($"{t("до ")}{TimeZoneInfo.ConvertTime(deadline, zone):yyyy-MM-dd HH:mm}");
         }
 
         if (task.Tags.Count > 0)
@@ -88,7 +101,7 @@ public static class MarkdownRenderer
 
         foreach (var child in childrenOf[task.Id])
         {
-            AppendTask(text, child, childrenOf, zone, depth + 1);
+            AppendTask(text, child, childrenOf, zone, t, depth + 1);
         }
     }
 

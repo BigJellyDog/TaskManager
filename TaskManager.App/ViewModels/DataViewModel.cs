@@ -125,7 +125,7 @@ public sealed partial class DataViewModel : ViewModelBase
                 var content = await _runner.RunAsync(sp =>
                 {
                     var export = sp.GetRequiredService<ExportService>();
-                    return json ? export.ExportJsonAsync(IncludeDeleted) : export.ExportMarkdownAsync(IncludeDeleted);
+                    return json ? export.ExportJsonAsync(IncludeDeleted) : export.ExportMarkdownAsync(IncludeDeleted, Loc.T);
                 });
 
                 var fileName = $"tasks-{_clock.GetLocalNow().ToString("yyyy-MM-dd-HHmmss", CultureInfo.InvariantCulture)}.{(json ? "json" : "md")}";

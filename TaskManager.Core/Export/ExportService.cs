@@ -27,10 +27,10 @@ public class ExportService
     }
 
     /// <summary>Чек-лист в формате Markdown с вложенными подзадачами.</summary>
-    public async Task<string> ExportMarkdownAsync(bool includeDeleted = false, CancellationToken cancellationToken = default)
+    public async Task<string> ExportMarkdownAsync(bool includeDeleted = false, Func<string, string>? translate = null, CancellationToken cancellationToken = default)
     {
         var document = await BuildDocumentAsync(includeDeleted, cancellationToken);
-        return MarkdownRenderer.Render(document, _clock.LocalTimeZone);
+        return MarkdownRenderer.Render(document, _clock.LocalTimeZone, translate);
     }
 
     private async Task<ExportDocument> BuildDocumentAsync(bool includeDeleted, CancellationToken cancellationToken)
