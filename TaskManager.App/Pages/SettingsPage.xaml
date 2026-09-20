@@ -72,9 +72,10 @@
                         <Grid ColumnDefinitions="*,Auto" Padding="0,8">
                             <VerticalStackLayout>
                                 <Label Text="{loc:Extension 'Тема'}" Style="{StaticResource SettingName}" />
-                                <Label Text="{loc:Extension 'Системная переключается автоматически'}" Style="{StaticResource SettingHint}" />
+                                <Label Text="{loc:Extension 'Цветовая тема интерфейса'}" Style="{StaticResource SettingHint}" />
                             </VerticalStackLayout>
-                            <controls:SegmentedChoice Grid.Column="1" Items="{loc:Extension 'Системная|Светлая|Тёмная'}" SelectedIndex="{Binding ThemeIndex}" />
+                            <controls:DropField Grid.Column="1" WidthRequest="190" ItemsSource="{Binding ThemeNames}" SelectedItem="{Binding SelectedTheme}"
+                                                Swatches="{Binding ThemeSwatches}" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="{DynamicResource Line}" />
                         <Grid ColumnDefinitions="*,Auto" Padding="0,8">

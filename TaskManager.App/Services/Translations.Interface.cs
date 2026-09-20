@@ -196,6 +196,8 @@ internal static partial class Translations
         ["Тема", "Theme", "Design", "Тема"],
         ["Системная переключается автоматически", "System follows Windows automatically", "„System“ folgt Windows automatisch", "Системна перемикається автоматично"],
         ["Системная|Светлая|Тёмная", "System|Light|Dark", "System|Hell|Dunkel", "Системна|Світла|Темна"],
+        ["Системная", "System", "System", "Системна"],
+        ["Цветовая тема интерфейса", "Interface color theme", "Farbthema der Oberfläche", "Кольорова тема інтерфейсу"],
         ["Светлая", "Light", "Hell", "Світла"],
         ["Тёмная", "Dark", "Dunkel", "Темна"],
         ["Вид по умолчанию", "Default view", "Standardansicht", "Вигляд за замовчуванням"],

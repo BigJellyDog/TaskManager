@@ -126,6 +126,27 @@ public static class SignalMenu
                 line.Children.Add(bars);
             }
 
+            if (entry.Swatch is { Length: 3 })
+            {
+                var swatch = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+                foreach (var hex in entry.Swatch)
+                {
+                    var color = Microsoft.Maui.Graphics.Color.FromArgb(hex).ToWindowsColor();
+                    swatch.Children.Add(new Border
+                    {
+                        Width = 10,
+                        Height = 14,
+                        CornerRadius = new CornerRadius(2),
+                        Background = new SolidColorBrush(color),
+                        BorderBrush = new SolidColorBrush(global::Windows.UI.Color.FromArgb(115, 128, 128, 128)),
+                        BorderThickness = new Thickness(1),
+                    });
+                }
+
+                Grid.SetColumn(swatch, 1);
+                line.Children.Add(swatch);
+            }
+
             Grid.SetColumn((FrameworkElement)text, 2);
             line.Children.Add(text);
 

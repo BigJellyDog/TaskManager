@@ -6,6 +6,11 @@ public enum ThemeMode
 {
     Dark,
     Light,
+    Dracula,
+    Nord,
+    Gruvbox,
+    Tokyo,
+    Solar,
 }
 
 /// <summary>
@@ -31,8 +36,11 @@ public static class ThemeManager
             return;
         }
 
-        Apply(choice == ThemeChoice.Light ? ThemeMode.Light : ThemeMode.Dark);
+        Apply(Enum.Parse<ThemeMode>(choice.ToString()));
     }
+
+    /// <summary>Светлые темы: обычная светлая и Solarized Light. Остальные тёмные.</summary>
+    public static bool IsLight(ThemeMode mode) => mode is ThemeMode.Light or ThemeMode.Solar;
 
     public static void Apply(ThemeMode mode) => Apply(mode, keepUserTheme: false);
 
@@ -50,14 +58,19 @@ public static class ThemeManager
         }
 
         // Порядок словарей не важен: стили берут цвета через DynamicResource и найдут их в любом месте.
-        merged.Add(mode == ThemeMode.Dark ? new DarkTheme() : new LightTheme());
+        merged.Add(mode switch
+        {
+            ThemeMode.Dark => new DarkTheme(),
+            ThemeMode.Light => new LightTheme(),
+            _ => new PaletteTheme(ThemeCatalog.Palette(mode)),
+        });
 
         // Стандартные элементы (меню, диалоги, полосы прокрутки) берут тему системы, пока мы не скажем иначе.
         ApplyToWindow(mode, keepUserTheme);
 
         if (!keepUserTheme)
         {
-            app.UserAppTheme = mode == ThemeMode.Dark ? AppTheme.Dark : AppTheme.Light;
+            app.UserAppTheme = IsLight(mode) ? AppTheme.Light : AppTheme.Dark;
         }
 
         Current = mode;
@@ -118,7 +131,7 @@ public static class ThemeManager
     private static Microsoft.UI.Xaml.ElementTheme ElementThemeNow() =>
         _followSystem
             ? Microsoft.UI.Xaml.ElementTheme.Default
-            : _mode == ThemeMode.Dark ? Microsoft.UI.Xaml.ElementTheme.Dark : Microsoft.UI.Xaml.ElementTheme.Light;
+            : IsLight(_mode) ? Microsoft.UI.Xaml.ElementTheme.Light : Microsoft.UI.Xaml.ElementTheme.Dark;
 
     /// <summary>Текущая тема приложения в виде темы WinUI, для окон, которые мы рисуем сами.</summary>
     public static Microsoft.UI.Xaml.ElementTheme NativeTheme => ElementThemeNow();
@@ -133,6 +146,6 @@ public static class ThemeManager
 
     private static bool IsTheme(ResourceDictionary dictionary)
     {
-        return dictionary is DarkTheme or LightTheme;
+        return dictionary is DarkTheme or LightTheme or PaletteTheme;
     }
 }

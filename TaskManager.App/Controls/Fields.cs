@@ -77,6 +77,16 @@ public sealed class DropField : Grid
     private readonly Label _label = new() { FontSize = 14, VerticalOptions = LayoutOptions.Center };
     private readonly InputBox _box;
 
+    /// <summary>Образцы цветов к пунктам списка (для выбора темы): по три цвета на пункт, в том же порядке.</summary>
+    public static readonly BindableProperty SwatchesProperty =
+        BindableProperty.Create(nameof(Swatches), typeof(IList<string[]>), typeof(DropField), null);
+
+    public IList<string[]>? Swatches
+    {
+        get => (IList<string[]>?)GetValue(SwatchesProperty);
+        set => SetValue(SwatchesProperty, value);
+    }
+
     public DropField()
     {
         HeightRequest = 38;
@@ -129,7 +139,9 @@ public sealed class DropField : Grid
             return;
         }
 
-        var entries = items.Cast<object>().Select(x => new DropEntry(x.ToString() ?? string.Empty)).ToList();
+        var entries = items.Cast<object>()
+            .Select((x, i) => new DropEntry(x.ToString() ?? string.Empty, Swatch: Swatches is { } s && i < s.Count ? s[i] : null))
+            .ToList();
         DropMenu.Show(_box, entries, items.IndexOf(SelectedItem), index => SelectedItem = items[index], mono: false);
     }
 

@@ -2,9 +2,9 @@
 
 /// <summary>
 /// Строка выпадающего списка. <see cref="Level"/> больше нуля рисует значок приоритета (столбики) в цвете
-/// <see cref="ColorKey"/>; <see cref="Muted"/> делает текст приглушённым (теги); <see cref="Hint"/> — подпись справа (код языка).
+/// <see cref="ColorKey"/>; <see cref="Muted"/> делает текст приглушённым (теги); <see cref="Hint"/> — подпись справа (код языка); <see cref="Swatch"/> — три цвета образца темы.
 /// </summary>
-public sealed record DropEntry(string Text, int Level = 0, string? ColorKey = null, bool Muted = false, string? Hint = null);
+public sealed record DropEntry(string Text, int Level = 0, string? ColorKey = null, bool Muted = false, string? Hint = null, string[]? Swatch = null);
 
 /// <summary>Открывает список в стиле Signal под элементом (чипом, полем). Сейчас только Windows.</summary>
 public static class DropMenu

@@ -20,7 +20,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         pageSizeIndex = Math.Max(0, UserSettings.PageSizes.ToList().IndexOf(settings.PageSize));
         hideClosed = settings.HideClosed;
-        themeIndex = (int)settings.Theme;
+        selectedTheme = ThemeCatalog.DisplayName(ThemeCatalog.Of(settings.Theme));
         defaultViewIndex = settings.DefaultBoard ? 0 : 1;
         showBanner = settings.ShowReminderBanner;
         selectedReminder = ReminderOptions[Math.Max(0, UserSettings.ReminderMinutesOptions.ToList().IndexOf(settings.ReminderMinutes))];
@@ -50,8 +50,13 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool hideClosed;
 
+    /// <summary>Названия тем на языке интерфейса и образцы их цветов для списка.</summary>
+    public IList<string> ThemeNames { get; } = ThemeCatalog.All.Select(ThemeCatalog.DisplayName).ToList();
+
+    public IList<string[]> ThemeSwatches { get; } = ThemeCatalog.All.Select(t => ThemeCatalog.Swatch(t.Choice)).ToList();
+
     [ObservableProperty]
-    private int themeIndex;
+    private string selectedTheme = string.Empty;
 
     [ObservableProperty]
     private int defaultViewIndex;
@@ -63,7 +68,14 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     partial void OnHideClosedChanged(bool value) => _settings.HideClosed = value;
 
-    partial void OnThemeIndexChanged(int value) => _settings.Theme = (ThemeChoice)Math.Clamp(value, 0, 2);
+    partial void OnSelectedThemeChanged(string value)
+    {
+        var index = ThemeNames.IndexOf(value);
+        if (index >= 0)
+        {
+            _settings.Theme = ThemeCatalog.All[index].Choice;
+        }
+    }
 
     partial void OnDefaultViewIndexChanged(int value) => _settings.DefaultBoard = value == 0;
 

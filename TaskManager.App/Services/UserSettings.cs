@@ -4,12 +4,17 @@ using TaskManager.Infrastructure.Reminders;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Выбор темы: «Системная» следует за темой Windows.</summary>
+/// <summary>Выбор темы: «Системная» следует за темой Windows. Числа сохраняются в settings.json, новые темы только в конец.</summary>
 public enum ThemeChoice
 {
     System,
     Light,
     Dark,
+    Dracula,
+    Nord,
+    Gruvbox,
+    Tokyo,
+    Solar,
 }
 
 /// <summary>

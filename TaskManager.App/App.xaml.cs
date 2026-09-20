@@ -12,6 +12,7 @@ public partial class App : Application
     private Window? _window;
     private Label? _languageLabel;
     private Controls.Flag? _languageFlag;
+    private readonly List<Border> _themeSwatches = [];
 
     public App(IServiceProvider services)
     {
@@ -24,6 +25,7 @@ public partial class App : Application
         settings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(() =>
         {
             ThemeManager.Apply(settings.Theme);
+            UpdateThemeButton();
             Loc.Set(settings.Language);
         });
         Loc.Changed += () => MainThread.BeginInvokeOnMainThread(async () => await OnLanguageChangedAsync());
@@ -82,21 +84,31 @@ public partial class App : Application
         UpdateLanguageLabel();
 
         // Обычная кнопка, а не рамка с жестом: заголовок окна считает перетаскиваемой всю свою область, кроме настоящих
-        // кнопок. Прозрачная кнопка лежит под значком и подписью и принимает нажатие.
-        var hit = new Button
+        // кнопок. Нажимаемая прозрачная кнопка лежит сверху на всю площадь; под ней только рисунок, который нажатия не принимает.
+        static Grid PillButton(View face, Action<VisualElement> open)
         {
-            Text = string.Empty,
-            BackgroundColor = Colors.Transparent,
-            BorderWidth = 1,
-            CornerRadius = 4,
-            Padding = new Thickness(0),
-            HeightRequest = 22,
-            MinimumHeightRequest = 0,
-        };
-        hit.SetDynamicResource(Button.BorderColorProperty, "Line");
-        hit.Clicked += (_, _) => OpenLanguageMenu(hit);
+            var hit = new Button
+            {
+                Text = string.Empty,
+                BackgroundColor = Colors.Transparent,
+                BorderWidth = 1,
+                CornerRadius = 4,
+                Padding = new Thickness(0),
+                HeightRequest = 22,
+                MinimumHeightRequest = 0,
+            };
+            hit.SetDynamicResource(Button.BorderColorProperty, "Line");
+            hit.Clicked += (_, _) => open(hit);
 
-        var face = new HorizontalStackLayout
+            return new Grid
+            {
+                HeightRequest = 22,
+                VerticalOptions = LayoutOptions.Center,
+                Children = { face, hit },
+            };
+        }
+
+        var languageFace = new HorizontalStackLayout
         {
             Spacing = 6,
             Padding = new Thickness(8, 0),
@@ -105,14 +117,35 @@ public partial class App : Application
             Children = { _languageFlag, _languageLabel },
         };
 
-        // Нажимаемая кнопка лежит сверху на всю площадь: под ней только рисунок, который нажатия не принимает.
-        var button = new Grid
+        // Кнопка темы: три цветных полоски (фон, поверхность, акцент) текущей темы и стрелка.
+        var themeFace = new HorizontalStackLayout
         {
-            HeightRequest = 22,
+            Spacing = 6,
+            Padding = new Thickness(8, 0),
+            InputTransparent = true,
+            VerticalOptions = LayoutOptions.Center,
+        };
+        var swatchRow = new HorizontalStackLayout { Spacing = 2, VerticalOptions = LayoutOptions.Center };
+        for (var i = 0; i < 3; i++)
+        {
+            var swatch = new Border { WidthRequest = 8, HeightRequest = 12, StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 2 }, StrokeThickness = 0 };
+            _themeSwatches.Add(swatch);
+            swatchRow.Children.Add(swatch);
+        }
+
+        var themeArrow = new Label { Text = "▾", FontFamily = "Consolas", FontSize = 11, VerticalOptions = LayoutOptions.Center };
+        themeArrow.SetDynamicResource(Label.TextColorProperty, "Ink");
+        themeFace.Children.Add(swatchRow);
+        themeFace.Children.Add(themeArrow);
+        UpdateThemeButton();
+
+        var button = new HorizontalStackLayout
+        {
+            Spacing = 8,
             VerticalOptions = LayoutOptions.Center,
             HorizontalOptions = LayoutOptions.End,
             Margin = new Thickness(0, 0, 14, 0),
-            Children = { face, hit },
+            Children = { PillButton(themeFace, OpenThemeMenu), PillButton(languageFace, OpenLanguageMenu) },
         };
 
         var content = new Grid { ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }, Padding = new Thickness(12, 0, 0, 0), VerticalOptions = LayoutOptions.Center };
@@ -132,6 +165,26 @@ public partial class App : Application
             _languageFlag!.Code = Loc.Current.Code;
             _languageLabel.Text = Loc.Current.Label + " ▾";
         }
+    }
+
+    private void UpdateThemeButton()
+    {
+        var choice = _services.GetRequiredService<UserSettings>().Theme;
+        var colors = ThemeCatalog.Swatch(choice);
+        for (var i = 0; i < _themeSwatches.Count; i++)
+        {
+            _themeSwatches[i].BackgroundColor = Color.FromArgb(colors[i]);
+        }
+    }
+
+    private void OpenThemeMenu(VisualElement anchor)
+    {
+        var current = _services.GetRequiredService<UserSettings>().Theme;
+        var entries = ThemeCatalog.All
+            .Select(t => new Controls.DropEntry(ThemeCatalog.DisplayName(t), Swatch: ThemeCatalog.Swatch(t.Choice)))
+            .ToList();
+        var selected = ThemeCatalog.All.ToList().FindIndex(t => t.Choice == current);
+        Controls.DropMenu.Show(anchor, entries, selected, index => _services.GetRequiredService<UserSettings>().Theme = ThemeCatalog.All[index].Choice, mono: false);
     }
 
     private void OpenLanguageMenu(VisualElement anchor)
