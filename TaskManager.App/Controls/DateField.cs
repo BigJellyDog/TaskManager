@@ -12,6 +12,7 @@ public sealed class DateField : HorizontalStackLayout
         BindableProperty.Create(nameof(Date), typeof(DateTime), typeof(DateField), DateTime.Today, BindingMode.TwoWay, propertyChanged: (b, _, _) => ((DateField)b).Apply());
 
     private readonly Label _label = new() { FontFamily = "Consolas", FontSize = 14, VerticalOptions = LayoutOptions.Center };
+    private readonly Icon _icon;
 
     public DateField()
     {
@@ -26,6 +27,9 @@ public sealed class DateField : HorizontalStackLayout
         Children.Add(icon);
         Children.Add(_label);
 
+        _icon = icon;
+        ThemeManager.Changed += OnThemeChanged;
+
         var tap = new TapGestureRecognizer();
         tap.Tapped += (_, _) => Open();
         GestureRecognizers.Add(tap);
@@ -36,6 +40,13 @@ public sealed class DateField : HorizontalStackLayout
     {
         get => (DateTime)GetValue(DateProperty);
         set => SetValue(DateProperty, value);
+    }
+
+    // Подпись уже построенного поля не перекрашивалась при смене темы на лету: цвета берутся заново.
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        _label.SetDynamicResource(Label.TextColorProperty, "Ink");
+        _icon.SetDynamicResource(Icon.ColorProperty, "InkMuted");
     }
 
     private void Apply() => _label.Text = Date.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);

@@ -21,6 +21,18 @@ public static class ThemeManager
 {
     public static ThemeMode Current { get; private set; } = ThemeMode.Dark;
 
+    private static readonly WeakEventManager Events = new();
+
+    /// <summary>
+    /// Тема сменилась. Нужна тому, что красит себя в коде и не обновляется само: подписка слабая, поэтому на экранах,
+    /// которые закрылись, она не держит память. Обработчик должен быть методом объекта, а не лямбдой.
+    /// </summary>
+    public static event EventHandler? Changed
+    {
+        add => Events.AddEventHandler(value);
+        remove => Events.RemoveEventHandler(value);
+    }
+
     /// <summary>Применяет выбор из настроек. «Системная» следует за темой Windows и меняется вместе с ней.</summary>
     public static void Apply(ThemeChoice choice)
     {
@@ -74,6 +86,7 @@ public static class ThemeManager
         }
 
         Current = mode;
+        Events.HandleEvent(null!, EventArgs.Empty, nameof(Changed));
     }
 
     /// <summary>Окно, созданное после выбора темы, тоже получает её (раскрывающиеся списки берут тему от корня окна).</summary>

@@ -57,6 +57,8 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
             new FilterOption<RecurrenceMode>(Loc.T("По календарю (даже если не закрыта)"), RecurrenceMode.ByCalendar),
         ];
 
+        ThemeManager.Changed += OnThemeChanged;
+
         SelectedPriority = PriorityOptions.Single(o => o.Value == Priority.Medium);
         SelectedRecurrence = RecurrenceOptions[0];
         SelectedMode = ModeOptions[0];
@@ -109,6 +111,9 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     public string PreviewTitle => string.IsNullOrWhiteSpace(Title) ? Loc.T("Название задачи") : Title.Trim();
 
     public string PreviewPriorityText => SelectedPriority?.Title ?? string.Empty;
+
+    // Цвет приоритета в предпросмотре берётся из темы при подсчёте: после смены темы на лету считаем заново.
+    private void OnThemeChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(PreviewPriorityColor));
 
     public Color PreviewPriorityColor => AppColors.For(SelectedPriority?.Value ?? Priority.Medium);
 
