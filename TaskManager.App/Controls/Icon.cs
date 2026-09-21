@@ -123,6 +123,7 @@ internal static class IconPaths
     public static IReadOnlyDictionary<string, (string Path, bool Filled)[]> All { get; } =
         new Dictionary<string, (string, bool)[]>
         {
+            ["clock"] = [("M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0", false), ("M12 6v6l4 2", false)], // clock
             ["calendar"] = [("M8 2v4", false), ("M16 2v4", false), ("M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2z", false), ("M3 10h18", false)], // calendar
             ["trash"] = [("M3 6h18", false), ("M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6", false), ("M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2", false), ("M10 11L10 17", false), ("M14 11L14 17", false)], // trash-2
             ["edit"] = [("M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z", false), ("m15 5 4 4", false)], // pencil

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Options;
@@ -31,6 +32,9 @@ public sealed partial class TasksViewModel : ViewModelBase
     private bool _isReloading;
     private bool _reloadRequested;
 
+    // Задачу выполнили из блока напоминаний: список перечитывается.
+    private void OnTasksChanged() => MainThread.BeginInvokeOnMainThread(() => _ = ReloadAsync());
+
     public TasksViewModel(
         ServiceRunner runner,
         TimeProvider clock,
@@ -44,6 +48,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         _clock = clock;
         _navigation = navigation;
         _settings = settings;
+        WeakReferenceMessenger.Default.Register<TasksViewModel, TasksChangedMessage>(this, (r, _) => r.OnTasksChanged());
         hideClosed = settings.HideClosed;
         isBoard = settings.DefaultBoard;
 

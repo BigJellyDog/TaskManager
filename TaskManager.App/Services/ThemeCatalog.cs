@@ -71,6 +71,9 @@ public static class ThemeCatalog
         // Колонка доски: приподнятая поверхность на 55% поверх фона, как в макете.
         palette["Column"] = Mix(v[3], v[0], 0.55);
 
+        // Фон метки «просрочено»: цвет просрочки на 10% поверх поверхности.
+        palette["PCritBg"] = Mix(mode == ThemeMode.Solar ? LightStatus["PCrit"] : DarkStatus["PCrit"], v[2], 0.1);
+
         foreach (var pair in mode == ThemeMode.Solar ? LightStatus : DarkStatus)
         {
             palette[pair.Key] = pair.Value;

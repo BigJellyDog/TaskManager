@@ -17,6 +17,7 @@
     <Color x:Key="OnAccent">#0A0F02</Color>
     <Color x:Key="AccentSoft">#202D0F</Color>
     <Color x:Key="PCrit">#FF7B7B</Color>
+    <Color x:Key="PCritBg">#2A1517</Color>
     <Color x:Key="PHigh">#F5A04A</Color>
     <Color x:Key="PMed">#6FB4FF</Color>
     <Color x:Key="PLow">#9BA7B6</Color>

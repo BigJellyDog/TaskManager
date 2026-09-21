@@ -8,42 +8,71 @@
              x:DataType="vm:ReminderBannerViewModel"
              IsVisible="{Binding IsVisible}">
 
-    <!-- Блок «Напоминания» внизу боковой панели: поверхность с тонкой границей, радиус 6. -->
-    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="10">
+    <!-- Блок «Напоминания» внизу боковой панели, вариант «Главное сейчас»: одно самое срочное напоминание крупно,
+         кнопки «Выполнить» и «Отложить», внизу «1 из 3» со стрелками. Поверхность с тонкой границей, радиус 6. -->
+    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0">
         <VerticalStackLayout Spacing="0">
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" Margin="0,0,0,6">
-                <controls:Icon Grid.Column="0" Kind="bell" Size="15" Color="{DynamicResource Ink}" />
-                <Label Grid.Column="1" Text="{loc:Extension 'Напоминания'}" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
-                <Label Grid.Column="2" Text="{loc:Extension 'Скрыть'}" FontSize="12" TextColor="{DynamicResource Accent}"
-                       VerticalOptions="Center">
+
+            <VerticalStackLayout Padding="12" Spacing="10">
+                <!-- Срочность: рамка и текст цвета срочности, у просроченного красный фон -->
+                <Border HorizontalOptions="Start" StrokeShape="RoundRectangle 3" StrokeThickness="1" Padding="7,2"
+                        Stroke="{Binding TagStroke}" BackgroundColor="{Binding TagBackground}">
+                    <Label Text="{Binding TagText}" FontFamily="{StaticResource MonoFont}" FontSize="10" FontAttributes="Bold"
+                           TextTransform="Uppercase" CharacterSpacing="1" TextColor="{Binding TagColor}" LineBreakMode="NoWrap" />
+                </Border>
+
+                <Label Text="{Binding TitleText}" FontSize="16" FontAttributes="Bold" LineBreakMode="WordWrap">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding DismissCommand}" />
+                        <TapGestureRecognizer Command="{Binding OpenCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
-            </Grid>
 
-            <!-- Клик по строке открывает задачу -->
-            <VerticalStackLayout BindableLayout.ItemsSource="{Binding VisibleItems}" Spacing="2">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ReminderRowViewModel">
-                        <Label Text="{Binding Text}" FontSize="12" TextColor="{DynamicResource InkMuted}"
-                               LineBreakMode="WordWrap">
-                            <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding IsOverdue}" Value="True">
-                                    <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
-                                    <Setter Property="FontAttributes" Value="Bold" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding OpenCommand}" />
-                            </Label.GestureRecognizers>
-                        </Label>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
+                <HorizontalStackLayout Spacing="6">
+                    <controls:Icon Kind="clock" Size="14" Color="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                    <Label FontFamily="{StaticResource MonoFont}" FontSize="12" VerticalOptions="Center" LineBreakMode="NoWrap">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding DateText}" TextColor="{DynamicResource InkMuted}" />
+                                <Span Text=" · " TextColor="{DynamicResource InkMuted}" />
+                                <Span Text="{Binding LeftText}" TextColor="{Binding LeftColor}" FontAttributes="Bold" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </HorizontalStackLayout>
+
+                <!-- Кнопки одна под другой: в панели шириной 207 рядом они не помещаются -->
+                <VerticalStackLayout Spacing="6" HorizontalOptions="Start">
+                    <controls:SignalButton Variant="Primary" Compact="True" Icon="check" Text="{loc:Extension 'Выполнить'}" Command="{Binding CompleteCommand}" />
+                    <controls:SignalButton Compact="True" Icon="clock" Text="{loc:Extension 'Отложить'}" Command="{Binding SnoozeCommand}" />
+                </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <Label Text="{Binding MoreText}" IsVisible="{Binding HasMore}" FontSize="12"
-                   TextColor="{DynamicResource InkMuted}" Margin="0,2,0,0" />
+            <!-- «1 из 3» и стрелки -->
+            <BoxView HeightRequest="1" Color="{DynamicResource Line}" />
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Padding="12,8">
+                <Label Grid.Column="0" Text="{Binding PagerText}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                       TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
+                <Border Grid.Column="1" WidthRequest="26" HeightRequest="26" StrokeShape="RoundRectangle 4" StrokeThickness="1"
+                        Stroke="{DynamicResource LineBrush}" BackgroundColor="Transparent" Padding="0">
+                    <Border.Behaviors>
+                        <controls:HoverBehavior HoverBackground="SurfaceRaised" />
+                    </Border.Behaviors>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding PreviousCommand}" />
+                    </Border.GestureRecognizers>
+                    <controls:Icon Kind="chevron-left" Size="14" Color="{DynamicResource InkMuted}" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <Border Grid.Column="2" WidthRequest="26" HeightRequest="26" StrokeShape="RoundRectangle 4" StrokeThickness="1"
+                        Stroke="{DynamicResource LineBrush}" BackgroundColor="Transparent" Padding="0">
+                    <Border.Behaviors>
+                        <controls:HoverBehavior HoverBackground="SurfaceRaised" />
+                    </Border.Behaviors>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NextCommand}" />
+                    </Border.GestureRecognizers>
+                    <controls:Icon Kind="chevron-right" Size="14" Color="{DynamicResource InkMuted}" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
         </VerticalStackLayout>
     </Border>
 

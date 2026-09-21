@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskManager.App.Services;
@@ -76,6 +77,10 @@ public sealed partial class SidebarViewModel : ObservableObject
             new NavItemViewModel("Настройки", "settings", "settings", "Ctrl 6"),
         ];
         Items[0].IsSelected = true;
+
+        // Задачу выполнили из блока напоминаний: счётчики в панели меняются.
+        WeakReferenceMessenger.Default.Register<SidebarViewModel, TasksChangedMessage>(
+            this, (r, _) => MainThread.BeginInvokeOnMainThread(async () => await r.RefreshCountsAsync()));
     }
 
     public ObservableCollection<NavItemViewModel> Items { get; }
