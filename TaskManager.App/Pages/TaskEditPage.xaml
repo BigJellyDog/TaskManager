@@ -158,10 +158,7 @@
                                 </Border>
 
                                 <controls:InputBox HeightRequest="38" WidthRequest="150" IsEnabled="{Binding HasDeadline}">
-                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                                        <controls:Icon Kind="calendar" Size="14" Color="{DynamicResource InkMuted}" />
-                                        <DatePicker Date="{Binding DeadlineDate}" Format="dd.MM.yyyy" FontSize="14" />
-                                    </HorizontalStackLayout>
+                                    <controls:DateField Date="{Binding DeadlineDate}" />
                                 </controls:InputBox>
                                 <controls:InputBox HeightRequest="38" WidthRequest="100" IsEnabled="{Binding HasDeadline}">
                                     <Entry Text="{Binding DeadlineTimeText}" Placeholder="{loc:Extension 'ЧЧ:ММ'}" MaxLength="5" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalOptions="Center" />
