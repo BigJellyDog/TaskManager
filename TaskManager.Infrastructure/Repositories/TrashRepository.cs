@@ -118,6 +118,12 @@ public class TrashRepository : ITrashRepository
             .ExecuteDeleteAsync(cancellationToken);
         await _context.HistoryEntries.Where(h => list.Contains(h.TaskId)).ExecuteDeleteAsync(cancellationToken);
         await _context.SentReminders.Where(r => list.Contains(r.TaskId)).ExecuteDeleteAsync(cancellationToken);
+
+        // Внешний ключ ParentId — ON DELETE RESTRICT, а SQLite проверяет его сразу для каждой строки, а не в конце команды:
+        // родитель и подзадачи в одном DELETE падают с "FOREIGN KEY constraint failed" (зависит от порядка строк).
+        // Поэтому сначала разрываем связи между удаляемыми задачами.
+        await AllTasks.Where(t => list.Contains(t.Id) && t.ParentId != null)
+            .ExecuteUpdateAsync(s => s.SetProperty(t => t.ParentId, (int?)null), cancellationToken);
         var removed = await AllTasks.Where(t => list.Contains(t.Id)).ExecuteDeleteAsync(cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);
