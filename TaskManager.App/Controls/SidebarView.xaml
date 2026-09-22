@@ -75,8 +75,12 @@
         </Grid>
 
         <!-- Узкая панель: вместо баннера колокольчик со значком числа напоминаний -->
-        <Grid Grid.Row="3" IsVisible="{Binding IsCompact}" WidthRequest="40" HeightRequest="40" HorizontalOptions="Center">
-            <controls:Icon Kind="bell" Size="18" Color="{DynamicResource InkMuted}" />
+        <Grid x:Name="Bell" Grid.Row="3" IsVisible="{Binding IsCompact}" WidthRequest="40" HeightRequest="40" HorizontalOptions="Center"
+              BackgroundColor="Transparent">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBellTapped" />
+            </Grid.GestureRecognizers>
+            <controls:Icon Kind="bell" Size="18" Color="{DynamicResource InkMuted}" InputTransparent="True" />
             <Border IsVisible="{Binding Reminders.HasCount}" BackgroundColor="{DynamicResource PCrit}" StrokeThickness="0"
                     StrokeShape="RoundRectangle 7" Padding="4,0" HorizontalOptions="End" VerticalOptions="Start" Margin="0,2,2,0">
                 <Label Text="{Binding Reminders.Count}" FontSize="10" TextColor="White" />
