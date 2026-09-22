@@ -128,7 +128,24 @@
                         </Border>
 
                         <VerticalStackLayout IsVisible="{Binding HasImportReport}" Spacing="4">
-                            <Label Text="{Binding ImportSummary}" FontFamily="{StaticResource MonoFont}" FontSize="12" TextColor="{DynamicResource InkMuted}" />
+                            <HorizontalStackLayout Spacing="22" Margin="0,0,0,4">
+                                <VerticalStackLayout>
+                                    <Label Text="{loc:Extension 'Добавлено'}" Style="{StaticResource MonoLabel}" FontSize="12" />
+                                    <Label Text="{Binding ImportAdded}" FontSize="16" FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout>
+                                    <Label Text="{loc:Extension 'Пропущено'}" Style="{StaticResource MonoLabel}" FontSize="12" />
+                                    <Label Text="{Binding ImportSkipped}" FontSize="16" FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout>
+                                    <Label Text="{loc:Extension 'Ошибок'}" Style="{StaticResource MonoLabel}" FontSize="12" />
+                                    <Label Text="{Binding ImportErrors}" FontSize="16" FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout>
+                                    <Label Text="{loc:Extension 'Предупреждений'}" Style="{StaticResource MonoLabel}" FontSize="12" />
+                                    <Label Text="{Binding ImportWarnings}" FontSize="16" FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
                             <VerticalStackLayout BindableLayout.ItemsSource="{Binding ImportIssues}" Spacing="3">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate x:DataType="vm:ImportIssueRowViewModel">

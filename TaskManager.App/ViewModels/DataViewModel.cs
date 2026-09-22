@@ -56,7 +56,16 @@ public sealed partial class DataViewModel : ViewModelBase
     private string? lastSavedPath;
 
     [ObservableProperty]
-    private string importSummary = string.Empty;
+    private int importAdded;
+
+    [ObservableProperty]
+    private int importSkipped;
+
+    [ObservableProperty]
+    private int importErrors;
+
+    [ObservableProperty]
+    private int importWarnings;
 
     [ObservableProperty]
     private bool hasImportReport;
@@ -239,7 +248,7 @@ public sealed partial class DataViewModel : ViewModelBase
         }
 
         LastSavedPath = path;
-        StatusMessage = Loc.F("Резервная копия сохранена: {0}", path);
+        StatusMessage = Loc.F("Сохранено: {0}", path);
     }
 
     private async Task RestoreCoreAsync()
@@ -283,13 +292,14 @@ public sealed partial class DataViewModel : ViewModelBase
 
     private void ShowReport(ImportReport report)
     {
-        ImportSummary =
-            Loc.F("Добавлено: {0}   Пропущено: {1}   ", report.Added, report.Skipped.Count) +
-            Loc.F("Ошибок: {0}   Предупреждений: {1}", report.Errors.Count, report.Warnings.Count);
+        ImportAdded = report.Added;
+        ImportSkipped = report.Skipped.Count;
+        ImportErrors = report.Errors.Count;
+        ImportWarnings = report.Warnings.Count;
 
         var rows = new List<ImportIssueRowViewModel>();
         rows.AddRange(report.Errors.Select(i => Row(Loc.T("Ошибка"), i, AppColors.Error)));
-        rows.AddRange(report.Warnings.Select(i => Row(Loc.T("Предупреждение"), i, AppColors.Warning)));
+        rows.AddRange(report.Warnings.Select(i => Row(Loc.T("Внимание"), i, AppColors.Warning)));
         rows.AddRange(report.Skipped.Select(i => Row(Loc.T("Пропущено"), i, AppColors.Muted)));
 
         ImportIssues.Clear();
