@@ -36,6 +36,21 @@
             <Grid RowDefinitions="Auto,Auto">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
                       ColumnDefinitions="28,*,150,120,140,250">
+                    <!-- Выбрать все -->
+                    <Border Grid.Column="0" WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 4" StrokeThickness="1.6"
+                            Stroke="{DynamicResource InkMutedBrush}" BackgroundColor="Transparent"
+                            HorizontalOptions="Start" VerticalOptions="Center" IsVisible="{Binding HasRows}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding AllSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource Accent}" />
+                                <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleSelectAllCommand}" />
+                        </Border.GestureRecognizers>
+                        <controls:Icon Kind="check" Size="14" Color="{DynamicResource OnAccent}" IsVisible="{Binding AllSelected}" />
+                    </Border>
                     <Label Grid.Column="1" Text="{loc:Extension 'Название'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                     <Label Grid.Column="2" Text="{loc:Extension 'Был статус'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                     <Label Grid.Column="3" Text="{loc:Extension 'Удалена'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />

@@ -71,13 +71,18 @@ public sealed partial class TrashViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasRows))]
     [NotifyPropertyChangedFor(nameof(SubtitleText))]
+    [NotifyPropertyChangedFor(nameof(AllSelected))]
     private int count;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
+    [NotifyPropertyChangedFor(nameof(AllSelected))]
     private int selectedCount;
 
     public bool HasRows => Count > 0;
+
+    /// <summary>Выбраны все строки: галочка в шапке таблицы.</summary>
+    public bool AllSelected => Count > 0 && SelectedCount == Count;
 
     public bool HasSelection => SelectedCount > 0;
 
@@ -119,6 +124,17 @@ public sealed partial class TrashViewModel : ViewModelBase
 
     [RelayCommand]
     private void ToggleSelect(TrashRowViewModel row) => row.IsSelected = !row.IsSelected;
+
+    /// <summary>Галочка в шапке: если выбраны все, снимает выбор, иначе выбирает все строки.</summary>
+    [RelayCommand]
+    private void ToggleSelectAll()
+    {
+        var select = !AllSelected;
+        foreach (var row in Rows)
+        {
+            row.IsSelected = select;
+        }
+    }
 
     [RelayCommand]
     private async Task RestoreSelectedAsync()
