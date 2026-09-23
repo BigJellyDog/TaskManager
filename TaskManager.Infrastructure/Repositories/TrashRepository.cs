@@ -114,7 +114,9 @@ public class TrashRepository : ITrashRepository
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
         // Связи зависимостей с обеих сторон, затем история и напоминания, затем сами задачи.
-        await _context.TaskDependencies.Where(d => list.Contains(d.TaskId) || list.Contains(d.DependsOnTaskId))
+        // IgnoreQueryFilters обязателен: у связи есть навигация к задаче, и фильтр мягкого удаления скрывает связи
+        // с удалёнными задачами. Без него они не удалились бы, а удаление самих задач упало бы на внешнем ключе.
+        await _context.TaskDependencies.IgnoreQueryFilters().Where(d => list.Contains(d.TaskId) || list.Contains(d.DependsOnTaskId))
             .ExecuteDeleteAsync(cancellationToken);
         await _context.HistoryEntries.Where(h => list.Contains(h.TaskId)).ExecuteDeleteAsync(cancellationToken);
         await _context.SentReminders.Where(r => list.Contains(r.TaskId)).ExecuteDeleteAsync(cancellationToken);
