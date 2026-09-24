@@ -7,6 +7,8 @@ internal static partial class Translations
     [
         // Разделы и общие слова
         ["Задачи", "Tasks", "Aufgaben", "Завдання"],
+        ["Уведомления Windows", "Windows notifications", "Windows-Benachrichtigungen", "Сповіщення Windows"],
+        ["Показывать системное уведомление", "Show a system notification", "Systembenachrichtigung anzeigen", "Показувати системне сповіщення"],
         ["Экспорт от", "Exported on", "Exportiert am", "Експортовано"],
         ["Сегодня", "Today", "Heute", "Сьогодні"],
         ["Завтра", "Tomorrow", "Morgen", "Завтра"],

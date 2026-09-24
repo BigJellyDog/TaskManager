@@ -115,6 +115,14 @@
                             </VerticalStackLayout>
                             <controls:SwitchToggle Grid.Column="1" IsOn="{Binding ShowBanner}" />
                         </Grid>
+                        <BoxView HeightRequest="1" Color="{DynamicResource Line}" />
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                            <VerticalStackLayout>
+                                <Label Text="{loc:Extension 'Уведомления Windows'}" Style="{StaticResource SettingName}" />
+                                <Label Text="{loc:Extension 'Показывать системное уведомление'}" Style="{StaticResource SettingHint}" />
+                            </VerticalStackLayout>
+                            <controls:SwitchToggle Grid.Column="1" IsOn="{Binding ShowWindowsToast}" />
+                        </Grid>
                     </VerticalStackLayout>
                 </Border>
 

@@ -97,6 +97,13 @@ public sealed class UserSettings
         set => Set(ref _data.ShowReminderBanner, value);
     }
 
+    /// <summary>Показывать напоминания ещё и системным уведомлением Windows.</summary>
+    public bool ShowWindowsToast
+    {
+        get => _data.ShowWindowsToast;
+        set => Set(ref _data.ShowWindowsToast, value);
+    }
+
     private void ApplyReminderInterval() => _reminderOptions.IntervalSeconds = Math.Max(1, _data.ReminderMinutes) * 60;
 
     private void Set<T>(ref T field, T value)
@@ -162,6 +169,7 @@ public sealed class UserSettings
         public bool DefaultBoard = true;
         public int ReminderMinutes = 1;
         public bool ShowReminderBanner = true;
+        public bool ShowWindowsToast = true;
         public string Language = "ru";
     }
 }

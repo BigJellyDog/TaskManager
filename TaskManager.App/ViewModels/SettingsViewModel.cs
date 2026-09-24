@@ -23,6 +23,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         selectedTheme = ThemeCatalog.DisplayName(ThemeCatalog.Of(settings.Theme));
         defaultViewIndex = settings.DefaultBoard ? 0 : 1;
         showBanner = settings.ShowReminderBanner;
+        showWindowsToast = settings.ShowWindowsToast;
         selectedReminder = ReminderOptions[Math.Max(0, UserSettings.ReminderMinutesOptions.ToList().IndexOf(settings.ReminderMinutes))];
     }
 
@@ -64,6 +65,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool showBanner;
 
+    [ObservableProperty]
+    private bool showWindowsToast;
+
     partial void OnPageSizeIndexChanged(int value) => _settings.PageSize = UserSettings.PageSizes[Math.Clamp(value, 0, UserSettings.PageSizes.Count - 1)];
 
     partial void OnHideClosedChanged(bool value) => _settings.HideClosed = value;
@@ -98,6 +102,8 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     partial void OnShowBannerChanged(bool value) => _settings.ShowReminderBanner = value;
+
+    partial void OnShowWindowsToastChanged(bool value) => _settings.ShowWindowsToast = value;
 
     [RelayCommand]
     private void RevealDatabase()
