@@ -91,6 +91,11 @@ public class ReminderService : BackgroundService
                 _logger.LogInformation("Создано повторяющихся задач по расписанию: {Count}", created);
             }
 
+            if (!_options.Enabled)
+            {
+                return;
+            }
+
             var shown = await scope.ServiceProvider.GetRequiredService<ReminderChecker>()
                 .CheckAsync(cancellationToken);
             if (shown.Count > 0)

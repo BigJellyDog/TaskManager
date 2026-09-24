@@ -45,8 +45,8 @@ public sealed class UserSettings
     /// <summary>Допустимые размеры страницы списка.</summary>
     public static IReadOnlyList<int> PageSizes { get; } = [10, 20, 50];
 
-    /// <summary>Допустимые интервалы проверки напоминаний, минуты.</summary>
-    public static IReadOnlyList<int> ReminderMinutesOptions { get; } = [1, 5, 15, 30];
+    /// <summary>Допустимые интервалы проверки напоминаний, минуты. 0 означает «никогда»: напоминания не показываются.</summary>
+    public static IReadOnlyList<int> ReminderMinutesOptions { get; } = [1, 5, 15, 30, 0];
 
     public int PageSize
     {
@@ -104,7 +104,12 @@ public sealed class UserSettings
         set => Set(ref _data.ShowWindowsToast, value);
     }
 
-    private void ApplyReminderInterval() => _reminderOptions.IntervalSeconds = Math.Max(1, _data.ReminderMinutes) * 60;
+    private void ApplyReminderInterval()
+    {
+        // «Никогда» выключает показ напоминаний, а цикл фонового сервиса (повторяющиеся задачи) остаётся с шагом в минуту.
+        _reminderOptions.Enabled = _data.ReminderMinutes > 0;
+        _reminderOptions.IntervalSeconds = Math.Max(1, _data.ReminderMinutes) * 60;
+    }
 
     private void Set<T>(ref T field, T value)
     {

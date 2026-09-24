@@ -46,7 +46,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
 
     /// <summary>Интервалы проверки напоминаний для выпадающего поля: «1 минута», «5 минут» ...</summary>
     public IList<string> ReminderOptions { get; } =
-        UserSettings.ReminderMinutesOptions.Select(m => Loc.T($"{m} {(m == 1 ? "минута" : "минут")}")).ToList();
+        UserSettings.ReminderMinutesOptions.Select(m => m == 0 ? Loc.T("Никогда") : Loc.T($"{m} {(m == 1 ? "минута" : "минут")}")).ToList();
 
     /// <summary>Названия языков на самих языках: Русский, English, Deutsch, Українська.</summary>
     public IList<string> LanguageNames { get; } = Loc.Languages.Select(l => l.Name).ToList();

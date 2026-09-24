@@ -8,6 +8,7 @@ internal static partial class Translations
         // Разделы и общие слова
         ["Задачи", "Tasks", "Aufgaben", "Завдання"],
         ["Изменить…", "Change…", "Ändern…", "Змінити…"],
+        ["Никогда", "Never", "Nie", "Ніколи"],
         ["Уведомления Windows", "Windows notifications", "Windows-Benachrichtigungen", "Сповіщення Windows"],
         ["Показывать системное уведомление", "Show a system notification", "Systembenachrichtigung anzeigen", "Показувати системне сповіщення"],
         ["Экспорт от", "Exported on", "Exportiert am", "Експортовано"],
