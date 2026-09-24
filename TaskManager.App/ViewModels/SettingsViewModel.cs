@@ -4,19 +4,34 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskManager.App.Configuration;
 using TaskManager.App.Services;
+using TaskManager.Core.Abstractions;
 
 namespace TaskManager.App.ViewModels;
 
 /// <summary>Настройки: каждый переключатель сразу записывается в <see cref="UserSettings"/> и применяется.</summary>
-public sealed partial class SettingsViewModel : ObservableObject
+public sealed partial class SettingsViewModel : ViewModelBase
 {
     private readonly UserSettings _settings;
     private readonly IOptions<AppOptions> _options;
+    private readonly IFileService _files;
+    private readonly IDatabaseBackup _backup;
+    private readonly IAppRestarter _restarter;
 
-    public SettingsViewModel(UserSettings settings, IOptions<AppOptions> options)
+    public SettingsViewModel(
+        UserSettings settings,
+        IOptions<AppOptions> options,
+        IFileService files,
+        IDatabaseBackup backup,
+        IAppRestarter restarter,
+        IDialogService dialogs,
+        ILogger<SettingsViewModel> logger)
+        : base(dialogs, logger)
     {
         _settings = settings;
         _options = options;
+        _files = files;
+        _backup = backup;
+        _restarter = restarter;
 
         pageSizeIndex = Math.Max(0, UserSettings.PageSizes.ToList().IndexOf(settings.PageSize));
         hideClosed = settings.HideClosed;
@@ -43,7 +58,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private string selectedReminder = string.Empty;
 
     /// <summary>Полный путь к файлу базы данных.</summary>
-    public string DatabasePath => Path.Combine(AppPaths.DataDirectory, _options.Value.DatabaseFileName);
+    public string DatabasePath => Path.Combine(AppPaths.DatabaseDirectory, _options.Value.DatabaseFileName);
 
     [ObservableProperty]
     private int pageSizeIndex;
@@ -113,9 +128,49 @@ public sealed partial class SettingsViewModel : ObservableObject
         {
             Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
         }
-        else if (Directory.Exists(AppPaths.DataDirectory))
+        else if (Directory.Exists(AppPaths.DatabaseDirectory))
         {
-            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{AppPaths.DataDirectory}\"") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{AppPaths.DatabaseDirectory}\"") { UseShellExecute = true });
         }
+    }
+
+    [RelayCommand]
+    private async Task MoveDatabaseAsync() => await RunAsync(MoveDatabaseCoreAsync, Loc.T("Не удалось перенести базу"));
+
+    private async Task MoveDatabaseCoreAsync()
+    {
+        var folder = await _files.PickFolderAsync();
+        if (folder is null)
+        {
+            return;
+        }
+
+        var target = Path.Combine(folder, _options.Value.DatabaseFileName);
+        if (string.Equals(Path.GetFullPath(target), Path.GetFullPath(DatabasePath), StringComparison.OrdinalIgnoreCase))
+        {
+            await Dialogs.AlertAsync(Loc.T("Перенос базы"), Loc.T("База уже лежит в этой папке."));
+            return;
+        }
+
+        if (File.Exists(target))
+        {
+            await Dialogs.AlertAsync(Loc.T("Перенос базы"), Loc.T("В этой папке уже есть файл базы данных. Выберите другую папку."));
+            return;
+        }
+
+        var confirmed = await Dialogs.ConfirmAsync(
+            Loc.T("Перенос базы"),
+            Loc.F("База будет скопирована в «{0}», после чего приложение перезапустится. Прежний файл останется на месте: его можно удалить вручную. Продолжить?", folder),
+            Loc.T("Перенести"),
+            Loc.T("Отмена"));
+        if (!confirmed)
+        {
+            return;
+        }
+
+        // Согласованная копия работающей базы; указатель меняется только после того, как копия готова.
+        await _backup.CreateBackupAsync(target);
+        AppPaths.SaveDatabaseDirectory(folder);
+        _restarter.Restart();
     }
 }

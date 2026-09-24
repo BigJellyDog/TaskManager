@@ -154,7 +154,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ReminderBannerViewModel>();
 		builder.Services.AddSingleton<SidebarViewModel>();
 		builder.Services.AddSingleton<IReminderNotifier, ReminderNotifier>();
-		builder.Services.AddInfrastructure(Path.Combine(AppPaths.DataDirectory, databaseFileName));
+		builder.Services.AddInfrastructure(Path.Combine(AppPaths.DatabaseDirectory, databaseFileName));
 
 		// Сервисы интерфейса.
 		builder.Services.AddSingleton<UserSettings>();

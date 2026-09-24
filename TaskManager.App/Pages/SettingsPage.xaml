@@ -134,7 +134,10 @@
                         <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,8" BackgroundColor="{DynamicResource Surface}">
                             <Label Text="{Binding DatabasePath}" FontFamily="{StaticResource MonoFont}" FontSize="12" LineBreakMode="CharacterWrap" />
                         </Border>
-                        <controls:SignalButton Text="{loc:Extension 'Показать в папке'}" Compact="True" Command="{Binding RevealDatabaseCommand}" />
+                        <HorizontalStackLayout Spacing="6">
+                            <controls:SignalButton Text="{loc:Extension 'Показать в папке'}" Compact="True" Command="{Binding RevealDatabaseCommand}" />
+                            <controls:SignalButton Text="{loc:Extension 'Изменить…'}" Compact="True" Command="{Binding MoveDatabaseCommand}" />
+                        </HorizontalStackLayout>
                     </VerticalStackLayout>
                 </Border>
 

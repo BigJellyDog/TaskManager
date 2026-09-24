@@ -21,6 +21,9 @@ public interface IFileService
     /// <summary>Путь к файлу в «Документы\TaskManager» (папка создаётся, файл нет).</summary>
     string GetDocumentsFilePath(string fileName);
 
+    /// <summary>Окно выбора папки. Возвращает путь или null, если пользователь отказался.</summary>
+    Task<string?> PickFolderAsync(CancellationToken cancellationToken = default);
+
     /// <summary>Показывает файл в Проводнике.</summary>
     void RevealInFolder(string path);
 }

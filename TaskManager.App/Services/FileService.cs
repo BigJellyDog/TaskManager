@@ -53,6 +53,12 @@ public sealed class FileService(ILogger<FileService> logger) : IFileService
         return file?.FullPath;
     }
 
+    public async Task<string?> PickFolderAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await FolderPicker.Default.PickAsync(cancellationToken);
+        return result.IsSuccessful ? result.Folder.Path : null;
+    }
+
     public async Task<string?> SaveFileWithDialogAsync(string suggestedFileName, string sourceFilePath, CancellationToken cancellationToken = default)
     {
         await using var stream = File.OpenRead(sourceFilePath);
