@@ -64,7 +64,17 @@ public partial class App : Application
             _services.GetRequiredService<HotKeyService>().Attach(window);
             ThemeManager.AttachWindow(window);
         };
-        window.Created += async (_, _) => await StartAsync(window, loading);
+        window.Created += async (_, _) =>
+        {
+#if WINDOWS
+            // Окно запускается поверх остальных, а не остаётся позади запустившей его программы.
+            if (window.Handler?.PlatformView is Microsoft.UI.Xaml.Window native)
+            {
+                Platforms.Windows.WindowActivator.BringToFront(WinRT.Interop.WindowNative.GetWindowHandle(native));
+            }
+#endif
+            await StartAsync(window, loading);
+        };
         window.Destroying += (_, _) => _services.GetRequiredService<AppInitializer>().Shutdown();
 
         return window;
