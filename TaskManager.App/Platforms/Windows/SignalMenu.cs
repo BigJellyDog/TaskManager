@@ -99,30 +99,20 @@ public static class SignalMenu
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
-            // Приоритет: четыре столбика и подпись в цвете приоритета, как в списке и на карточках.
-            // Как в макете: слева место под галочку выбранного пункта, справа приглушённая подпись.
-            var check = new TextBlock
-            {
-                Text = isSelected ? "✓" : string.Empty,
-                Width = 14,
-                Foreground = Brush("Accent"),
-                FontSize = 12,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-
+            // Выбранный пункт отмечен цветом и жирным шрифтом, без галочки. Приоритет: четыре столбика и подпись в цвете
+            // приоритета, как в списке и на карточках; справа приглушённая подпись. Отступы задаёт только то, что есть в строке.
             UIElement content = text;
-            var line = new Grid { ColumnSpacing = 8 };
+            var line = new Grid();
             line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             line.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            Grid.SetColumn(check, 0);
-            line.Children.Add(check);
 
             if (entry.Level > 0)
             {
                 var bars = PriorityBars(entry.Level, colorKey);
-                Grid.SetColumn(bars, 1);
+                bars.Margin = new Thickness(0, 0, 8, 0);
+                Grid.SetColumn(bars, 0);
                 line.Children.Add(bars);
             }
 
@@ -143,6 +133,7 @@ public static class SignalMenu
                     });
                 }
 
+                swatch.Margin = new Thickness(0, 0, 8, 0);
                 Grid.SetColumn(swatch, 1);
                 line.Children.Add(swatch);
             }
