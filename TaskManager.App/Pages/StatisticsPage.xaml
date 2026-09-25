@@ -216,14 +216,15 @@
                     <FlexLayout BindableLayout.ItemsSource="{Binding CompletedColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:ChartColumnViewModel">
-                                <VerticalStackLayout FlexLayout.Grow="1" FlexLayout.Basis="0" Spacing="4" VerticalOptions="End" Margin="2,0">
-                                    <Label Text="{Binding Value}" Style="{StaticResource ChartValue}" />
+                                <VerticalStackLayout FlexLayout.Grow="1" FlexLayout.Basis="0" Spacing="4" VerticalOptions="End" Margin="{Binding Gap}">
+                                    <Label Text="{Binding Value}" Style="{StaticResource ChartValue}" HorizontalOptions="Center"
+                                           WidthRequest="{Binding LabelWidth}" LineBreakMode="NoWrap" HeightRequest="16" />
                                     <Border HeightRequest="78" StrokeThickness="0" StrokeShape="RoundRectangle 3"
                                             BackgroundColor="{DynamicResource SurfaceRaised}">
                                         <BoxView VerticalOptions="End" HeightRequest="{Binding Height}" Color="{Binding Color}" />
                                     </Border>
-                                    <Label Text="{Binding Label}" FontSize="11" TextColor="{DynamicResource InkMuted}"
-                                           HorizontalTextAlignment="Center" LineBreakMode="NoWrap" HeightRequest="16" />
+                                    <Label Text="{Binding Label}" FontSize="11" TextColor="{DynamicResource InkMuted}" HorizontalOptions="Center"
+                                           WidthRequest="{Binding LabelWidth}" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" HeightRequest="16" />
                                 </VerticalStackLayout>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>

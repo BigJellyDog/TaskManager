@@ -12,8 +12,18 @@ namespace TaskManager.App.ViewModels;
 /// <summary>Строка горизонтальной гистограммы приоритетов: значок, полоса, число и доля.</summary>
 public sealed record PriorityBarViewModel(string Title, int Level, int Count, string Percent, double Fraction, Color Color);
 
-/// <summary>Столбец вертикального графика. <see cref="Height"/> уже в пикселях, <see cref="Color"/> — цвет заливки.</summary>
-public sealed record ChartColumnViewModel(string Value, string Label, double Height, Color Color, Color ValueColor);
+/// <summary>
+/// Столбец вертикального графика. <see cref="Height"/> уже в пикселях, <see cref="Color"/> — цвет заливки.
+/// <paramref name="Dense"/>: столбцов много (месяц), они узкие, поэтому зазор меньше, а подписи шире столбца
+/// (они центрируются по нему и выходят за его края, не сдвигая соседей).
+/// </summary>
+public sealed record ChartColumnViewModel(string Value, string Label, double Height, Color Color, Color ValueColor, bool Dense = false)
+{
+    public Thickness Gap => Dense ? new Thickness(1, 0) : new Thickness(2, 0);
+
+    /// <summary>Ширина подписи: -1 — по тексту (обычный график), у плотного фиксированная, чтобы подпись не сжималась до ширины столбца.</summary>
+    public double LabelWidth => Dense ? 40 : -1;
+}
 
 /// <summary>Сегмент полосы статусов; <see cref="Weight"/> — его доля по ширине.</summary>
 public sealed record StatusSegmentViewModel(string Title, string Icon, int Count, double Weight, Color Color);
@@ -201,18 +211,34 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         var weekly = days.Count <= 7;
 
         CompletedColumns.Clear();
+        var peakIndex = -1;
+        for (var i = 0; i < days.Count; i++)
+        {
+            if (days[i].Count > 0 && days[i].Count >= max)
+            {
+                peakIndex = i;
+            }
+        }
+
         for (var i = 0; i < days.Count; i++)
         {
             var day = days[i];
+
+            // Неделя: подпись и число у каждого столбца. Месяц: столбцы узкие, дата только у каждого седьмого (считая от
+            // сегодняшнего, чтобы последние две подписи не наползали друг на друга), число только над самым высоким.
             var label = weekly
                 ? ShortWeekday(day.Day)
-                : (i % 6 == 0 || i == days.Count - 1 ? day.Day.ToString("dd.MM", Ru) : string.Empty);
+                : ((days.Count - 1 - i) % 7 == 0 ? day.Day.ToString("dd.MM", Ru) : string.Empty);
+            var value = weekly || (i == peakIndex)
+                ? day.Count.ToString(Ru)
+                : string.Empty;
             CompletedColumns.Add(new ChartColumnViewModel(
-                day.Count.ToString(Ru),
+                value,
                 label,
                 BarHeight(day.Count, max),
                 day.Count == 0 ? line : accent,
-                muted));
+                muted,
+                Dense: !weekly));
         }
 
         var total = days.Sum(d => d.Count);
