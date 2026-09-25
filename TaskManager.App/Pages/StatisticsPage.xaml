@@ -213,22 +213,7 @@
             <Border Grid.Column="1" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{loc:Extension 'Выполнено по дням'}" Style="{StaticResource PanelTitle}" />
-                    <FlexLayout BindableLayout.ItemsSource="{Binding CompletedColumns}" Direction="Row" AlignItems="End" HeightRequest="128">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ChartColumnViewModel">
-                                <VerticalStackLayout FlexLayout.Grow="1" FlexLayout.Basis="0" Spacing="4" VerticalOptions="End" Margin="{Binding Gap}">
-                                    <Label Text="{Binding Value}" Style="{StaticResource ChartValue}" HorizontalOptions="Center"
-                                           WidthRequest="{Binding LabelWidth}" LineBreakMode="NoWrap" HeightRequest="16" />
-                                    <Border HeightRequest="78" StrokeThickness="0" StrokeShape="RoundRectangle 3"
-                                            BackgroundColor="{DynamicResource SurfaceRaised}">
-                                        <BoxView VerticalOptions="End" HeightRequest="{Binding Height}" Color="{Binding Color}" />
-                                    </Border>
-                                    <Label Text="{Binding Label}" FontSize="11" TextColor="{DynamicResource InkMuted}" HorizontalOptions="Center"
-                                           WidthRequest="{Binding LabelWidth}" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" HeightRequest="16" />
-                                </VerticalStackLayout>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </FlexLayout>
+                    <controls:DayChart Columns="{Binding CompletedColumns}" />
                     <Label Text="{Binding CompletedHint}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" />
                 </VerticalStackLayout>
             </Border>
