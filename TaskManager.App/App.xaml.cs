@@ -224,7 +224,7 @@ public partial class App : Application
         _services.GetRequiredService<ViewModels.SidebarViewModel>().Relocalize();
 
         await WaitUntilLoadedAsync(shell);
-        shell.FlyoutWidth = _services.GetRequiredService<ViewModels.SidebarViewModel>().IsCompact ? 56 : 207;
+        shell.FlyoutWidth = _services.GetRequiredService<ViewModels.SidebarViewModel>().IsCompact ? 56 : 228;
         if (route.Length > 0 && route != "tasks")
         {
             await Shell.Current!.GoToAsync("//" + route);

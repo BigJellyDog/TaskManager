@@ -82,6 +82,7 @@ public static class ThemeManager
 
         // Свечение Aurora (фон страницы, тень акцентных элементов) собирается из цветов только что выбранной темы.
         merged.Add(new GlowTheme(theme, IsLight(mode)));
+        GlowBrushes.Apply(app.Resources, theme, IsLight(mode));
 
         // Стандартные элементы (меню, диалоги, полосы прокрутки) берут тему системы, пока мы не скажем иначе.
         ApplyToWindow(mode, keepUserTheme);

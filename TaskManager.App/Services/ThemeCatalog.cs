@@ -12,15 +12,15 @@ public static class ThemeCatalog
     public static IReadOnlyList<ThemeInfo> All { get; } =
     [
         new(ThemeChoice.System, "Системная", "#090B0F", "#12161C", "#C6F25A"),
-        new(ThemeChoice.AuroraDark, "Aurora", "#06060C", "#11111F", "#A78BFA"),
-        new(ThemeChoice.AuroraLight, "Aurora Light", "#F4F2FF", "#FFFFFF", "#6D3FE0"),
+        new(ThemeChoice.AuroraDark, "Аврора", "#06060C", "#11111F", "#A78BFA"),
+        new(ThemeChoice.AuroraLight, "Аврора светлая", "#F4F2FF", "#FFFFFF", "#6D3FE0"),
         new(ThemeChoice.Dark, "Тёмная", "#090B0F", "#12161C", "#C6F25A"),
         new(ThemeChoice.Light, "Светлая", "#F1F3F6", "#FFFFFF", "#476F00"),
         new(ThemeChoice.Dracula, "Dracula", "#282A36", "#2B2D3A", "#BD93F9"),
         new(ThemeChoice.Nord, "Nord", "#262B35", "#2A2F3A", "#88C0D0"),
         new(ThemeChoice.Gruvbox, "Gruvbox", "#282828", "#2D2B2A", "#FABD2F"),
-        new(ThemeChoice.Tokyo, "Tokyo Night", "#1A1B26", "#24283B", "#7AA2F7"),
-        new(ThemeChoice.Solar, "Solarized Light", "#FDF6E3", "#FFFBEE", "#1A6498"),
+        new(ThemeChoice.Tokyo, "Токийская ночь", "#1A1B26", "#24283B", "#7AA2F7"),
+        new(ThemeChoice.Solar, "Solarized светлая", "#FDF6E3", "#FFFBEE", "#1A6498"),
     ];
 
     public static ThemeInfo Of(ThemeChoice choice) => All.First(t => t.Choice == choice);
@@ -126,48 +126,76 @@ public sealed class PaletteTheme : ResourceDictionary
 }
 
 /// <summary>
-/// Свечение дизайна Aurora, собранное из цветов выбранной темы: фон страницы (мягкое пятно акцента в левом верхнем
-/// углу) и цвет тени у акцентных элементов. Лежит отдельным словарём, чтобы подходить к любой теме, а не только к Aurora.
+/// Кисти дизайна Aurora: фон страницы, градиент карточек, основной кнопки и выбранного пункта меню. Каждая кисть создаётся
+/// один раз и лежит в ресурсах приложения, а при смене темы только перекрашивается на месте. Замена самой кисти в словаре
+/// темы не годится: элементы со стилем на DynamicResource-кисть иногда оставались в цветах прежней темы.
 /// </summary>
+public static class GlowBrushes
+{
+    private static readonly RadialGradientBrush PageGlow = new(
+        [new GradientStop(Colors.Black, 0f), new GradientStop(Colors.Black, 1f)], new Point(0, 0), 1.1f);
+
+    private static readonly LinearGradientBrush CardGradient = new(
+        [new GradientStop(Colors.Black, 0f), new GradientStop(Colors.Black, 1f)], new Point(0, 0), new Point(0, 1));
+
+    private static readonly LinearGradientBrush AccentSoftGradient = new(
+        [new GradientStop(Colors.Black, 0f), new GradientStop(Colors.Black, 1f)], new Point(0, 0), new Point(1, 0));
+
+    private static readonly LinearGradientBrush AccentGradient = new(
+        [new GradientStop(Colors.Black, 0f), new GradientStop(Colors.Black, 1f)], new Point(0, 0), new Point(1, 1));
+
+    private static readonly SolidColorBrush AccentBorder = new(Colors.Black);
+
+    /// <summary>Кладёт кисти в ресурсы приложения (один раз) и перекрашивает их под цвета темы.</summary>
+    public static void Apply(ResourceDictionary appResources, ResourceDictionary theme, bool light)
+    {
+        ArgumentNullException.ThrowIfNull(appResources);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        appResources["PageGlow"] = PageGlow;
+        appResources["CardGradient"] = CardGradient;
+        appResources["AccentSoftGradient"] = AccentSoftGradient;
+        appResources["AccentGradient"] = AccentGradient;
+        appResources["AccentBorder"] = AccentBorder;
+
+        Color Get(string key, Color fallback) => theme.TryGetValue(key, out var v) && v is Color c ? c : fallback;
+        var bg = Get("Bg", Colors.Black);
+        var accent = Get("Accent", Colors.Gray);
+        var second = Get("A2", accent);
+        var surface = Get("Surface", bg);
+        var raised = Get("SurfaceRaised", surface);
+
+        // Фон страницы: мягкое пятно акцента в левом верхнем углу.
+        PageGlow.GradientStops[0].Color = Color.FromArgb(ThemeCatalog.Mix(accent.ToArgbHex(), bg.ToArgbHex(), light ? 0.12 : 0.20));
+        PageGlow.GradientStops[1].Color = bg;
+
+        // Карточки и панели: сверху чуть светлее (приподнятая поверхность на 60%), книзу обычная поверхность.
+        CardGradient.GradientStops[0].Color = Color.FromArgb(ThemeCatalog.Mix(raised.ToArgbHex(), surface.ToArgbHex(), 0.6));
+        CardGradient.GradientStops[1].Color = surface;
+
+        // Выбранный пункт меню: градиент от акцента (22%) к второму цвету (8%) и рамка акцента (45%).
+        AccentSoftGradient.GradientStops[0].Color = accent.WithAlpha(0.22f);
+        AccentSoftGradient.GradientStops[1].Color = second.WithAlpha(0.08f);
+        AccentBorder.Color = accent.WithAlpha(0.45f);
+
+        // Основная кнопка и полосы: от акцента ко второму цвету темы.
+        AccentGradient.GradientStops[0].Color = accent;
+        AccentGradient.GradientStops[1].Color = second;
+    }
+}
+
+/// <summary>Цвета свечения и второго акцента темы (тень акцентных элементов, цвет A2). Простые цвета и кисти меняются словарём.</summary>
 public sealed class GlowTheme : ResourceDictionary
 {
     public GlowTheme(ResourceDictionary theme, bool light)
     {
         ArgumentNullException.ThrowIfNull(theme);
 
-        var bg = theme.TryGetValue("Bg", out var b) && b is Color bc ? bc : Colors.Black;
         var accent = theme.TryGetValue("Accent", out var a) && a is Color ac ? ac : Colors.Gray;
         var second = theme.TryGetValue("A2", out var s) && s is Color sc ? sc : accent;
 
         this["Glow"] = accent.WithAlpha(light ? 0.18f : 0.30f);
         this["GlowBrush"] = new SolidColorBrush(accent.WithAlpha(light ? 0.18f : 0.30f));
         this["A2Brush"] = new SolidColorBrush(second);
-
-        var centre = Color.FromArgb(ThemeCatalog.Mix(accent.ToArgbHex(), bg.ToArgbHex(), light ? 0.12 : 0.20));
-        this["PageGlow"] = new RadialGradientBrush(
-            [new GradientStop(centre, 0f), new GradientStop(bg, 1f)],
-            new Point(0, 0),
-            1.1f);
-
-        // Карточки и панели: сверху чуть светлее (приподнятая поверхность на 60%), книзу обычная поверхность.
-        var surface = theme.TryGetValue("Surface", out var sf) && sf is Color sfc ? sfc : bg;
-        var raised = theme.TryGetValue("SurfaceRaised", out var rs) && rs is Color rsc ? rsc : surface;
-        this["CardGradient"] = new LinearGradientBrush(
-            [new GradientStop(Color.FromArgb(ThemeCatalog.Mix(raised.ToArgbHex(), surface.ToArgbHex(), 0.6)), 0f), new GradientStop(surface, 1f)],
-            new Point(0, 0),
-            new Point(0, 1));
-
-        // Выбранный пункт меню: градиент от акцента (22%) к второму цвету (8%) и рамка акцента (45%).
-        this["AccentSoftGradient"] = new LinearGradientBrush(
-            [new GradientStop(accent.WithAlpha(0.22f), 0f), new GradientStop(second.WithAlpha(0.08f), 1f)],
-            new Point(0, 0),
-            new Point(1, 0));
-        this["AccentBorder"] = new SolidColorBrush(accent.WithAlpha(0.45f));
-
-        // Градиент основной кнопки и полос: от акцента ко второму цвету темы.
-        this["AccentGradient"] = new LinearGradientBrush(
-            [new GradientStop(accent, 0f), new GradientStop(second, 1f)],
-            new Point(0, 0),
-            new Point(1, 1));
     }
 }
