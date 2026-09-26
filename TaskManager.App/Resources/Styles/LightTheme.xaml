@@ -15,6 +15,7 @@
     <Color x:Key="InkMuted">#454F5C</Color>
     <Color x:Key="Accent">#476F00</Color>
     <Color x:Key="OnAccent">#FFFFFF</Color>
+    <Color x:Key="A2">#11662D</Color>
     <Color x:Key="AccentSoft">#E6F2CC</Color>
     <Color x:Key="PCritBg">#FBE9EA</Color>
     <Color x:Key="PCrit">#B31F28</Color>

@@ -15,6 +15,8 @@ public enum ThemeChoice
     Gruvbox,
     Tokyo,
     Solar,
+    AuroraDark,
+    AuroraLight,
 }
 
 /// <summary>

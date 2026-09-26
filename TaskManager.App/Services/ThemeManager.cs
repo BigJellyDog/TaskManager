@@ -11,6 +11,8 @@ public enum ThemeMode
     Gruvbox,
     Tokyo,
     Solar,
+    AuroraDark,
+    AuroraLight,
 }
 
 /// <summary>
@@ -51,8 +53,8 @@ public static class ThemeManager
         Apply(Enum.Parse<ThemeMode>(choice.ToString()));
     }
 
-    /// <summary>Светлые темы: обычная светлая и Solarized Light. Остальные тёмные.</summary>
-    public static bool IsLight(ThemeMode mode) => mode is ThemeMode.Light or ThemeMode.Solar;
+    /// <summary>Светлые темы: обычная светлая, Solarized Light и Aurora Light. Остальные тёмные.</summary>
+    public static bool IsLight(ThemeMode mode) => mode is ThemeMode.Light or ThemeMode.Solar or ThemeMode.AuroraLight;
 
     public static void Apply(ThemeMode mode) => Apply(mode, keepUserTheme: false);
 
@@ -70,12 +72,16 @@ public static class ThemeManager
         }
 
         // Порядок словарей не важен: стили берут цвета через DynamicResource и найдут их в любом месте.
-        merged.Add(mode switch
+        ResourceDictionary theme = mode switch
         {
             ThemeMode.Dark => new DarkTheme(),
             ThemeMode.Light => new LightTheme(),
             _ => new PaletteTheme(ThemeCatalog.Palette(mode)),
-        });
+        };
+        merged.Add(theme);
+
+        // Свечение Aurora (фон страницы, тень акцентных элементов) собирается из цветов только что выбранной темы.
+        merged.Add(new GlowTheme(theme, IsLight(mode)));
 
         // Стандартные элементы (меню, диалоги, полосы прокрутки) берут тему системы, пока мы не скажем иначе.
         ApplyToWindow(mode, keepUserTheme);
@@ -159,6 +165,6 @@ public static class ThemeManager
 
     private static bool IsTheme(ResourceDictionary dictionary)
     {
-        return dictionary is DarkTheme or LightTheme or PaletteTheme;
+        return dictionary is DarkTheme or LightTheme or PaletteTheme or GlowTheme;
     }
 }

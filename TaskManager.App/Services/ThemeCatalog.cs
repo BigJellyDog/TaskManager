@@ -12,6 +12,8 @@ public static class ThemeCatalog
     public static IReadOnlyList<ThemeInfo> All { get; } =
     [
         new(ThemeChoice.System, "Системная", "#090B0F", "#12161C", "#C6F25A"),
+        new(ThemeChoice.AuroraDark, "Aurora", "#06060C", "#11111F", "#A78BFA"),
+        new(ThemeChoice.AuroraLight, "Aurora Light", "#F4F2FF", "#FFFFFF", "#6D3FE0"),
         new(ThemeChoice.Dark, "Тёмная", "#090B0F", "#12161C", "#C6F25A"),
         new(ThemeChoice.Light, "Светлая", "#F1F3F6", "#FFFFFF", "#476F00"),
         new(ThemeChoice.Dracula, "Dracula", "#282A36", "#2B2D3A", "#BD93F9"),
@@ -58,6 +60,8 @@ public static class ThemeCatalog
             ThemeMode.Nord => new[] { "#262B35", "#21252E", "#2A2F3A", "#2D3340", "#4C566A", "#ECEFF4", "#C0C8D8", "#88C0D0", "#1B2A30", "#36495A" },
             ThemeMode.Gruvbox => new[] { "#282828", "#1D2021", "#2D2B2A", "#2F2D2C", "#504945", "#EBDBB2", "#BDAE93", "#FABD2F", "#2A1F00", "#4A3F1A" },
             ThemeMode.Tokyo => new[] { "#1A1B26", "#16161E", "#24283B", "#292E42", "#3B4261", "#C0CAF5", "#9AA5CE", "#7AA2F7", "#0F1A33", "#24325A" },
+            ThemeMode.AuroraDark => new[] { "#06060C", "#0B0B16", "#11111F", "#191930", "#2A2A47", "#F1F0FF", "#AAA8CA", "#A78BFA", "#140A33", "#2A2152" },
+            ThemeMode.AuroraLight => new[] { "#F4F2FF", "#FBFAFF", "#FFFFFF", "#EFECFF", "#D8D2F4", "#170F33", "#4F4778", "#6D3FE0", "#FFFFFF", "#ECE6FF" },
             _ => new[] { "#FDF6E3", "#F1EBD8", "#FFFBEE", "#F7F1DE", "#DDD6C1", "#073642", "#4A5F67", "#1A6498", "#FFFFFF", "#E1EDF5" },
         };
 
@@ -72,17 +76,30 @@ public static class ThemeCatalog
         palette["Column"] = Mix(v[3], v[0], 0.55);
 
         // Фон метки «просрочено»: цвет просрочки на 10% поверх поверхности.
-        palette["PCritBg"] = Mix(mode == ThemeMode.Solar ? LightStatus["PCrit"] : DarkStatus["PCrit"], v[2], 0.1);
+        var light = ThemeManager.IsLight(mode);
+        palette["PCritBg"] = Mix(light ? LightStatus["PCrit"] : DarkStatus["PCrit"], v[2], 0.1);
 
-        foreach (var pair in mode == ThemeMode.Solar ? LightStatus : DarkStatus)
+        foreach (var pair in light ? LightStatus : DarkStatus)
         {
             palette[pair.Key] = pair.Value;
         }
 
+        // Второй цвет градиента (кнопка, полосы, свечение): пара к акценту у каждой темы.
+        palette["A2"] = mode switch
+        {
+            ThemeMode.Dracula => "#8BE9FD",
+            ThemeMode.Nord => "#B48EAD",
+            ThemeMode.Gruvbox => "#FE8019",
+            ThemeMode.Tokyo => "#BB9AF7",
+            ThemeMode.Solar => "#2AA198",
+            ThemeMode.AuroraDark => "#22D3EE",
+            _ => "#0A7C94",
+        };
+
         return palette;
     }
 
-    private static string Mix(string top, string bottom, double share)
+    internal static string Mix(string top, string bottom, double share)
     {
         var a = Color.FromArgb(top);
         var b = Color.FromArgb(bottom);
@@ -105,5 +122,37 @@ public sealed class PaletteTheme : ResourceDictionary
                 this[key + "Brush"] = new SolidColorBrush(color);
             }
         }
+    }
+}
+
+/// <summary>
+/// Свечение дизайна Aurora, собранное из цветов выбранной темы: фон страницы (мягкое пятно акцента в левом верхнем
+/// углу) и цвет тени у акцентных элементов. Лежит отдельным словарём, чтобы подходить к любой теме, а не только к Aurora.
+/// </summary>
+public sealed class GlowTheme : ResourceDictionary
+{
+    public GlowTheme(ResourceDictionary theme, bool light)
+    {
+        ArgumentNullException.ThrowIfNull(theme);
+
+        var bg = theme.TryGetValue("Bg", out var b) && b is Color bc ? bc : Colors.Black;
+        var accent = theme.TryGetValue("Accent", out var a) && a is Color ac ? ac : Colors.Gray;
+        var second = theme.TryGetValue("A2", out var s) && s is Color sc ? sc : accent;
+
+        this["Glow"] = accent.WithAlpha(light ? 0.18f : 0.30f);
+        this["GlowBrush"] = new SolidColorBrush(accent.WithAlpha(light ? 0.18f : 0.30f));
+        this["A2Brush"] = new SolidColorBrush(second);
+
+        var centre = Color.FromArgb(ThemeCatalog.Mix(accent.ToArgbHex(), bg.ToArgbHex(), light ? 0.12 : 0.20));
+        this["PageGlow"] = new RadialGradientBrush(
+            [new GradientStop(centre, 0f), new GradientStop(bg, 1f)],
+            new Point(0, 0),
+            1.1f);
+
+        // Градиент основной кнопки и полос: от акцента ко второму цвету темы.
+        this["AccentGradient"] = new LinearGradientBrush(
+            [new GradientStop(accent, 0f), new GradientStop(second, 1f)],
+            new Point(0, 0),
+            new Point(1, 1));
     }
 }
