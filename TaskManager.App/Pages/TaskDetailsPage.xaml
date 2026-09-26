@@ -35,7 +35,7 @@
             <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="14">
 
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="{Binding Title}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                    <Label Text="{Binding Title}" FontSize="30" FontAttributes="Bold" />
 
                     <FlexLayout Wrap="Wrap" AlignItems="Center">
                         <Border StrokeShape="RoundRectangle 99" StrokeThickness="0" Padding="7,2,9,2" Margin="0,0,10,4"
@@ -94,7 +94,7 @@
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Subtasks}" Spacing="6">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:SubtaskRowViewModel">
-                                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="12,8" Margin="{Binding Indent}">
+                                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="12,8" Margin="{Binding Indent}">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding OpenCommand}" />
                                     </Border.GestureRecognizers>
@@ -149,7 +149,7 @@
                             <VerticalStackLayout BindableLayout.ItemsSource="{Binding DependsOn}" Spacing="6">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate x:DataType="vm:DependencyRowViewModel">
-                                        <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="12,8">
+                                        <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="12,8">
                                             <Border.GestureRecognizers>
                                                 <TapGestureRecognizer Command="{Binding OpenCommand}" />
                                             </Border.GestureRecognizers>
@@ -179,7 +179,7 @@
                         <VerticalStackLayout Grid.Column="1" Spacing="6" BindableLayout.ItemsSource="{Binding Blocks}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DependencyRowViewModel">
-                                    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="12,8">
+                                    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="12,8">
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding OpenCommand}" />
                                         </Border.GestureRecognizers>
@@ -198,7 +198,7 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,4,0,0">
-                        <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,0" HeightRequest="34">
+                        <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="10,0" HeightRequest="34">
                             <Grid>
                                 <HorizontalStackLayout VerticalOptions="Center" Spacing="8" InputTransparent="True">
                                     <Label Text="{Binding CandidateText}" FontSize="13" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
@@ -216,7 +216,7 @@
             <!-- Правая колонка: действия, свойства, история -->
             <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="12">
 
-                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
+                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="14">
                     <VerticalStackLayout Spacing="10">
                         <controls:SignalButton Variant="{Binding PrimaryAction.Variant}" Icon="{Binding PrimaryAction.Icon}" Text="{Binding PrimaryAction.Title}"
                                                Command="{Binding PrimaryAction.Command}" IsEnabled="{Binding PrimaryAction.IsEnabled}"
@@ -239,7 +239,7 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
+                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="14">
                     <VerticalStackLayout Spacing="10">
                         <Label Text="{loc:Extension 'Свойства'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" />
                         <Grid ColumnDefinitions="92,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="8">
@@ -263,7 +263,7 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
+                <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="14">
                     <VerticalStackLayout Spacing="6">
                         <Label Text="{loc:Extension 'История'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" Margin="0,0,0,4" />
                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding History}" Spacing="0">
@@ -271,7 +271,7 @@
                                 <DataTemplate x:DataType="vm:HistoryRowViewModel">
                                     <Grid ColumnDefinitions="14,78,*" ColumnSpacing="8" Padding="0,5">
                                         <BoxView Grid.Column="0" WidthRequest="2" HorizontalOptions="Center" VerticalOptions="Fill" Margin="0,16,0,-5" Color="{DynamicResource Line}" />
-                                        <Border Grid.Column="0" WidthRequest="9" HeightRequest="9" StrokeShape="RoundRectangle 5" StrokeThickness="2"
+                                        <Border Grid.Column="0" WidthRequest="9" HeightRequest="9" StrokeShape="RoundRectangle 12" StrokeThickness="2"
                                                 Stroke="{DynamicResource AccentBrush}" BackgroundColor="{DynamicResource Surface}"
                                                 VerticalOptions="Start" Margin="0,5,0,0" />
                                         <Label Grid.Column="1" Text="{Binding When}" FontSize="13" TextColor="{DynamicResource InkMuted}" />

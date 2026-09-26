@@ -24,10 +24,10 @@ public sealed class ToggleChip : Border
 
     private readonly Label _label = new()
     {
-        FontFamily = "Consolas",
+        FontFamily = "Segoe UI Variable",
         FontSize = 11,
         CharacterSpacing = 0.5,
-        TextTransform = TextTransform.Uppercase,
+        TextTransform = TextTransform.None,
         VerticalOptions = LayoutOptions.Center,
     };
 
@@ -111,10 +111,10 @@ public sealed class DropChip : Border
 
     private readonly Label _label = new()
     {
-        FontFamily = "Consolas",
+        FontFamily = "Segoe UI Variable",
         FontSize = 11,
         CharacterSpacing = 0.5,
-        TextTransform = TextTransform.Uppercase,
+        TextTransform = TextTransform.None,
         VerticalOptions = LayoutOptions.Center,
     };
 

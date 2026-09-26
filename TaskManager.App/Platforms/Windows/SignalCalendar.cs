@@ -37,7 +37,7 @@ public static class SignalCalendar
         style.Setters.Add(new Setter(Control.BackgroundProperty, Brush("Surface")));
         style.Setters.Add(new Setter(Control.BorderBrushProperty, Brush("Line")));
         style.Setters.Add(new Setter(Control.BorderThicknessProperty, new Thickness(1)));
-        style.Setters.Add(new Setter(Control.CornerRadiusProperty, new CornerRadius(6)));
+        style.Setters.Add(new Setter(Control.CornerRadiusProperty, new CornerRadius(14)));
         style.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(10)));
 
         var flyout = new Flyout { Placement = FlyoutPlacementMode.Bottom, FlyoutPresenterStyle = style };
@@ -63,7 +63,7 @@ public static class SignalCalendar
 
         var none = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
         var raised = Brush("SurfaceRaised");
-        var mono = new FontFamily("Consolas");
+        var mono = new FontFamily("Segoe UI Variable");
 
         UIElement Arrow(string glyph, int delta)
         {

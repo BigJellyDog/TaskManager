@@ -63,7 +63,7 @@ public static class SignalMenu
         style.Setters.Add(new Setter(Control.BackgroundProperty, Brush("Surface")));
         style.Setters.Add(new Setter(Control.BorderBrushProperty, Brush("Line")));
         style.Setters.Add(new Setter(Control.BorderThicknessProperty, new Thickness(1)));
-        style.Setters.Add(new Setter(Control.CornerRadiusProperty, new CornerRadius(6)));
+        style.Setters.Add(new Setter(Control.CornerRadiusProperty, new CornerRadius(14)));
         style.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(4)));
         style.Setters.Add(new Setter(FrameworkElement.MinWidthProperty, Math.Max(anchor.ActualWidth, 140)));
         style.Setters.Add(new Setter(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Hidden));
@@ -92,7 +92,7 @@ public static class SignalMenu
                 // Теги в макете строчными (#работа), приоритеты и служебные подписи заглавными.
                 Text = mono && !entry.Muted ? entry.Text.ToUpperInvariant() : entry.Text,
                 Foreground = Brush(isSelected && entry.Level == 0 ? "Accent" : colorKey),
-                FontFamily = mono ? new FontFamily("Consolas") : new FontFamily("Segoe UI Variable"),
+                FontFamily = mono ? new FontFamily("Segoe UI Variable") : new FontFamily("Segoe UI Variable"),
                 FontSize = mono ? 12 : 13,
                 CharacterSpacing = mono && !entry.Muted ? 40 : 0,
                 FontWeight = isSelected || entry.Level > 0 ? FontWeights.Bold : FontWeights.Normal,
@@ -147,7 +147,7 @@ public static class SignalMenu
                 {
                     Text = entry.Hint,
                     Foreground = Brush("InkMuted"),
-                    FontFamily = new FontFamily("Consolas"),
+                    FontFamily = new FontFamily("Segoe UI Variable"),
                     FontSize = 11,
                     Margin = new Thickness(14, 0, 0, 0),
                     VerticalAlignment = VerticalAlignment.Center,
@@ -163,7 +163,7 @@ public static class SignalMenu
             {
                 Child = (UIElement)content,
                 Background = none,
-                CornerRadius = new CornerRadius(4),
+                CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(10, 0, 10, 0),
                 MinHeight = 30,
             };

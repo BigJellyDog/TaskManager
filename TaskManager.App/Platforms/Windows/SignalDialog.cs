@@ -51,7 +51,7 @@ public static class SignalDialog
                 Background = Brush("Surface"),
                 BorderBrush = Brush("Line"),
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
+                CornerRadius = new CornerRadius(18),
                 Padding = new Thickness(0),
             };
 
@@ -78,7 +78,7 @@ public static class SignalDialog
                     Background = normal,
                     BorderBrush = Brush(primary ? "Accent" : "Line"),
                     BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(5),
+                    CornerRadius = new CornerRadius(16),
                     Padding = new Thickness(16, 0, 16, 0),
                     MinHeight = 32,
                     MinWidth = 84,
@@ -118,12 +118,11 @@ public static class SignalDialog
             };
             content.Children.Add(new TextBlock
             {
-                Text = title.ToUpperInvariant(),
+                Text = title,
                 Foreground = Brush("Ink"),
-                FontFamily = new FontFamily("Consolas"),
-                FontSize = 12,
+                FontFamily = new FontFamily("Segoe UI Variable"),
+                FontSize = 16,
                 FontWeight = FontWeights.Bold,
-                CharacterSpacing = 100,
             });
             content.Children.Add(new TextBlock
             {

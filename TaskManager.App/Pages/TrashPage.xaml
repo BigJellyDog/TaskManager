@@ -13,7 +13,7 @@
         <!-- Заголовок и действия -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="{loc:Extension 'Корзина'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{loc:Extension 'Корзина'}" FontSize="30" FontAttributes="Bold" />
                 <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
             </VerticalStackLayout>
             <controls:SignalButton Grid.Column="1" Icon="undo" Text="{loc:Extension 'Восстановить выбранные'}"
@@ -23,7 +23,7 @@
         </Grid>
 
         <!-- Пояснение -->
-        <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="14,10">
+        <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="14,10">
             <HorizontalStackLayout Spacing="10">
                 <controls:Icon Kind="bell" Size="16" Color="{DynamicResource InkMuted}" />
                 <Label Text="{loc:Extension 'Удалённые задачи скрыты из списка и статистики. Восстановление возвращает задачу вместе с подзадачами.'}"
@@ -32,7 +32,7 @@
         </Border>
 
         <!-- Таблица -->
-        <Border Grid.Row="2" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0" VerticalOptions="Start">
+        <Border Grid.Row="2" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0" VerticalOptions="Start">
             <Grid RowDefinitions="Auto,Auto">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
                       ColumnDefinitions="28,*,150,120,140,250">

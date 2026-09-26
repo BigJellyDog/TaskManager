@@ -10,7 +10,7 @@
 
     <!-- Блок «Напоминания» внизу боковой панели, вариант «Главное сейчас»: одно самое срочное напоминание крупно,
          кнопки «Выполнить» и «Отложить», внизу «1 из 3» со стрелками. Поверхность с тонкой границей, радиус 6. -->
-    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0">
+    <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0">
         <VerticalStackLayout Spacing="0">
 
             <VerticalStackLayout Padding="12" Spacing="10">
@@ -18,7 +18,7 @@
                 <Border HorizontalOptions="Start" StrokeShape="RoundRectangle 3" StrokeThickness="1" Padding="7,2"
                         Stroke="{Binding TagStroke}" BackgroundColor="{Binding TagBackground}">
                     <Label Text="{Binding TagText}" FontFamily="{StaticResource MonoFont}" FontSize="10" FontAttributes="Bold"
-                           TextTransform="Uppercase" CharacterSpacing="1" TextColor="{Binding TagColor}" LineBreakMode="NoWrap" />
+                           CharacterSpacing="1" TextColor="{Binding TagColor}" LineBreakMode="NoWrap" />
                 </Border>
 
                 <Label Text="{Binding TitleText}" FontSize="16" FontAttributes="Bold" LineBreakMode="WordWrap">

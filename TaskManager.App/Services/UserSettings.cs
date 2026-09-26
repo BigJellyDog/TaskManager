@@ -172,7 +172,7 @@ public sealed class UserSettings
     {
         public int PageSize = 20;
         public bool HideClosed;
-        public ThemeChoice Theme = ThemeChoice.Dark;
+        public ThemeChoice Theme = ThemeChoice.AuroraDark;
         public bool DefaultBoard = true;
         public int ReminderMinutes = 1;
         public bool ShowReminderBanner = true;

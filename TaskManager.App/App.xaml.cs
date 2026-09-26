@@ -55,7 +55,7 @@ public partial class App : Application
                 sidebar.IsCompact = compact;
                 if (Shell.Current is { } shell)
                 {
-                    shell.FlyoutWidth = compact ? 56 : 207;
+                    shell.FlyoutWidth = compact ? 56 : 228;
                 }
             }
         };
@@ -85,11 +85,11 @@ public partial class App : Application
     {
         var icon = new Controls.Icon { Kind = "check", Size = 14 };
         icon.SetDynamicResource(Controls.Icon.ColorProperty, "InkMuted");
-        var label = new Label { Text = "TaskManager", FontFamily = "Consolas", FontSize = 11, CharacterSpacing = 0.4, VerticalOptions = LayoutOptions.Center };
+        var label = new Label { Text = "TaskManager", FontFamily = "Segoe UI Variable", FontSize = 11, CharacterSpacing = 0.4, VerticalOptions = LayoutOptions.Center };
         label.SetDynamicResource(Label.TextColorProperty, "InkMuted");
 
         _languageFlag = new Controls.Flag { Code = Loc.Current.Code };
-        _languageLabel = new Label { FontFamily = "Consolas", FontSize = 11, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center };
+        _languageLabel = new Label { FontFamily = "Segoe UI Variable", FontSize = 11, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center };
         _languageLabel.SetDynamicResource(Label.TextColorProperty, "Ink");
         UpdateLanguageLabel();
 
@@ -143,7 +143,7 @@ public partial class App : Application
             swatchRow.Children.Add(swatch);
         }
 
-        var themeArrow = new Label { Text = "▾", FontFamily = "Consolas", FontSize = 11, VerticalOptions = LayoutOptions.Center };
+        var themeArrow = new Label { Text = "▾", FontFamily = "Segoe UI Variable", FontSize = 11, VerticalOptions = LayoutOptions.Center };
         themeArrow.SetDynamicResource(Label.TextColorProperty, "Ink");
         themeFace.Children.Add(swatchRow);
         themeFace.Children.Add(themeArrow);

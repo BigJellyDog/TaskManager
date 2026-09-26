@@ -13,11 +13,11 @@
         <!-- Заголовок: название, сводка, переключатель Доска/Список, главная кнопка -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="{loc:Extension 'Задачи'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{loc:Extension 'Задачи'}" FontSize="30" FontAttributes="Bold" />
                 <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
             </VerticalStackLayout>
 
-            <Border Grid.Column="1" StrokeShape="RoundRectangle 5" Stroke="{DynamicResource LineBrush}" VerticalOptions="Center">
+            <Border Grid.Column="1" StrokeShape="RoundRectangle 12" Stroke="{DynamicResource LineBrush}" VerticalOptions="Center">
                 <Grid ColumnDefinitions="Auto,Auto">
                     <Border x:Name="BoardTab" Grid.Column="0" Padding="12,0" HeightRequest="30" StrokeThickness="0" StrokeShape="Rectangle">
                         <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
@@ -46,7 +46,7 @@
 
         <!-- Поиск и быстрые фильтры -->
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8">
-            <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="10,0" HeightRequest="34">
+            <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="10,0" HeightRequest="34">
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                     <controls:Icon Grid.Column="0" Kind="search" Size="15" Color="{DynamicResource InkMuted}" />
                     <Entry x:Name="SearchEntry" Grid.Column="1" Text="{Binding SearchText}" Placeholder="{loc:Extension 'Поиск по названию и описанию'}"
@@ -80,7 +80,7 @@
         </Grid>
 
         <!-- Таблица задач -->
-        <Border Grid.Row="2" IsVisible="{Binding IsList}" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="0">
+        <Border Grid.Row="2" IsVisible="{Binding IsList}" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0">
             <Grid RowDefinitions="Auto,*">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="12,0" ColumnSpacing="8"
                       ColumnDefinitions="30,28,*,190,130,130">
@@ -157,7 +157,7 @@
                                 <HorizontalStackLayout Grid.Column="4" Spacing="5" VerticalOptions="Center">
                                     <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
                                     <Label Text="{Binding PriorityText}" Margin="0,0,4,0" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
-                                           TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                           CharacterSpacing="0.4" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
 
                                 <HorizontalStackLayout Grid.Column="5" Spacing="5" VerticalOptions="Center" IsVisible="{Binding HasDeadline}">

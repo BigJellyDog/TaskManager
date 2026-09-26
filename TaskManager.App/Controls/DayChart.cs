@@ -82,7 +82,7 @@ public sealed class DayChart : GraphicsView
             var track = Token("SurfaceRaised", Colors.LightGray);
             var ink = Token("Ink", Colors.Black);
             var muted = Token("InkMuted", Colors.Gray);
-            var mono = new Microsoft.Maui.Graphics.Font("Consolas", 700, FontStyleType.Normal);
+            var mono = new Microsoft.Maui.Graphics.Font("Segoe UI Variable", 700, FontStyleType.Normal);
             var normal = new Microsoft.Maui.Graphics.Font("Segoe UI Variable");
 
             var width = dirtyRect.Width;

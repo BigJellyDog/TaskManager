@@ -8,12 +8,12 @@
              x:DataType="controls:BoardColumn">
 
     <!-- Колонка доски: заголовок со счётчиком и прокручиваемый список карточек -->
-    <Border BackgroundColor="{DynamicResource Column}" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 6" Padding="8">
+    <Border BackgroundColor="{DynamicResource Column}" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 16" Padding="8">
         <Grid RowDefinitions="Auto,*" RowSpacing="8">
             <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="4,2,4,4">
                 <controls:Icon Grid.Column="0" Kind="{Binding ColumnIcon, Source={x:Reference Root}}" Size="14" Color="{DynamicResource InkMuted}" />
                 <Label Grid.Column="1" Text="{Binding ColumnTitle, Source={x:Reference Root}}" FontSize="12" FontAttributes="Bold"
-                       TextTransform="Uppercase" CharacterSpacing="0.7" VerticalOptions="Center" />
+                       CharacterSpacing="0.7" VerticalOptions="Center" />
                 <Label Grid.Column="2" Text="{Binding Count, Source={x:Reference Root}}" FontFamily="{StaticResource MonoFont}"
                        FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
             </Grid>
@@ -25,7 +25,7 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:TaskRowViewModel">
-                        <Border Padding="12,10" StrokeShape="RoundRectangle 5" StrokeThickness="1"
+                        <Border Padding="12,10" StrokeShape="RoundRectangle 12" StrokeThickness="1"
                                 BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}">
                             <Border.Behaviors>
                                 <controls:HoverBehavior HoverStroke="AccentBrush" RestStroke="LineBrush" IsSuppressed="{Binding IsOverdue}" />
@@ -52,7 +52,7 @@
                                     <HorizontalStackLayout Spacing="5" Margin="0,0,10,0">
                                         <controls:PriorityBars Level="{Binding PriorityLevel}" Color="{Binding PriorityColor}" />
                                         <Label Text="{Binding PriorityText}" Margin="0,0,4,0" TextColor="{Binding PriorityColor}" FontSize="11" FontAttributes="Bold"
-                                               TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                               CharacterSpacing="0.4" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                     <HorizontalStackLayout Spacing="5" Margin="0,0,10,0" IsVisible="{Binding HasDeadline}">
                                         <controls:Icon Kind="calendar" Size="13" Color="{DynamicResource InkMuted}">

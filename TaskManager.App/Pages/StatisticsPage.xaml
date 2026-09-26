@@ -11,7 +11,7 @@
     <ContentPage.Resources>
         <!-- Плитка с показателем -->
         <Style x:Key="MetricTile" TargetType="Border" BasedOn="{StaticResource CardBorder}">
-            <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 16" />
             <Setter Property="Padding" Value="14,12" />
         </Style>
         <Style x:Key="MetricCaption" TargetType="Label" BasedOn="{StaticResource MonoLabel}">
@@ -25,7 +25,7 @@
             <Setter Property="FontSize" Value="11" />
         </Style>
         <Style x:Key="Panel" TargetType="Border" BasedOn="{StaticResource CardBorder}">
-            <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 16" />
             <Setter Property="Padding" Value="14,12" />
         </Style>
         <Style x:Key="PanelTitle" TargetType="Label" BasedOn="{StaticResource MonoLabel}">
@@ -52,12 +52,12 @@
         <!-- Заголовок, переключатель периода, обновление -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="{loc:Extension 'Статистика'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                <Label Text="{loc:Extension 'Статистика'}" FontSize="30" FontAttributes="Bold" />
                 <Label Text="{Binding Subtitle}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
             </VerticalStackLayout>
 
             <Border Grid.Column="1" BackgroundColor="{DynamicResource SurfaceRaised}" StrokeThickness="0"
-                    StrokeShape="RoundRectangle 5" Padding="3" VerticalOptions="Center">
+                    StrokeShape="RoundRectangle 12" Padding="3" VerticalOptions="Center">
                 <HorizontalStackLayout Spacing="2">
                     <Border Style="{StaticResource PeriodItem}">
                         <Label Text="{loc:Extension '7 дней'}" FontSize="13" TextColor="{DynamicResource InkMuted}">
@@ -196,7 +196,7 @@
                                     <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
                                         <controls:PriorityBars Level="{Binding Level}" Color="{Binding Color}" />
                                         <Label Text="{Binding Title}" FontSize="11" TextColor="{Binding Color}"
-                                               TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                               CharacterSpacing="0.4" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                     <controls:BarMeter Grid.Column="1" Fraction="{Binding Fraction}" FillColor="{Binding Color}" />
                                     <Label Grid.Column="2" Text="{Binding Count}" Style="{StaticResource ChartValue}"

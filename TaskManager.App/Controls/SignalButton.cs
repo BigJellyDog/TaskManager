@@ -43,17 +43,17 @@ public sealed class SignalButton : Border
 
     private readonly Icon _icon = new() { Size = 16 };
     private readonly Label _label = new() { FontSize = 13, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center };
-    private readonly Label _hint = new() { FontFamily = "Consolas", FontSize = 11, VerticalOptions = LayoutOptions.Center };
+    private readonly Label _hint = new() { FontFamily = "Segoe UI Variable", FontSize = 11, VerticalOptions = LayoutOptions.Center };
     private readonly Border _hintBox;
     private bool _hover;
     private readonly HorizontalStackLayout _row = new() { Spacing = 7, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 
     public SignalButton()
     {
-        StrokeShape = new RoundRectangle { CornerRadius = 5 };
+        StrokeShape = new RoundRectangle { CornerRadius = 18 };
         StrokeThickness = 1;
-        Padding = new Thickness(14, 0);
-        HeightRequest = 32;
+        Padding = new Thickness(16, 0);
+        HeightRequest = 36;
         HorizontalOptions = LayoutOptions.Start;
         VerticalOptions = LayoutOptions.Center;
 
@@ -209,12 +209,12 @@ public sealed class SignalButton : Border
         _hint.Text = hint;
         _hintBox.IsVisible = hint.Length > 0;
         // Высоту, заданную в XAML (например, 42 у главной кнопки карточки), не затираем: стандартные 28/32 подставляем сами.
-        if (HeightRequest is -1 or 28 or 32)
+        if (HeightRequest is -1 or 28 or 32 or 36)
         {
-            HeightRequest = Compact ? 28 : 32;
+            HeightRequest = Compact ? 28 : 36;
         }
 
-        Padding = Compact ? new Thickness(10, 0) : new Thickness(14, 0);
+        Padding = Compact ? new Thickness(12, 0) : new Thickness(16, 0);
         _label.FontAttributes = Compact || Variant is ButtonVariant.Ghost ? FontAttributes.None : FontAttributes.Bold;
 
         string background, foreground, stroke;
@@ -226,7 +226,7 @@ public sealed class SignalButton : Border
         {
             (background, foreground, stroke) = Variant switch
             {
-                ButtonVariant.Primary => ("Accent", "OnAccent", "AccentBrush"),
+                ButtonVariant.Primary => ("Accent", "OnAccent", string.Empty),
                 ButtonVariant.Ghost => (string.Empty, "InkMuted", string.Empty),
                 ButtonVariant.Danger => ("Surface", "PCrit", "LineBrush"),
                 _ => ("Surface", "Ink", "LineBrush"),
@@ -246,10 +246,15 @@ public sealed class SignalButton : Border
             }
         }
 
-        if (hovering && Variant == ButtonVariant.Primary && TryGetColor("Accent") is { } accent)
+        // Основная кнопка Aurora: градиент от акцента ко второму цвету темы; под указателем чуть светлее.
+        Opacity = 1;
+        if (enabled && Variant == ButtonVariant.Primary)
         {
-            // Чуть ярче (в макете filter: brightness(1.06)).
-            BackgroundColor = accent.WithLuminosity(Math.Min(1f, accent.GetLuminosity() * 1.06f));
+            this.SetDynamicResource(BackgroundProperty, "AccentGradient");
+            if (hovering)
+            {
+                Opacity = 0.92;
+            }
         }
         else if (background.Length > 0)
         {
@@ -277,7 +282,7 @@ public sealed class SignalButton : Border
         // Свечение только у доступной основной кнопки.
         if (enabled && Variant == ButtonVariant.Primary)
         {
-            var shadow = new Shadow { Radius = 18, Opacity = 0.3f, Offset = new Point(0, 0) };
+            var shadow = new Shadow { Radius = 22, Opacity = 0.35f, Offset = new Point(0, 0) };
             shadow.SetDynamicResource(Shadow.BrushProperty, "AccentBrush");
             Shadow = shadow;
         }

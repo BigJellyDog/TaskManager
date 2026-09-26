@@ -35,7 +35,7 @@
                 </HorizontalStackLayout>
 
                 <VerticalStackLayout>
-                    <Label Text="{Binding PageTitle}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                    <Label Text="{Binding PageTitle}" FontSize="30" FontAttributes="Bold" />
                     <Label Text="{loc:Extension 'Поля со знаком * обязательны'}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
                     <Label Text="{Binding ParentText}" IsVisible="{Binding HasParent}" FontSize="13" TextColor="{DynamicResource Accent}" Margin="0,4,0,0" />
                 </VerticalStackLayout>
@@ -65,7 +65,7 @@
                         <VerticalStackLayout Spacing="6">
                             <Label Text="{loc:Extension 'Приоритет'}" Style="{StaticResource FieldLabel}" />
                             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
-                                <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
+                                <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="0" HeightRequest="38">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding IsCritical}" Value="True">
                                             <Setter Property="Stroke" Value="{DynamicResource PCritBrush}" />
@@ -81,7 +81,7 @@
                                         <Label Text="{loc:Extension 'Критический'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PCrit}" />
                                     </HorizontalStackLayout>
                                 </Border>
-                                <Border Grid.Column="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
+                                <Border Grid.Column="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="0" HeightRequest="38">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding IsHighPriority}" Value="True">
                                             <Setter Property="Stroke" Value="{DynamicResource PHighBrush}" />
@@ -97,7 +97,7 @@
                                         <Label Text="{loc:Extension 'Высокий'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PHigh}" />
                                     </HorizontalStackLayout>
                                 </Border>
-                                <Border Grid.Column="2" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
+                                <Border Grid.Column="2" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="0" HeightRequest="38">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding IsMediumPriority}" Value="True">
                                             <Setter Property="Stroke" Value="{DynamicResource PMedBrush}" />
@@ -113,7 +113,7 @@
                                         <Label Text="{loc:Extension 'Средний'}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource PMed}" />
                                     </HorizontalStackLayout>
                                 </Border>
-                                <Border Grid.Column="3" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5" Padding="0" HeightRequest="38">
+                                <Border Grid.Column="3" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="0" HeightRequest="38">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding IsLowPriority}" Value="True">
                                             <Setter Property="Stroke" Value="{DynamicResource PLowBrush}" />
@@ -217,7 +217,7 @@
                     <!-- Правая колонка: повторение и предпросмотр -->
                     <VerticalStackLayout Grid.Column="1" Spacing="12">
 
-                        <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
+                        <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="14">
                             <VerticalStackLayout Spacing="10">
                                 <Label Text="{loc:Extension 'Повторение'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" CharacterSpacing="1" />
                                 <controls:DropField ItemsSource="{Binding RecurrenceOptions}" SelectedItem="{Binding SelectedRecurrence}" />
@@ -226,7 +226,7 @@
                                     <Label Text="{loc:Extension 'Шаг'}" Style="{StaticResource FieldLabel}" />
                                     <HorizontalStackLayout Spacing="10">
                                         <Grid ColumnDefinitions="32,44,32" HeightRequest="34">
-                                            <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 5,0,5,0" Padding="0">
+                                            <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12,0,5,0" Padding="0">
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer Command="{Binding StepDownCommand}" />
                                                 </Border.GestureRecognizers>
@@ -307,7 +307,7 @@
                                         <HorizontalStackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding SelectModeCommand}" CommandParameter="AfterCompletion" />
                                         </HorizontalStackLayout.GestureRecognizers>
-                                        <Border WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 8" StrokeThickness="1.6" Stroke="{DynamicResource InkMutedBrush}"
+                                        <Border WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 18" StrokeThickness="1.6" Stroke="{DynamicResource InkMutedBrush}"
                                                 BackgroundColor="Transparent" VerticalOptions="Center">
                                             <Border.Triggers>
                                                 <DataTrigger TargetType="Border" Binding="{Binding IsModeAfter}" Value="True">
@@ -322,7 +322,7 @@
                                         <HorizontalStackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding SelectModeCommand}" CommandParameter="ByCalendar" />
                                         </HorizontalStackLayout.GestureRecognizers>
-                                        <Border WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 8" StrokeThickness="1.6" Stroke="{DynamicResource InkMutedBrush}"
+                                        <Border WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 18" StrokeThickness="1.6" Stroke="{DynamicResource InkMutedBrush}"
                                                 BackgroundColor="Transparent" VerticalOptions="Center">
                                             <Border.Triggers>
                                                 <DataTrigger TargetType="Border" Binding="{Binding IsModeCalendar}" Value="True">
@@ -338,18 +338,18 @@
                         </Border>
 
                         <!-- Предпросмотр карточки -->
-                        <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 6" Padding="14">
+                        <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="14">
                             <VerticalStackLayout Spacing="10">
                                 <Label Text="{loc:Extension 'Предпросмотр'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" CharacterSpacing="1" />
-                                <Border StrokeThickness="1" StrokeDashArray="3,3" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 6" Padding="10" BackgroundColor="Transparent">
-                                    <Border StrokeShape="RoundRectangle 5" BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}" Padding="12,10">
+                                <Border StrokeThickness="1" StrokeDashArray="3,3" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 16" Padding="10" BackgroundColor="Transparent">
+                                    <Border StrokeShape="RoundRectangle 12" BackgroundColor="{DynamicResource Surface}" Stroke="{DynamicResource LineBrush}" Padding="12,10">
                                         <VerticalStackLayout Spacing="6">
                                             <Label Text="{Binding PreviewTitle}" FontSize="14" FontAttributes="Bold" LineBreakMode="WordWrap" />
                                             <FlexLayout Wrap="Wrap" AlignItems="Center">
                                                 <HorizontalStackLayout Spacing="5" Margin="0,0,10,0">
                                                     <controls:PriorityBars Level="{Binding PreviewPriorityLevel}" Color="{Binding PreviewPriorityColor}" />
                                                     <Label Text="{Binding PreviewPriorityText}" TextColor="{Binding PreviewPriorityColor}" FontSize="11" FontAttributes="Bold"
-                                                           TextTransform="Uppercase" CharacterSpacing="0.4" VerticalOptions="Center" />
+                                                           CharacterSpacing="0.4" VerticalOptions="Center" />
                                                 </HorizontalStackLayout>
                                                 <HorizontalStackLayout Spacing="5" Margin="0,0,10,0" IsVisible="{Binding PreviewHasDeadline}">
                                                     <controls:Icon Kind="calendar" Size="13" Color="{DynamicResource InkMuted}" />

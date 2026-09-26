@@ -10,7 +10,7 @@
 
     <ContentPage.Resources>
         <Style x:Key="Panel" TargetType="Border" BasedOn="{StaticResource CardBorder}">
-            <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 16" />
             <Setter Property="Padding" Value="14,12" />
         </Style>
         <Style x:Key="PanelTitle" TargetType="Label" BasedOn="{StaticResource MonoLabel}">
@@ -23,7 +23,7 @@
         </Style>
         <!-- Строка действия: название слева, кнопки справа -->
         <Style x:Key="ActionRow" TargetType="Border">
-            <Setter Property="StrokeShape" Value="RoundRectangle 5" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 12" />
             <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Stroke" Value="{DynamicResource LineBrush}" />
             <Setter Property="BackgroundColor" Value="{DynamicResource Bg}" />
@@ -41,7 +41,7 @@
 
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                 <VerticalStackLayout VerticalOptions="Center">
-                    <Label Text="{loc:Extension 'Данные'}" FontSize="20" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="1.6" />
+                    <Label Text="{loc:Extension 'Данные'}" FontSize="30" FontAttributes="Bold" />
                     <Label Text="{loc:Extension 'Экспорт · резервная копия · импорт'}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
                 </VerticalStackLayout>
                 <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" />
@@ -151,7 +151,7 @@
                                     <DataTemplate x:DataType="vm:ImportIssueRowViewModel">
                                         <HorizontalStackLayout Spacing="10">
                                             <Label Text="{Binding Kind}" TextColor="{Binding Color}" FontFamily="{StaticResource MonoFont}"
-                                                   FontSize="10" FontAttributes="Bold" TextTransform="Uppercase" CharacterSpacing="0.6" WidthRequest="84" VerticalOptions="Center" />
+                                                   FontSize="10" FontAttributes="Bold" CharacterSpacing="0.6" WidthRequest="84" VerticalOptions="Center" />
                                             <Label Text="{Binding Text}" FontSize="12" LineBreakMode="TailTruncation" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </DataTemplate>

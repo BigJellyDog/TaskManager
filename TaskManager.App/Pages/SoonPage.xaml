@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TaskManager.App.Pages.SoonPage">
     <VerticalStackLayout Padding="28,20" Spacing="6">
-        <Label x:Name="TitleLabel" Style="{StaticResource DisplayLabel}" TextTransform="Uppercase" />
+        <Label x:Name="TitleLabel" Style="{StaticResource DisplayLabel}" />
         <Label Text="{loc:Extension 'Раздел ещё в работе'}" Style="{StaticResource MonoLabel}" />
     </VerticalStackLayout>
 </ContentPage>

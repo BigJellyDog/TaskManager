@@ -7,7 +7,7 @@
     xmlns:controls="clr-namespace:TaskManager.App.Controls"
     Title="TaskManager"
     FlyoutBehavior="Locked"
-    FlyoutWidth="207"
+    FlyoutWidth="228"
     FlyoutBackgroundColor="{DynamicResource Side}">
 
     <!-- Постоянная боковая панель Signal: разделы, счётчики и напоминания -->

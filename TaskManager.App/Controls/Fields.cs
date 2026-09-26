@@ -16,7 +16,7 @@ public sealed class InputBox : Border
 
     public InputBox()
     {
-        StrokeShape = new RoundRectangle { CornerRadius = 5 };
+        StrokeShape = new RoundRectangle { CornerRadius = 12 };
         StrokeThickness = 1;
         Padding = new Thickness(10, 0);
         this.SetDynamicResource(BackgroundColorProperty, "Surface");

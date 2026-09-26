@@ -149,6 +149,21 @@ public sealed class GlowTheme : ResourceDictionary
             new Point(0, 0),
             1.1f);
 
+        // Карточки и панели: сверху чуть светлее (приподнятая поверхность на 60%), книзу обычная поверхность.
+        var surface = theme.TryGetValue("Surface", out var sf) && sf is Color sfc ? sfc : bg;
+        var raised = theme.TryGetValue("SurfaceRaised", out var rs) && rs is Color rsc ? rsc : surface;
+        this["CardGradient"] = new LinearGradientBrush(
+            [new GradientStop(Color.FromArgb(ThemeCatalog.Mix(raised.ToArgbHex(), surface.ToArgbHex(), 0.6)), 0f), new GradientStop(surface, 1f)],
+            new Point(0, 0),
+            new Point(0, 1));
+
+        // Выбранный пункт меню: градиент от акцента (22%) к второму цвету (8%) и рамка акцента (45%).
+        this["AccentSoftGradient"] = new LinearGradientBrush(
+            [new GradientStop(accent.WithAlpha(0.22f), 0f), new GradientStop(second.WithAlpha(0.08f), 1f)],
+            new Point(0, 0),
+            new Point(1, 0));
+        this["AccentBorder"] = new SolidColorBrush(accent.WithAlpha(0.45f));
+
         // Градиент основной кнопки и полос: от акцента ко второму цвету темы.
         this["AccentGradient"] = new LinearGradientBrush(
             [new GradientStop(accent, 0f), new GradientStop(second, 1f)],

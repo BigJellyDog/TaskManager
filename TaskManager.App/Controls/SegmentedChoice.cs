@@ -19,7 +19,7 @@ public sealed class SegmentedChoice : Border
     public SegmentedChoice()
     {
         StrokeThickness = 0;
-        StrokeShape = new RoundRectangle { CornerRadius = 5 };
+        StrokeShape = new RoundRectangle { CornerRadius = 18 };
         Padding = new Thickness(3);
         HorizontalOptions = LayoutOptions.End;
         VerticalOptions = LayoutOptions.Center;
@@ -64,7 +64,7 @@ public sealed class SegmentedChoice : Border
             var item = new Border
             {
                 StrokeThickness = 0,
-                StrokeShape = new RoundRectangle { CornerRadius = 3 },
+                StrokeShape = new RoundRectangle { CornerRadius = 14 },
                 Padding = new Thickness(12, 4),
                 Content = label,
             };
