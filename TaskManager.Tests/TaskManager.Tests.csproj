@@ -20,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Таблицы переводов приложения: обычные массивы строк без MAUI, поэтому подключаем файлы как есть. -->
+    <Compile Include="..\TaskManager.App\Services\Translations.*.cs" LinkBase="Linked" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TaskManager.Core\TaskManager.Core.csproj" />
     <ProjectReference Include="..\TaskManager.Infrastructure\TaskManager.Infrastructure.csproj" />
   </ItemGroup>
