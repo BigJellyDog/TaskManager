@@ -233,7 +233,12 @@ public sealed class SignalButton : Border
             };
         }
 
-        // Прежнее значение фона (прозрачный у прозрачной кнопки, посветлевший у основной под указателем) мешало бы ресурсу.
+        // Прежний фон мешал бы новому. Градиент основной кнопки лежит в Background, обычные цвета в BackgroundColor, и ресурс
+        // одного свойства не снимается очисткой другого: недоступная кнопка оставалась бы залитой градиентом (с серым
+        // текстом на светлой заливке).
+        RemoveDynamicResource(BackgroundProperty);
+        RemoveDynamicResource(BackgroundColorProperty);
+        ClearValue(BackgroundProperty);
         ClearValue(BackgroundColorProperty);
 
         var hovering = _hover && enabled;
