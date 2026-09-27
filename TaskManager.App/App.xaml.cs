@@ -29,6 +29,7 @@ public partial class App : Application
             Loc.Set(settings.Language);
         });
         Loc.Changed += () => MainThread.BeginInvokeOnMainThread(async () => await OnLanguageChangedAsync());
+        ThemeManager.Changed += OnThemeModeChanged;
         RequestedThemeChanged += (_, _) =>
         {
             if (settings.Theme == ThemeChoice.System)
@@ -210,6 +211,27 @@ public partial class App : Application
     private async Task OnLanguageChangedAsync()
     {
         UpdateLanguageLabel();
+        await RebuildShellAsync();
+    }
+
+    // Тема, с которой собрана текущая оболочка. Настройки зовут ThemeManager.Apply при любом изменении, поэтому сравниваем темы.
+    private ThemeMode? _shellMode;
+
+    private void OnThemeModeChanged(object? sender, EventArgs e)
+    {
+        if (_shellMode is { } built && built != ThemeManager.Current)
+        {
+            MainThread.BeginInvokeOnMainThread(async () => await RebuildShellAsync());
+        }
+    }
+
+    /// <summary>
+    /// Пересобирает оболочку с открытым разделом. Нужна при смене языка и темы: цвета, которые элементы получили через
+    /// триггеры (выбранный пункт, переключатель периода), после смены темы не обновляются сами, а заново созданные берут новые.
+    /// </summary>
+    private async Task RebuildShellAsync()
+    {
+        _shellMode = ThemeManager.Current;
         if (_window is null || _window.Page is not AppShell)
         {
             return;
@@ -280,6 +302,7 @@ public partial class App : Application
         {
             await _services.GetRequiredService<AppInitializer>().InitializeAsync();
             var shell = new AppShell();
+            _shellMode = ThemeManager.Current;
             window.Page = shell;
             _ = WarmUpPagesAsync();
 
