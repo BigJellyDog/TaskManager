@@ -198,16 +198,9 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,4,0,0">
-                        <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="10,0" HeightRequest="34">
-                            <Grid>
-                                <HorizontalStackLayout VerticalOptions="Center" Spacing="8" InputTransparent="True">
-                                    <Label Text="{Binding CandidateText}" FontSize="13" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
-                                </HorizontalStackLayout>
-                                <controls:Icon Kind="chevron-down" Size="14" Color="{DynamicResource InkMuted}" HorizontalOptions="End" />
-                                <Picker ItemsSource="{Binding DependencyCandidates}" SelectedItem="{Binding SelectedCandidate}"
-                                        Opacity="0.011" BackgroundColor="Transparent" />
-                            </Grid>
-                        </Border>
+                        <!-- Список задач в стиле приложения (системный Picker открывал окно Windows не в нашей теме) -->
+                        <controls:DropField Grid.Column="0" HeightRequest="34" ItemsSource="{Binding DependencyCandidates}"
+                                            SelectedItem="{Binding SelectedCandidate}" Placeholder="{loc:Extension 'Добавить зависимость…'}" />
                         <controls:SignalButton Grid.Column="1" Variant="Secondary" Text="{loc:Extension 'Добавить'}" Command="{Binding AddDependencyCommand}" />
                     </Grid>
                 </VerticalStackLayout>
