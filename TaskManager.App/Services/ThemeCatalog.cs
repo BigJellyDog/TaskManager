@@ -91,7 +91,7 @@ public static class ThemeCatalog
             ThemeMode.Nord => "#B48EAD",
             ThemeMode.Gruvbox => "#FE8019",
             ThemeMode.Tokyo => "#BB9AF7",
-            ThemeMode.Solar => "#2AA198",
+            ThemeMode.Solar => "#14766F",
             ThemeMode.AuroraDark => "#22D3EE",
             _ => "#0A7C94",
         };

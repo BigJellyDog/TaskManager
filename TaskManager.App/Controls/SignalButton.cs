@@ -71,6 +71,10 @@ public sealed class SignalButton : Border
         _row.Children.Add(_hintBox);
         Content = _row;
 
+        // Подписи внутри кнопки красим сами: общий стиль Label перекрашивает отключённую подпись в серый поверх любого цвета.
+        _label.Style = new Style(typeof(Label));
+        _hint.Style = new Style(typeof(Label));
+
         var tap = new TapGestureRecognizer();
         tap.Tapped += (_, _) =>
         {
@@ -218,7 +222,12 @@ public sealed class SignalButton : Border
         _label.FontAttributes = Compact || Variant is ButtonVariant.Ghost ? FontAttributes.None : FontAttributes.Bold;
 
         string background, foreground, stroke;
-        if (!enabled)
+        if (!enabled && Variant == ButtonVariant.Primary)
+        {
+            // Недоступная основная кнопка остаётся узнаваемой: тот же градиент с тем же тёмным (или белым) текстом, но бледнее.
+            (background, foreground, stroke) = ("Accent", "OnAccent", string.Empty);
+        }
+        else if (!enabled)
         {
             (background, foreground, stroke) = ("SurfaceRaised", "InkMuted", "LineBrush");
         }
@@ -253,13 +262,10 @@ public sealed class SignalButton : Border
 
         // Основная кнопка Aurora: градиент от акцента ко второму цвету темы; под указателем чуть светлее.
         Opacity = 1;
-        if (enabled && Variant == ButtonVariant.Primary)
+        if (Variant == ButtonVariant.Primary)
         {
             this.SetDynamicResource(BackgroundProperty, "AccentGradient");
-            if (hovering)
-            {
-                Opacity = 0.92;
-            }
+            Opacity = !enabled ? 0.5 : hovering ? 0.92 : 1;
         }
         else if (background.Length > 0)
         {
