@@ -62,6 +62,8 @@ check recognises migrations automatically: a backup made by a newer version (wit
   exception end the app.
 - **Colours** only through theme tokens (`DynamicResource`), never as literals in a page. Elements that colour
   themselves in code subscribe to `ThemeManager.Changed` with an instance method (the event is weak).
+- **Comments and XML documentation** are written in English. The only Russian text in the code are translation keys and the
+  user-visible messages built from them.
 - **Commits** are small and described in English (`feat:`, `fix:`, `docs:`, `test:`).
 
 ## 6. How to extend

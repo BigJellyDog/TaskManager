@@ -64,6 +64,8 @@ Migration) wird abgelehnt.
   Ausnahme die App beenden lassen.
 - **Farben** nur über Design-Token (`DynamicResource`), nie als Literale in einer Seite. Elemente, die sich im Code
   selbst färben, abonnieren `ThemeManager.Changed` mit einer Instanzmethode (das Ereignis ist schwach).
+- **Kommentare und XML-Dokumentation** sind auf Englisch geschrieben. Russischer Text steht im Code nur als Übersetzungsschlüssel
+  und in den daraus gebildeten Meldungen für die Oberfläche.
 - **Commits** sind klein und auf Englisch beschrieben (`feat:`, `fix:`, `docs:`, `test:`).
 
 ## 6. Erweiterung
