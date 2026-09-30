@@ -26,14 +26,15 @@
         </Grid>
 
         <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0" VerticalOptions="Start">
-            <Grid RowDefinitions="Auto,Auto">
+            <Grid RowDefinitions="Auto,*">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
                       ColumnDefinitions="*,220,280">
                     <Label Grid.Column="0" Text="{loc:Extension 'Тег'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                     <Label Grid.Column="1" Text="{loc:Extension 'Задач'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                 </Grid>
 
-                <VerticalStackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Rows}">
+                <ScrollView Grid.Row="1">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Rows}">
                     <BindableLayout.EmptyView>
                         <Label Text="{loc:Extension 'Тегов нет'}" HorizontalOptions="Center" Margin="0,28" Style="{StaticResource CaptionLabel}" />
                     </BindableLayout.EmptyView>
@@ -92,6 +93,7 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
+                </ScrollView>
             </Grid>
         </Border>
 
