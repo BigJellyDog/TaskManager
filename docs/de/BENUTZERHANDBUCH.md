@@ -145,6 +145,10 @@ Die Tabelle listet jeden Tag mit der Zahl der Aufgaben, die ihn verwenden. **Umb
 Aufgaben (ein bereits vorhandener Name wird abgelehnt), **Löschen** geht nur bei Tags, die keine Aufgabe nutzt.
 Das Suchfeld filtert die Tabelle.
 
+Um viele ungenutzte Tags auf einmal zu entfernen, die Kästchen ankreuzen (nur ungenutzte Tags haben eines) oder das
+Kästchen in der Tabellenkopfzeile für alle setzen. Mit gedrückter **Umschalttaste** ein zweites Kästchen anklicken
+wählt alles dazwischen; danach **Ausgewählte löschen** drücken.
+
 ## 9. Daten: Export, Import, Sicherung
 
 ![Daten](../images/de/data.png)

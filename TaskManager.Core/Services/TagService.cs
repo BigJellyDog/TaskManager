@@ -55,4 +55,31 @@ public class TagService
         _tags.Remove(tag);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// Deletes several tags at once. A tag that is used (or no longer exists) is skipped, never an error:
+    /// the list on screen may be a moment old. Returns how many tags were removed.
+    /// </summary>
+    public async Task<int> DeleteManyAsync(IReadOnlyCollection<int> ids, CancellationToken cancellationToken = default)
+    {
+        if (ids.Count == 0)
+        {
+            return 0;
+        }
+
+        var wanted = ids.ToHashSet();
+        var removable = (await _tags.ListUnusedAsync(cancellationToken)).Where(t => wanted.Contains(t.Id)).ToList();
+
+        foreach (var tag in removable)
+        {
+            _tags.Remove(tag);
+        }
+
+        if (removable.Count > 0)
+        {
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        return removable.Count;
+    }
 }

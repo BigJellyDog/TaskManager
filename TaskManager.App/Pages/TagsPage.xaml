@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,240" ColumnSpacing="10">
+        <Grid Grid.Row="0" ColumnDefinitions="*,240,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <Label Text="{loc:Extension 'Теги'}" FontSize="30" FontAttributes="Bold" />
                 <Label Text="{Binding SubtitleText}" Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0.7" />
@@ -23,14 +23,32 @@
                            VerticalOptions="Center" MinimumHeightRequest="0" BackgroundColor="Transparent" />
                 </Grid>
             </Border>
+
+            <controls:SignalButton Grid.Column="2" Variant="Danger" Icon="trash" Text="{loc:Extension 'Удалить выбранные'}"
+                                   Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding HasSelection}" VerticalOptions="Center" />
         </Grid>
 
         <Border Grid.Row="1" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0" VerticalOptions="Start">
             <Grid RowDefinitions="Auto,*">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="14,0" ColumnSpacing="10"
-                      ColumnDefinitions="*,220,280">
-                    <Label Grid.Column="0" Text="{loc:Extension 'Тег'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="{loc:Extension 'Задач'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                      ColumnDefinitions="28,*,220,280">
+                    <!-- Select all -->
+                    <Border Grid.Column="0" WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 4" StrokeThickness="1.6"
+                            Stroke="{DynamicResource InkMutedBrush}" BackgroundColor="Transparent"
+                            HorizontalOptions="Start" VerticalOptions="Center" IsVisible="{Binding HasDeletable}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding AllSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource Accent}" />
+                                <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleSelectAllCommand}" />
+                        </Border.GestureRecognizers>
+                        <controls:Icon Kind="check" Size="14" Color="{DynamicResource OnAccent}" IsVisible="{Binding AllSelected}" />
+                    </Border>
+                    <Label Grid.Column="1" Text="{loc:Extension 'Тег'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="{loc:Extension 'Задач'}" Style="{StaticResource MonoLabel}" FontAttributes="Bold" VerticalOptions="Center" />
                 </Grid>
 
                 <ScrollView Grid.Row="1">
@@ -40,22 +58,39 @@
                     </BindableLayout.EmptyView>
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="vm:TagRowViewModel">
-                            <Grid MinimumHeightRequest="40" Padding="14,4" ColumnSpacing="10" ColumnDefinitions="*,220,280">
+                            <Grid MinimumHeightRequest="40" Padding="14,4" ColumnSpacing="10" ColumnDefinitions="28,*,220,280">
                                 <Grid.Triggers>
                                     <DataTrigger TargetType="Grid" Binding="{Binding IsEditing}" Value="True">
                                         <Setter Property="BackgroundColor" Value="{DynamicResource AccentSoft}" />
                                     </DataTrigger>
                                 </Grid.Triggers>
 
+                                <!-- Selection check box (only an unused tag can be selected) -->
+                                <Border Grid.Column="0" WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 4" StrokeThickness="1.6"
+                                        Stroke="{DynamicResource InkMutedBrush}" BackgroundColor="Transparent"
+                                        HorizontalOptions="Start" VerticalOptions="Center" IsVisible="{Binding CanSelect}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource Accent}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=ToggleSelectCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <controls:Icon Kind="check" Size="14" Color="{DynamicResource OnAccent}" IsVisible="{Binding IsSelected}" />
+                                </Border>
+
                                 <!-- Normal view -->
-                                <Label Grid.Column="0" Text="{Binding DisplayName}" IsVisible="{Binding IsNotEditing}"
+                                <Label Grid.Column="1" Text="{Binding DisplayName}" IsVisible="{Binding IsNotEditing}"
                                        FontFamily="{StaticResource MonoFont}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
-                                <HorizontalStackLayout Grid.Column="1" Spacing="10" IsVisible="{Binding IsNotEditing}" VerticalOptions="Center">
+                                <HorizontalStackLayout Grid.Column="2" Spacing="10" IsVisible="{Binding IsNotEditing}" VerticalOptions="Center">
                                     <controls:BarMeter Fraction="{Binding Fraction}" FillColor="{DynamicResource Accent}" HeightRequest="6" WidthRequest="170" />
                                     <Label Text="{Binding TaskCount}" FontFamily="{StaticResource MonoFont}" FontSize="13"
                                            WidthRequest="24" HorizontalTextAlignment="End" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
-                                <HorizontalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}">
+                                <HorizontalStackLayout Grid.Column="3" Spacing="6" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}">
                                     <controls:SignalButton Variant="Ghost" Icon="edit" Text="{loc:Extension 'Переименовать'}" Compact="True"
                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=StartEditCommand}"
                                                            CommandParameter="{Binding .}" />
@@ -71,15 +106,15 @@
                                 </HorizontalStackLayout>
 
                                 <!-- Edit -->
-                                <controls:InputBox Grid.Column="0" IsVisible="{Binding IsEditing}" HeightRequest="30">
+                                <controls:InputBox Grid.Column="1" IsVisible="{Binding IsEditing}" HeightRequest="30">
                                     <Entry Text="{Binding EditName}" FontFamily="{StaticResource MonoFont}" FontSize="13" FontAttributes="Bold"
                                            VerticalOptions="Center" MinimumHeightRequest="0" BackgroundColor="Transparent"
                                            ReturnCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=SaveEditCommand}"
                                            ReturnCommandParameter="{Binding .}" />
                                 </controls:InputBox>
-                                <Label Grid.Column="1" Text="{Binding EditHint}" IsVisible="{Binding IsEditing}"
+                                <Label Grid.Column="2" Text="{Binding EditHint}" IsVisible="{Binding IsEditing}"
                                        Style="{StaticResource MonoLabel}" FontSize="11" CharacterSpacing="0" TextTransform="None" VerticalOptions="Center" />
-                                <HorizontalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding IsEditing}">
+                                <HorizontalStackLayout Grid.Column="3" Spacing="6" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding IsEditing}">
                                     <controls:SignalButton Variant="Primary" Text="{loc:Extension 'Сохранить'}" Compact="True"
                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TagsViewModel}}, Path=SaveEditCommand}"
                                                            CommandParameter="{Binding .}" />
@@ -88,7 +123,7 @@
                                                            CommandParameter="{Binding .}" />
                                 </HorizontalStackLayout>
 
-                                <BoxView Grid.ColumnSpan="3" VerticalOptions="End" HeightRequest="1" Margin="-14,0" Color="{DynamicResource Line}" />
+                                <BoxView Grid.ColumnSpan="4" VerticalOptions="End" HeightRequest="1" Margin="-14,0" Color="{DynamicResource Line}" />
                             </Grid>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>

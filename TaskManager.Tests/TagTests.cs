@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Time.Testing;
+﻿using Microsoft.Extensions.Time.Testing;
 using TaskManager.Core.Domain;
 using TaskManager.Core.Services;
 using TaskManager.Infrastructure.Persistence;
@@ -68,6 +68,31 @@ public sealed class TagTests : IDisposable
 
         await using var context = _db.CreateContext();
         await Assert.ThrowsAsync<DomainValidationException>(() => Tags(context).RenameAsync(work, "дом"));
+    }
+
+    [Fact]
+    public async Task DeleteMany_RemovesUnusedTags_AndSkipsUsedOnes()
+    {
+        await CreateAsync("keeps a tag", "работа");
+        var gone = await CreateAsync("will be erased", "дом", "спорт");
+
+        // The tags of an erased task become unused.
+        await using (var context = _db.CreateContext())
+        {
+            await Tasks(context).DeleteAsync(gone);
+            await new TrashService(new TrashRepository(context), Tasks(context)).PurgeAsync([gone]);
+        }
+
+        var ids = (await ListAsync()).ToDictionary(t => t.Name, t => t.Id);
+
+        await using (var context = _db.CreateContext())
+        {
+            // "работа" is used and stays; "дом" and "спорт" are unused; 9999 does not exist.
+            var removed = await Tags(context).DeleteManyAsync([ids["работа"], ids["дом"], ids["спорт"], 9999]);
+            Assert.Equal(2, removed);
+        }
+
+        Assert.Equal("работа", Assert.Single(await ListAsync()).Name);
     }
 
     [Fact]

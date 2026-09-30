@@ -105,7 +105,7 @@ runs the tests for pushes to the main branch and for pull requests.
 ## 8. Status and roadmap
 
 Done: the full task workflow (statuses, subtasks, dependencies, recurrence, history), reminders, trash, tags,
-statistics, export and import, backup and restore, four languages, nine themes, 190 automated tests.
+statistics, export and import, backup and restore, four languages, nine themes, 191 automated tests.
 
 Ideas for later: a Windows installer or MSIX package, UI tests for the MAUI layer, more export formats,
 saved filters, attachments.

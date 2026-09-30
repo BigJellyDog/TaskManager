@@ -152,7 +152,7 @@ placeholders and plural forms match between the languages, and that no key is tr
   restore keeps a safety copy, import skips duplicates and reports everything it did.
 - **A crash in the background does not end the app**: a failed reminder run is logged and tried again at the
   next interval.
-- **Analyzers on** (`AnalysisLevel latest-recommended`, code style enforced in build); 190 automated tests.
+- **Analyzers on** (`AnalysisLevel latest-recommended`, code style enforced in build); 191 automated tests.
 
 ## 6. Known limits
 

@@ -135,6 +135,10 @@ The table lists every tag with the number of tasks that use it. **Rename** chang
 that already exists is refused), **Delete** works only for tags that no task uses. The search field filters the
 table.
 
+To clear many unused tags at once, tick their check boxes (only unused tags have one), or tick the box in the table
+header to select all of them. Hold **Shift** and click a second check box to select everything in between, then press
+**Delete selected**.
+
 ## 9. Data: export, import, backup
 
 ![Data](../images/en/data.png)

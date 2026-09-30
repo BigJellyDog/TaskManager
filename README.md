@@ -30,7 +30,7 @@ All data stays in a local SQLite file: no account, no server, no cloud.
 - **Four languages** (English, German, Russian, Ukrainian) and **nine themes** (Aurora, Aurora Light, Dark,
   Light, Dracula, Nord, Gruvbox, Tokyo Night, Solarized Light, or follow Windows), switched at runtime.
 - **Clean architecture**: a framework-free domain layer, an infrastructure layer for EF Core and SQLite,
-  and an MVVM application layer. 190 automated tests.
+  and an MVVM application layer. 191 automated tests.
 
 ## Screens
 
