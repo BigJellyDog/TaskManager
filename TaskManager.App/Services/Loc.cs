@@ -238,7 +238,7 @@ internal static partial class MessagePatterns
 
     public static IReadOnlyList<(Regex Pattern, string Key)> All { get; } =
     [
-        (TaskTransferRegex(), "Нельзя перевести задачу из {0} в {1}: {2}"),
+        (TaskTransferRegex(), "Нельзя перевести задачу из «{0}» в «{1}»: {2}"),
         (TagNameTooLongRegex(), "Название тега не может быть длиннее {0} символов."),
         (TaskNameTooLongRegex(), "Название задачи не может быть длиннее {0} символов."),
         (IncompleteSubtasksRegex(), "Нельзя завершить задачу: не завершены подзадачи ({0})."),
@@ -247,7 +247,7 @@ internal static partial class MessagePatterns
         (TagAlreadyExistsRegex(), "Тег «{0}» уже есть. Выберите другое название."),
         (TagInUseRegex(), "Тег «{0}» используется в задачах, удалить его нельзя."),
         (DependencyCycleRegex(), "Нельзя добавить зависимость: она создаёт цикл ({0})."),
-        (UnmetDependenciesRegex(), "Нельзя перевести задачу в {0}: не выполнены зависимости: {1}"),
+        (UnmetDependenciesRegex(), "Нельзя перевести задачу в «{0}»: не выполнены зависимости: {1}"),
         (DuplicateIdRegex(), "Id {0} повторяется в файле."),
         (NestingDepthExceededRegex(), "Вложенность больше {0} уровней."),
         (UnsupportedFormatVersionRegex(), "Версия формата {0} не поддерживается (поддерживается до {1})."),

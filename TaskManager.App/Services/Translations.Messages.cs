@@ -23,7 +23,7 @@ internal static partial class Translations
         ["Неизвестный приоритет.", "Unknown priority.", "Unbekannte Priorität.", "Невідомий пріоритет."],
 
         // Статусы
-        ["Нельзя перевести задачу из {0} в {1}: {2}", "A task cannot go from {0} to {1}: {2}", "Eine Aufgabe kann nicht von {0} auf {1} wechseln: {2}", "Не можна перевести завдання з {0} у {1}: {2}"],
+        ["Нельзя перевести задачу из «{0}» в «{1}»: {2}", "A task cannot go from “{0}” to “{1}”: {2}", "Eine Aufgabe kann nicht von „{0}“ auf „{1}“ wechseln: {2}", "Не можна перевести завдання з «{0}» у «{1}»: {2}"],
         ["задача уже в этом статусе.", "the task is already in this status.", "die Aufgabe hat diesen Status bereits.", "завдання вже в цьому статусі."],
         ["для этого используйте «переоткрыть».", "use “reopen” for that.", "verwenden Sie dafür „Wieder öffnen“.", "для цього використайте «відкрити знову»."],
         ["завершённую или отменённую задачу можно только переоткрыть.", "a done or cancelled task can only be reopened.", "eine erledigte oder abgebrochene Aufgabe kann nur wieder geöffnet werden.", "завершене або скасоване завдання можна лише відкрити знову."],
@@ -51,7 +51,7 @@ internal static partial class Translations
         ["Такая зависимость уже есть.", "This dependency already exists.", "Diese Abhängigkeit besteht bereits.", "Така залежність уже є."],
         ["Нельзя добавить зависимость: она создаёт цикл ({0}).", "The dependency cannot be added: it creates a cycle ({0}).", "Die Abhängigkeit kann nicht hinzugefügt werden: Sie erzeugt einen Zyklus ({0}).", "Не можна додати залежність: вона створює цикл ({0})."],
         ["Такой зависимости нет.", "There is no such dependency.", "Diese Abhängigkeit gibt es nicht.", "Такої залежності немає."],
-        ["Нельзя перевести задачу в {0}: не выполнены зависимости: {1}", "The task cannot move to {0}: dependencies are not done: {1}", "Die Aufgabe kann nicht auf {0} wechseln: Abhängigkeiten sind nicht erledigt: {1}", "Не можна перевести завдання в {0}: не виконано залежності: {1}"],
+        ["Нельзя перевести задачу в «{0}»: не выполнены зависимости: {1}", "The task cannot move to “{0}”: dependencies are not done: {1}", "Die Aufgabe kann nicht auf „{0}“ wechseln: Abhängigkeiten sind nicht erledigt: {1}", "Не можна перевести завдання в «{0}»: не виконано залежності: {1}"],
         ["Вложенность подзадач не может быть больше {0} уровней.", "Subtasks cannot be nested deeper than {0} levels.", "Unteraufgaben dürfen nicht tiefer als {0} Ebenen verschachtelt sein.", "Вкладеність підзавдань не може бути більшою за {0} рівнів."],
 
         // Запросы и параллельные изменения
