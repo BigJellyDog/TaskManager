@@ -31,7 +31,7 @@ Alle Daten liegen in einer lokalen SQLite-Datei: kein Konto, kein Server, keine 
 - **Vier Sprachen** (Englisch, Deutsch, Russisch, Ukrainisch) und **neun Designs** (Aurora, Aurora Hell,
   Dunkel, Hell, Dracula, Nord, Gruvbox, Tokio Nacht, Solarized Hell oder wie Windows), zur Laufzeit umschaltbar.
 - **Saubere Architektur**: eine framework-freie Domänenschicht, eine Infrastrukturschicht für EF Core und
-  SQLite sowie eine MVVM-Anwendungsschicht. 191 automatisierte Tests.
+  SQLite sowie eine MVVM-Anwendungsschicht. 192 automatisierte Tests.
 
 ## Bildschirme
 

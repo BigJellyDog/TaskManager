@@ -108,7 +108,7 @@ führt die Tests bei Pushes auf den Hauptzweig und bei Pull Requests aus.
 
 Fertig: der vollständige Aufgabenablauf (Status, Unteraufgaben, Abhängigkeiten, Wiederholung, Verlauf),
 Erinnerungen, Papierkorb, Tags, Statistik, Export und Import, Sicherung und Wiederherstellung, vier Sprachen, neun
-Designs, 191 automatisierte Tests.
+Designs, 192 automatisierte Tests.
 
 Ideen für später: ein Windows-Installer oder MSIX-Paket, UI-Tests für die MAUI-Schicht, weitere Exportformate,
 gespeicherte Filter, Anhänge.

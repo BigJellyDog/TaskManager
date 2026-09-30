@@ -162,7 +162,7 @@ hat, Platzhalter und Pluralformen zwischen den Sprachen übereinstimmen und kein
   und berichtet alles, was er getan hat.
 - **Ein Absturz im Hintergrund beendet die App nicht**: Ein fehlgeschlagener Erinnerungslauf wird protokolliert und
   beim nächsten Intervall wiederholt.
-- **Analyzer an** (`AnalysisLevel latest-recommended`, Codestil beim Build erzwungen); 191 automatisierte Tests.
+- **Analyzer an** (`AnalysisLevel latest-recommended`, Codestil beim Build erzwungen); 192 automatisierte Tests.
 
 ## 6. Bekannte Grenzen
 

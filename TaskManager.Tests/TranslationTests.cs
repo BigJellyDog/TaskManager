@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using TaskManager.App.Services;
 
 namespace TaskManager.Tests;
@@ -82,4 +82,60 @@ public sealed partial class TranslationTests
         Assert.Equal("Aurora", all["Аврора"][1]);
         Assert.Equal("Dark", all["Тёмная"][1]);
     }
+
+    [GeneratedRegex(@"\{loc:Extension\s+'((?:[^'\\]|\\.)*)'")]
+    private static partial Regex XamlKey();
+
+    [GeneratedRegex(@"Loc\.(?:T|F)\(\s*""([^""\\]*)""")]
+    private static partial Regex CodeKey();
+
+    /// <summary>
+    /// A text written in Russian in the markup or passed to Loc.T / Loc.F as a literal must have a row in a table,
+    /// otherwise the other languages show it in Russian.
+    /// </summary>
+    [Fact]
+    public void EveryTextInMarkupAndCode_HasATranslation()
+    {
+        var root = AppContext.BaseDirectory;
+        while (root is not null && !File.Exists(Path.Combine(root, "TaskManager.sln")))
+        {
+            root = Path.GetDirectoryName(root);
+        }
+
+        Assert.NotNull(root);
+        var known = Tables.SelectMany(t => t.Rows).Select(r => r[0]).ToHashSet(StringComparer.Ordinal);
+        var missing = new SortedSet<string>(StringComparer.Ordinal);
+        var app = Path.Combine(root, "TaskManager.App");
+
+        foreach (var file in Directory.EnumerateFiles(app, "*.xaml", SearchOption.AllDirectories)
+                     .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")))
+        {
+            foreach (Match m in XamlKey().Matches(File.ReadAllText(file)))
+            {
+                var key = m.Groups[1].Value.Replace("\\'", "'");
+                if (ContainsCyrillic(key) && !known.Contains(key))
+                {
+                    missing.Add($"{Path.GetFileName(file)}: {key}");
+                }
+            }
+        }
+
+        foreach (var file in Directory.EnumerateFiles(app, "*.cs", SearchOption.AllDirectories)
+                     .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
+                                 && !Path.GetFileName(f).StartsWith("Translations.", StringComparison.Ordinal)))
+        {
+            foreach (Match m in CodeKey().Matches(File.ReadAllText(file)))
+            {
+                var key = m.Groups[1].Value;
+                if (ContainsCyrillic(key) && !known.Contains(key))
+                {
+                    missing.Add($"{Path.GetFileName(file)}: {key}");
+                }
+            }
+        }
+
+        Assert.True(missing.Count == 0, "нет перевода:" + Environment.NewLine + string.Join(Environment.NewLine, missing));
+    }
+
+    private static bool ContainsCyrillic(string text) => text.Any(c => c is >= 'А' and <= 'я' or 'Ё' or 'ё' or 'І' or 'і' or 'Ї' or 'ї' or 'Є' or 'є');
 }

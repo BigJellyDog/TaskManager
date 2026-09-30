@@ -161,6 +161,7 @@ internal static partial class Translations
 
         // Корзина
         ["Восстановить выбранные", "Restore selected", "Auswahl wiederherstellen", "Відновити вибрані"],
+        ["Удалить выбранные", "Delete selected", "Ausgewählte löschen", "Видалити вибрані"],
         ["Очистить корзину", "Empty trash", "Papierkorb leeren", "Очистити кошик"],
         ["Удалённые задачи скрыты из списка и статистики. Восстановление возвращает задачу вместе с подзадачами.", "Deleted tasks are hidden from the list and statistics. Restoring brings a task back together with its subtasks.", "Gelöschte Aufgaben sind in Liste und Statistik ausgeblendet. Beim Wiederherstellen kommt die Aufgabe samt Unteraufgaben zurück.", "Видалені завдання приховані зі списку та статистики. Відновлення повертає завдання разом із підзавданнями."],
         ["Был статус", "Was status", "War Status", "Був статус"],
