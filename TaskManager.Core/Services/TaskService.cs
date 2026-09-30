@@ -419,42 +419,6 @@ public class TaskService
         return dependencies.Where(d => !d.IsDeleted && d.Status != TaskStatus.Done).OrderBy(d => d.Id).ToList();
     }
 
-    /// <summary>Дерево зависимостей задачи: от чего она зависит, и так далее вглубь.</summary>
-    public async Task<DependencyNode> GetDependencyTreeAsync(int id, CancellationToken cancellationToken = default)
-    {
-        var edges = await _tasks.GetDependencyGraphAsync(cancellationToken);
-        var root = await _tasks.GetByIdAsync(id, includeDeleted: false, cancellationToken)
-            ?? throw new TaskNotFoundException(id);
-
-        var ids = new HashSet<int> { id };
-        var queue = new Queue<int>([id]);
-        while (queue.Count > 0)
-        {
-            var current = queue.Dequeue();
-            foreach (var edge in edges.Where(e => e.TaskId == current))
-            {
-                if (ids.Add(edge.DependsOnTaskId))
-                {
-                    queue.Enqueue(edge.DependsOnTaskId);
-                }
-            }
-        }
-
-        var tasks = (await _tasks.GetByIdsAsync(ids.ToList(), includeDeleted: false, cancellationToken))
-            .ToDictionary(t => t.Id);
-
-        // Граф без циклов (их не пускаем при добавлении), поэтому рекурсия конечна.
-        // Одна и та же задача может встретиться в дереве несколько раз: это "ромб", он допустим.
-        DependencyNode Build(TaskItem task) => new(
-            task,
-            edges.Where(e => e.TaskId == task.Id && tasks.ContainsKey(e.DependsOnTaskId))
-                .Select(e => Build(tasks[e.DependsOnTaskId]))
-                .OrderBy(n => n.Task.Id)
-                .ToList());
-
-        return Build(root);
-    }
-
     public Task<IReadOnlyList<TaskHistoryEntry>> GetHistoryAsync(int id, CancellationToken cancellationToken = default) =>
         _tasks.GetHistoryAsync(id, cancellationToken);
 

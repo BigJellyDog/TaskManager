@@ -44,7 +44,6 @@ internal static partial class Translations
         ["Отмена", "Cancel", "Abbrechen", "Скасувати"],
         ["Сохранить", "Save", "Speichern", "Зберегти"],
         ["Запуск…", "Starting…", "Wird gestartet …", "Запуск…"],
-        ["Раздел ещё в работе", "This section is not ready yet", "Dieser Bereich ist noch in Arbeit", "Розділ ще в роботі"],
 
         // Статусы и приоритеты
         ["К выполнению", "To do", "Offen", "До виконання"],
@@ -96,7 +95,6 @@ internal static partial class Translations
         ["сортировка: ", "sort: ", "Sortierung: ", "сортування: "],
         ["просрочено · ", "overdue · ", "überfällig · ", "прострочено · "],
         ["+ тег", "+ tag", "+ Tag", "+ тег"],
-        ["Нет задач по фильтру", "No tasks match the filter", "Keine Aufgaben für den Filter", "Немає завдань за фільтром"],
 
         // Статистика
         ["Выполнено за неделю", "Done this week", "Diese Woche erledigt", "Виконано за тиждень"],
@@ -210,7 +208,6 @@ internal static partial class Translations
         ["Изменения применяются сразу", "Changes apply immediately", "Änderungen gelten sofort", "Зміни застосовуються одразу"],
         ["Оформление", "Appearance", "Darstellung", "Оформлення"],
         ["Тема", "Theme", "Design", "Тема"],
-        ["Системная переключается автоматически", "System follows Windows automatically", "„System“ folgt Windows automatisch", "Системна перемикається автоматично"],
         ["Системная|Светлая|Тёмная", "System|Light|Dark", "System|Hell|Dunkel", "Системна|Світла|Темна"],
         ["Системная", "System", "System", "Системна"],
         ["Аврора", "Aurora", "Aurora", "Аврора"],
@@ -234,10 +231,7 @@ internal static partial class Translations
         ["Список напоминаний внизу навигации", "Reminder list at the bottom of the navigation", "Erinnerungsliste unten in der Navigation", "Список нагадувань унизу навігації"],
         ["Путь к базе", "Database path", "Pfad der Datenbank", "Шлях до бази"],
         ["Горячие клавиши", "Keyboard shortcuts", "Tastenkürzel", "Гарячі клавіші"],
-        ["Новая задача ", "New task ", "Neue Aufgabe ", "Нове завдання "],
         ["Сохранить ", "Save ", "Speichern ", "Зберегти "],
-        ["Выполнить ", "Complete ", "Erledigen ", "Виконати "],
-        ["Отмена ", "Cancel ", "Abbrechen ", "Скасувати "],
         ["1 мин", "1 min", "1 Min.", "1 хв"],
         ["5 мин", "5 min", "5 Min.", "5 хв"],
         ["15 мин", "15 min", "15 Min.", "15 хв"],

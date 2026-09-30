@@ -12,18 +12,8 @@ namespace TaskManager.App.ViewModels;
 /// <summary>Строка горизонтальной гистограммы приоритетов: значок, полоса, число и доля.</summary>
 public sealed record PriorityBarViewModel(string Title, int Level, int Count, string Percent, double Fraction, Color Color);
 
-/// <summary>
-/// Столбец вертикального графика. <see cref="Height"/> уже в пикселях, <see cref="Color"/> — цвет заливки.
-/// <paramref name="Dense"/>: столбцов много (месяц), они узкие, поэтому зазор меньше, а подписи шире столбца
-/// (они центрируются по нему и выходят за его края, не сдвигая соседей).
-/// </summary>
-public sealed record ChartColumnViewModel(string Value, string Label, double Height, Color Color, Color ValueColor, bool Dense = false)
-{
-    public Thickness Gap => Dense ? new Thickness(1, 0) : new Thickness(2, 0);
-
-    /// <summary>Ширина подписи: -1 — по тексту (обычный график), у плотного фиксированная, чтобы подпись не сжималась до ширины столбца.</summary>
-    public double LabelWidth => Dense ? 40 : -1;
-}
+/// <summary>Столбец вертикального графика. <see cref="Height"/> уже в пикселях, <see cref="Color"/> — цвет заливки.</summary>
+public sealed record ChartColumnViewModel(string Value, string Label, double Height, Color Color, Color ValueColor);
 
 /// <summary>Сегмент полосы статусов; <see cref="Weight"/> — его доля по ширине.</summary>
 public sealed record StatusSegmentViewModel(string Title, string Icon, int Count, double Weight, Color Color);
@@ -237,8 +227,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
                 label,
                 BarHeight(day.Count, max),
                 day.Count == 0 ? line : accent,
-                muted,
-                Dense: !weekly));
+                muted));
         }
 
         var total = days.Sum(d => d.Count);
@@ -307,12 +296,6 @@ public sealed partial class StatisticsViewModel : ViewModelBase
 
     private static Color ThemeColor(string key) =>
         Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color ? color : Colors.Gray;
-
-    private static string Plural(int n, string one, string few, string many)
-    {
-        var form = (n % 100 is >= 11 and <= 14) ? many : (n % 10) switch { 1 => one, >= 2 and <= 4 => few, _ => many };
-        return $"{n} {form}";
-    }
 
     /// <summary>Длительность в виде "2д 12ч", "5ч 30мин" или "15мин": две самые крупные единицы.</summary>
     private static string FormatDuration(TimeSpan value)

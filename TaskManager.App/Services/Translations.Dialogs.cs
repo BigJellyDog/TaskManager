@@ -9,7 +9,6 @@ internal static partial class Translations
         ["Да", "Yes", "Ja", "Так"],
         ["Нет", "No", "Nein", "Ні"],
         ["Ошибка", "Error", "Fehler", "Помилка"],
-        ["Предупреждение", "Warning", "Warnung", "Попередження"],
         ["Пропущено", "Skipped", "Übersprungen", "Пропущено"],
         ["Не удалось выполнить действие", "The action failed", "Aktion fehlgeschlagen", "Не вдалося виконати дію"],
         ["Произошла непредвиденная ошибка. Подробности записаны в журнал.", "An unexpected error occurred. Details are in the log.", "Ein unerwarteter Fehler ist aufgetreten. Details stehen im Protokoll.", "Сталася непередбачена помилка. Подробиці записано в журнал."],
@@ -147,7 +146,6 @@ internal static partial class Translations
         ["Файл слишком большой для импорта (больше 50 МБ).", "The file is too large to import (over 50 MB).", "Die Datei ist zu groß für den Import (über 50 MB).", "Файл завеликий для імпорту (понад 50 МБ)."],
 
         // Напоминания и история
-        ["Напоминания ({0})", "Reminders ({0})", "Erinnerungen ({0})", "Нагадування ({0})"],
         ["просрочена", "overdue", "überfällig", "прострочено"],
         ["меньше часа", "less than an hour", "weniger als eine Stunde", "менше години"],
         ["меньше суток", "less than a day", "weniger als ein Tag", "менше доби"],

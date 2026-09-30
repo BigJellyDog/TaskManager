@@ -396,6 +396,10 @@ dotnet_diagnostic.CA1873.severity = none
 [TaskManager.Tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
 
+# Команды и свойства моделей представления привязываются из XAML как члены экземпляра: делать их static нельзя.
+[TaskManager.App/ViewModels/*.cs]
+dotnet_diagnostic.CA1822.severity = none
+
 # EF migrations are generated, do not analyze them
 [**/Migrations/*.cs]
 generated_code = true

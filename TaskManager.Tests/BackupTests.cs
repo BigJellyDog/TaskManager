@@ -31,7 +31,7 @@ public sealed class BackupTests : IDisposable
         Directory.Delete(_folder, recursive: true);
     }
 
-    private TaskManagerDbContext Open(string path) =>
+    private static TaskManagerDbContext Open(string path) =>
         new(new DbContextOptionsBuilder<TaskManagerDbContext>().UseSqlite($"Data Source={path};Pooling=False").Options);
 
     private SqliteDatabaseBackup NewBackup() => new(_databasePath, _clock, NullLogger<SqliteDatabaseBackup>.Instance);

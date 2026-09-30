@@ -556,7 +556,7 @@ public sealed partial class TasksViewModel : ViewModelBase
     }
 
     /// <summary>Заменяет содержимое списка, только если оно изменилось. Возвращает, менялось ли оно.</summary>
-    private static bool Sync(ObservableCollection<TaskRowViewModel> target, IReadOnlyList<TaskRowViewModel> fresh)
+    private static bool Sync(ObservableCollection<TaskRowViewModel> target, List<TaskRowViewModel> fresh)
     {
         if (target.Count == fresh.Count && target.Zip(fresh).All(pair => pair.First.Signature == pair.Second.Signature))
         {
@@ -629,22 +629,6 @@ public sealed partial class TasksViewModel : ViewModelBase
         WeekCount = counts.Week;
         BlockedCount = counts.Blocked;
         AllCount = counts.All;
-    }
-
-    private static string Plural(int count, string one, string few, string many)
-    {
-        var tail = count % 100;
-        if (tail is >= 11 and <= 14)
-        {
-            return many;
-        }
-
-        return (count % 10) switch
-        {
-            1 => one,
-            2 or 3 or 4 => few,
-            _ => many,
-        };
     }
 
     private async Task<PagedResult<TaskItem>> FetchAsync(int pageNumber)

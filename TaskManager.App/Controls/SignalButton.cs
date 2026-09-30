@@ -154,9 +154,6 @@ public sealed class SignalButton : Border
         }
     }
 
-    private static Color? TryGetColor(string key) =>
-        Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color ? color : null;
-
     private static void OnChanged(BindableObject bindable, object oldValue, object newValue) => ((SignalButton)bindable).Apply();
 
     private static void OnCommandChanged(BindableObject bindable, object? oldValue, object? newValue)

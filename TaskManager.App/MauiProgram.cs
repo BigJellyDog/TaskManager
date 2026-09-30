@@ -14,87 +14,14 @@ namespace TaskManager.App;
 
 public static class MauiProgram
 {
-#if WINDOWS
-	private static Microsoft.UI.Xaml.FrameworkElement? FindByName(Microsoft.UI.Xaml.DependencyObject parent, string name)
-	{
-		for (var i = 0; i < Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
-		{
-			var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(parent, i);
-			if (child is Microsoft.UI.Xaml.FrameworkElement element && element.Name == name)
-			{
-				return element;
-			}
-
-			if (FindByName(child, name) is { } found)
-			{
-				return found;
-			}
-		}
-
-		return null;
-	}
-#endif
-
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
-		// Шрифты шаблона (OpenSans) не регистрируем: в неупакованном Windows-приложении они не загружаются
-		// (ms-appx не находит файл), а на Windows и так подставляется системный шрифт.
+		// Свои шрифты не подключаем: на Windows используется системный (Segoe UI Variable).
 		builder
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit();
 
-		// Списки и календари раскрываются системным окном: оно должно быть в теме приложения, а не Windows.
-		Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("Theme", (handler, view) =>
-		{
-#if WINDOWS
-			Services.ThemeManager.Register(handler.PlatformView);
-#endif
-		});
-		Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("Theme", (handler, view) =>
-		{
-#if WINDOWS
-			Services.ThemeManager.Register(handler.PlatformView);
-#endif
-		});
-		Microsoft.Maui.Handlers.TimePickerHandler.Mapper.AppendToMapping("Theme", (handler, view) =>
-		{
-#if WINDOWS
-			Services.ThemeManager.Register(handler.PlatformView);
-#endif
-		});
-
-		// Поля ввода без штатной рамки WinUI: рамку и подсветку фокуса рисует наша оболочка (Signal).
-		Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
-		{
-#if WINDOWS
-			handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
-			var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
-			handler.PlatformView.Background = transparent;
-			handler.PlatformView.Resources["CalendarDatePickerBackground"] = transparent;
-			handler.PlatformView.Resources["CalendarDatePickerBackgroundPointerOver"] = transparent;
-			handler.PlatformView.Resources["CalendarDatePickerBackgroundPressed"] = transparent;
-			handler.PlatformView.Resources["CalendarDatePickerBorderBrush"] = transparent;
-			handler.PlatformView.Resources["CalendarDatePickerBorderBrushPointerOver"] = transparent;
-			handler.PlatformView.Resources["CalendarDatePickerBorderBrushPressed"] = transparent;
-			// Значок календаря рисуем сами слева от поля: штатный справа прячем.
-			handler.PlatformView.Loaded += (sender, _) =>
-			{
-				if (sender is Microsoft.UI.Xaml.DependencyObject root && FindByName(root, "CalendarGlyph") is Microsoft.UI.Xaml.UIElement glyph)
-				{
-					glyph.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-				}
-			};
-#endif
-		});
-		Microsoft.Maui.Handlers.TimePickerHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
-		{
-#if WINDOWS
-			var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
-			handler.PlatformView.Background = transparent;
-			handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
-#endif
-		});
 		Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("Signal", (handler, view) =>
 		{
 #if WINDOWS
@@ -137,6 +64,8 @@ public static class MauiProgram
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Information()
 			.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+			// MAUI пишет «Error loading font» для имени системного шрифта (он не из пакета, а из Windows): шрифт при этом подставляется верно.
+			.MinimumLevel.Override("Microsoft.Maui.FontManager", Serilog.Events.LogEventLevel.Fatal)
 			.WriteTo.File(
 				Path.Combine(AppPaths.LogsDirectory, "taskmanager-.log"),
 				rollingInterval: RollingInterval.Day,

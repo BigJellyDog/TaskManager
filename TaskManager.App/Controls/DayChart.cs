@@ -66,7 +66,7 @@ public sealed class DayChart : GraphicsView
         private const float LabelTop = 102;
         private const float LabelHeight = 18;
 
-        public IReadOnlyList<ChartColumnViewModel> Columns { get; set; } = [];
+        public List<ChartColumnViewModel> Columns { get; set; } = [];
 
         private static Color Token(string key, Color fallback) =>
             Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color ? color : fallback;

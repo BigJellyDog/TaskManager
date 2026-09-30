@@ -42,9 +42,6 @@ public sealed partial class TagRowViewModel : ObservableObject
 
     [ObservableProperty]
     private string editName;
-
-    private static string PluralTask(int n) =>
-        (n % 100 is >= 11 and <= 14) ? "задач" : (n % 10) switch { 1 => "задачу", >= 2 and <= 4 => "задачи", _ => "задач" };
 }
 
 /// <summary>Теги: список с числом задач, переименование во всех задачах и удаление неиспользуемых.</summary>
@@ -154,11 +151,5 @@ public sealed partial class TagsViewModel : ViewModelBase
         {
             await LoadCoreAsync();
         }
-    }
-
-    private static string Plural(int n, string one, string few, string many)
-    {
-        var form = (n % 100 is >= 11 and <= 14) ? many : (n % 10) switch { 1 => one, >= 2 and <= 4 => few, _ => many };
-        return $"{n} {form}";
     }
 }

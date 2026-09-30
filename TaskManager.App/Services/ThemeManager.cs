@@ -131,23 +131,12 @@ public static class ThemeManager
         {
             root.RequestedTheme = theme;
         }
-
-        Native.RemoveAll(reference => !reference.TryGetTarget(out _));
-        foreach (var reference in Native)
-        {
-            if (reference.TryGetTarget(out var element))
-            {
-                element.RequestedTheme = theme;
-            }
-        }
 #endif
     }
 
     private static ThemeMode _mode = ThemeMode.Dark;
 
 #if WINDOWS
-    private static readonly List<WeakReference<Microsoft.UI.Xaml.FrameworkElement>> Native = [];
-
     private static Microsoft.UI.Xaml.ElementTheme ElementThemeNow() =>
         _followSystem
             ? Microsoft.UI.Xaml.ElementTheme.Default
@@ -155,13 +144,6 @@ public static class ThemeManager
 
     /// <summary>Текущая тема приложения в виде темы WinUI, для окон, которые мы рисуем сами.</summary>
     public static Microsoft.UI.Xaml.ElementTheme NativeTheme => ElementThemeNow();
-
-    /// <summary>Подключает системный элемент с раскрывающимся окном (список, календарь) к теме приложения.</summary>
-    public static void Register(Microsoft.UI.Xaml.FrameworkElement element)
-    {
-        Native.Add(new WeakReference<Microsoft.UI.Xaml.FrameworkElement>(element));
-        element.RequestedTheme = ElementThemeNow();
-    }
 #endif
 
     private static bool IsTheme(ResourceDictionary dictionary)

@@ -25,10 +25,10 @@ public sealed class Flag : GraphicsView, IDrawable
         set => SetValue(CodeProperty, value);
     }
 
-    public void Draw(ICanvas canvas, RectF dirty)
+    public void Draw(ICanvas canvas, RectF dirtyRect)
     {
-        var w = dirty.Width;
-        var h = dirty.Height;
+        var w = dirtyRect.Width;
+        var h = dirtyRect.Height;
         canvas.SaveState();
         var clip = new PathF();
         clip.AppendRoundedRectangle(0, 0, w, h, 2);

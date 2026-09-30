@@ -45,12 +45,6 @@ public sealed partial class TrashRowViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isSelected;
-
-    private static string Plural(int n, string one, string few, string many)
-    {
-        var form = (n % 100 is >= 11 and <= 14) ? many : (n % 10) switch { 1 => one, >= 2 and <= 4 => few, _ => many };
-        return $"{n} {form}";
-    }
 }
 
 /// <summary>Корзина: удалённые задачи, восстановление (с подзадачами) и удаление навсегда с подтверждением.</summary>
@@ -204,11 +198,5 @@ public sealed partial class TrashViewModel : ViewModelBase
         {
             await LoadCoreAsync();
         }
-    }
-
-    private static string Plural(int n, string one, string few, string many)
-    {
-        var form = (n % 100 is >= 11 and <= 14) ? many : (n % 10) switch { 1 => one, >= 2 and <= 4 => few, _ => many };
-        return $"{n} {form}";
     }
 }

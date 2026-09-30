@@ -49,19 +49,19 @@ public static partial class SvgPathNormalizer
         {
             x = startX = nx;
             y = startY = ny;
-            output.Append($"M{F(x)} {F(y)}");
+            output.Append(CultureInfo.InvariantCulture, $"M{F(x)} {F(y)}");
         }
 
         void LineTo(double nx, double ny)
         {
             x = nx;
             y = ny;
-            output.Append($"L{F(x)} {F(y)}");
+            output.Append(CultureInfo.InvariantCulture, $"L{F(x)} {F(y)}");
         }
 
         void CurveTo(double x1, double y1, double x2, double y2, double nx, double ny)
         {
-            output.Append($"C{F(x1)} {F(y1)} {F(x2)} {F(y2)} {F(nx)} {F(ny)}");
+            output.Append(CultureInfo.InvariantCulture, $"C{F(x1)} {F(y1)} {F(x2)} {F(y2)} {F(nx)} {F(ny)}");
             controlX = x2;
             controlY = y2;
             x = nx;
