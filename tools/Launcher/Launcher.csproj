@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- A tiny native starter for the release zip: it is the only exe in the zip's root and starts
+	     app\TaskManager.App.exe, so all the other files can live in subfolders. -->
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<AssemblyName>TaskManager</AssemblyName>
+		<RootNamespace>TaskManager.Launcher</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<ApplicationIcon>app.ico</ApplicationIcon>
+		<AssemblyTitle>Task Manager</AssemblyTitle>
+		<PublishAot>true</PublishAot>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+</Project>
