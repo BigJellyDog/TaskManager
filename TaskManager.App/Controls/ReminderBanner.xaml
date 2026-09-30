@@ -8,13 +8,13 @@
              x:DataType="vm:ReminderBannerViewModel"
              IsVisible="{Binding IsVisible}">
 
-    <!-- Блок «Напоминания» внизу боковой панели, вариант «Главное сейчас»: одно самое срочное напоминание крупно,
-         кнопки «Выполнить» и «Отложить», внизу «1 из 3» со стрелками. Поверхность с тонкой границей, радиус 6. -->
+    <!-- The "Reminders" block at the bottom of the side panel, the "Main one now" variant: one most urgent reminder, large,
+         the "Complete" and "Snooze" buttons, below "1 of 3" with arrows. A surface with a thin border, radius 6. -->
     <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0">
         <VerticalStackLayout Spacing="0">
 
             <VerticalStackLayout Padding="12" Spacing="10">
-                <!-- Срочность: рамка и текст цвета срочности, у просроченного красный фон -->
+                <!-- Urgency: a border and text in the urgency colour, a red background for an overdue one -->
                 <Border HorizontalOptions="Start" StrokeShape="RoundRectangle 3" StrokeThickness="1" Padding="7,2"
                         Stroke="{Binding TagStroke}" BackgroundColor="{Binding TagBackground}">
                     <Label Text="{Binding TagText}" FontFamily="{StaticResource MonoFont}" FontSize="10" FontAttributes="Bold"
@@ -40,14 +40,14 @@
                     </Label>
                 </HorizontalStackLayout>
 
-                <!-- Кнопки одна под другой: в панели шириной 207 рядом они не помещаются -->
+                <!-- Buttons one under the other: they do not fit side by side in a panel 207 wide -->
                 <VerticalStackLayout Spacing="6" HorizontalOptions="Start">
                     <controls:SignalButton Variant="Primary" Compact="True" Icon="check" Text="{loc:Extension 'Выполнить'}" Command="{Binding CompleteCommand}" />
                     <controls:SignalButton Compact="True" Icon="clock" Text="{loc:Extension 'Отложить'}" Command="{Binding SnoozeCommand}" />
                 </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <!-- «1 из 3» и стрелки -->
+            <!-- "1 of 3" and the arrows -->
             <BoxView HeightRequest="1" Color="{DynamicResource Line}" />
             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Padding="12,8">
                 <Label Grid.Column="0" Text="{Binding PagerText}" FontFamily="{StaticResource MonoFont}" FontSize="12"

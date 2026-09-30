@@ -3,13 +3,13 @@ using TaskManager.Core.Specifications;
 
 namespace TaskManager.Core.Querying;
 
-/// <summary>Запрос списка задач: что отобрать, как отсортировать и какую страницу вернуть.</summary>
+/// <summary>A task list query: what to select, how to sort and which page to return.</summary>
 public sealed class TaskQuery
 {
     public const int DefaultPageSize = 20;
     public const int MaxPageSize = 200;
 
-    /// <summary>Сортировка по умолчанию: сначала важные, среди равных сначала срочные.</summary>
+    /// <summary>The default sorting: important first, among equals urgent first.</summary>
     public static IReadOnlyList<TaskSort> DefaultSort { get; } =
     [
         new TaskSort(TaskSortField.Priority, Descending: true),
@@ -38,13 +38,13 @@ public sealed class TaskQuery
         PageSize = pageSize;
     }
 
-    /// <summary>Условие отбора. Если фильтров нет, подходят все задачи.</summary>
+    /// <summary>The selection condition. If there are no filters, all tasks match.</summary>
     public ISpecification<TaskItem> Filter { get; }
 
-    /// <summary>Правила сортировки по порядку важности. Если не заданы, действует <see cref="DefaultSort"/>.</summary>
+    /// <summary>The sorting rules in order of importance. If not set, <see cref="DefaultSort"/> applies.</summary>
     public IReadOnlyList<TaskSort> Sort { get; }
 
-    /// <summary>Номер страницы, с единицы.</summary>
+    /// <summary>The page number, starting from one.</summary>
     public int Page { get; }
 
     public int PageSize { get; }

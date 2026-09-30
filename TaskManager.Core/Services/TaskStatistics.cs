@@ -2,7 +2,7 @@ using TaskManager.Core.Domain;
 
 namespace TaskManager.Core.Services;
 
-/// <summary>Период, за который считаются «Вовремя», «Среднее время» и график выполненных по дням.</summary>
+/// <summary>The period for which "On time", "Average time" and the done-by-day chart are counted.</summary>
 public enum StatisticsPeriod
 {
     Week,
@@ -10,25 +10,25 @@ public enum StatisticsPeriod
     AllTime,
 }
 
-/// <summary>Сколько задач приходится на календарный день (в местном часовом поясе).</summary>
+/// <summary>How many tasks fall on a calendar day (in the local time zone).</summary>
 public sealed record DayCount(DateOnly Day, int Count);
 
-/// <summary>Сколько открытых задач помечено тегом.</summary>
+/// <summary>How many open tasks are marked with the tag.</summary>
 public sealed record TagCount(string Name, int Count);
 
-/// <summary>Сводная статистика по задачам (FR-11).</summary>
-/// <param name="CompletedLastWeek">Выполнено за последние 7 суток.</param>
-/// <param name="CompletedLastMonth">Выполнено за последние 30 суток.</param>
-/// <param name="CompletedWithDeadline">Сколько выполнено задач с дедлайном за выбранный период (база для процента).</param>
-/// <param name="CompletedOnTime">Из них выполнено не позже дедлайна.</param>
-/// <param name="AverageCompletionTime">Среднее время от создания до выполнения за период; null, если выполненных задач нет.</param>
-/// <param name="OverdueCount">Открытые задачи с прошедшим дедлайном.</param>
-/// <param name="BlockedCount">Задачи в статусе Blocked.</param>
-/// <param name="OpenByPriority">Открытые задачи по приоритетам. Всегда содержит все четыре приоритета.</param>
-/// <param name="OpenByStatus">Открытые задачи по статусам (К выполнению, В работе, Заблокирована). Содержит все три.</param>
-/// <param name="CompletedByDay">Выполнено по дням: последний день — сегодня. Дни без задач присутствуют с нулём.</param>
-/// <param name="DeadlinesByDay">Дедлайны открытых задач на ближайшие 7 дней, начиная с сегодняшнего (просроченные не входят).</param>
-/// <param name="TopTags">Самые частые теги в открытых задачах, по убыванию.</param>
+/// <summary>The summary statistics of tasks (FR-11).</summary>
+/// <param name="CompletedLastWeek">Completed in the last 7 days.</param>
+/// <param name="CompletedLastMonth">Completed in the last 30 days.</param>
+/// <param name="CompletedWithDeadline">How many tasks with a deadline were completed in the chosen period (the base for the percentage).</param>
+/// <param name="CompletedOnTime">Of them completed not later than the deadline.</param>
+/// <param name="AverageCompletionTime">The average time from creation to completion over the period; null if there are no completed tasks.</param>
+/// <param name="OverdueCount">Open tasks with a deadline that has passed.</param>
+/// <param name="BlockedCount">Tasks with the Blocked status.</param>
+/// <param name="OpenByPriority">Open tasks by priority. Always contains all four priorities.</param>
+/// <param name="OpenByStatus">Open tasks by status (To do, In progress, Blocked). Contains all three.</param>
+/// <param name="CompletedByDay">Completed by day: the last day is today. Days without tasks are present with zero.</param>
+/// <param name="DeadlinesByDay">The deadlines of open tasks for the next 7 days, starting from today (overdue ones are not included).</param>
+/// <param name="TopTags">The most frequent tags in open tasks, in descending order.</param>
 public sealed record TaskStatistics(
     int CompletedLastWeek,
     int CompletedLastMonth,
@@ -43,10 +43,10 @@ public sealed record TaskStatistics(
     IReadOnlyList<DayCount> DeadlinesByDay,
     IReadOnlyList<TagCount> TopTags)
 {
-    /// <summary>Процент выполненных вовремя среди выполненных с дедлайном (0-100); null, если таких задач ещё нет.</summary>
+    /// <summary>The percentage completed on time among those completed with a deadline (0-100); null if there are no such tasks yet.</summary>
     public double? OnTimePercent =>
         CompletedWithDeadline == 0 ? null : Math.Round(CompletedOnTime * 100.0 / CompletedWithDeadline, 1);
 
-    /// <summary>Всего открытых задач.</summary>
+    /// <summary>The total of open tasks.</summary>
     public int OpenCount => OpenByPriority.Values.Sum();
 }

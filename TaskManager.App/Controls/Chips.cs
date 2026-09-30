@@ -5,8 +5,8 @@ using Microsoft.Maui.Controls.Shapes;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Быстрый фильтр-чип «ПРОСРОЧЕНО · 2»: моноширинная подпись заглавными, рамка 1 px. Включённый чип подсвечивается
-/// акцентом, «тревожный» (просрочено) красным.
+/// The quick filter chip "OVERDUE · 2": a monospaced upper-case label, a 1 px border. An enabled chip is highlighted
+/// with the accent, an "alarm" one (overdue) in red.
 /// </summary>
 public sealed class ToggleChip : Border
 {
@@ -77,7 +77,7 @@ public sealed class ToggleChip : Border
     {
         _label.Text = Text;
 
-        // Красный: просрочено (есть задачи). Акцент: фильтр включён. Иначе спокойная рамка.
+        // Red: overdue (there are tasks). Accent: the filter is on. Otherwise a calm border.
         var (text, stroke, background) = (IsAlert, IsActive) switch
         {
             (true, _) => ("PCrit", "PCritBrush", IsActive ? "SurfaceRaised" : "Bg"),
@@ -92,8 +92,8 @@ public sealed class ToggleChip : Border
 }
 
 /// <summary>
-/// Выпадающий чип «СТАТУС ▾» из макета: рамка 1 px, моноширинная подпись заглавными. Нажатие открывает список в стиле
-/// Signal под чипом. Если выбран не первый пункт («Все …»), на чипе подпись выбранного, а рамка и текст акцентные.
+/// The drop-down chip "STATUS ▾" from the mockup: a 1 px border, a monospaced upper-case label. A tap opens a list in the Signal
+/// style under the chip. If an item other than the first ("All ...") is chosen, the chip shows the chosen label, with an accent border and text.
 /// </summary>
 public sealed class DropChip : Border
 {
@@ -141,7 +141,7 @@ public sealed class DropChip : Border
         set => SetValue(TitleProperty, value);
     }
 
-    /// <summary>Вид пунктов: «tag» (с решёткой, как теги на карточках) или «priority» (столбики и цвет приоритета).</summary>
+    /// <summary>The kind of items: "tag" (with a hash, like the tags on cards) or "priority" (bars and the priority colour).</summary>
     public string Kind
     {
         get => (string)GetValue(KindProperty);
@@ -162,7 +162,7 @@ public sealed class DropChip : Border
 
     private static void OnChanged(BindableObject bindable, object oldValue, object newValue) => ((DropChip)bindable).Apply();
 
-    // Пункт «Все …» всегда первый и без оформления; остальные оформляются по виду списка.
+    // The "All ..." item is always first and has no styling; the others are styled by the kind of list.
     private DropEntry Describe(object item, int index)
     {
         var text = item.ToString() ?? string.Empty;
@@ -218,7 +218,7 @@ public sealed class DropChip : Border
         var first = ItemsSource is { Count: > 0 } ? ItemsSource[0] : null;
         var chosen = SelectedItem is { } item && !Equals(item, first) ? item.ToString() : null;
 
-        // В макете подпись «Тег ▾» просто текст со стрелкой.
+        // In the mockup the "Tag ▾" label is just text with an arrow.
         var shown = chosen is not null && Kind == "tag" ? "#" + chosen : chosen;
         _label.Text = (shown ?? Title) + " ▾";
         _label.SetDynamicResource(Label.TextColorProperty, chosen is null ? "InkMuted" : "Accent");

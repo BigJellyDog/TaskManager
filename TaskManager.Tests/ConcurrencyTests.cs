@@ -111,7 +111,7 @@ public sealed class ConcurrencyTests : IDisposable
         taskInSecond!.SetPriority(Priority.Critical);
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
 
-        // Первое изменение не потеряно, второе не записано.
+        // The first change is not lost, the second is not written.
         await using var read = _db.CreateContext();
         var saved = await read.Tasks.FindAsync(id);
         Assert.Equal("Изменил первый", saved!.Title);
@@ -132,7 +132,7 @@ public sealed class ConcurrencyTests : IDisposable
         taskInSecond!.SetPriority(Priority.Critical);
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
 
-        // "Повторить": перечитываем актуальные данные и применяем своё изменение заново.
+        // "Retry": we read the current data again and apply our change anew.
         await second.Entry(taskInSecond).ReloadAsync();
         taskInSecond.SetPriority(Priority.Critical);
         await second.SaveChangesAsync();

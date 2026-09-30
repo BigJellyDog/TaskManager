@@ -4,8 +4,8 @@ using TaskManager.App.Services;
 namespace TaskManager.App.ViewModels;
 
 /// <summary>
-/// Основа для моделей представления. Даёт индикатор занятости и единый способ выполнить действие с обработкой
-/// ошибок: ожидаемые (проверки, конфликт версий) показываются пользователем, неожиданные пишутся в журнал.
+/// The base of view models. Gives a busy indicator and one way to run an action with error
+/// handling: expected errors (checks, version conflict) are shown to the user, unexpected ones are written to the log.
 /// </summary>
 public abstract partial class ViewModelBase : ObservableObject
 {
@@ -19,7 +19,7 @@ public abstract partial class ViewModelBase : ObservableObject
 
     protected IDialogService Dialogs { get; }
 
-    /// <summary>Идёт операция: интерфейс может показать индикатор и заблокировать кнопки.</summary>
+    /// <summary>An operation is running: the interface may show an indicator and block the buttons.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotBusy))]
     private bool isBusy;
@@ -27,8 +27,8 @@ public abstract partial class ViewModelBase : ObservableObject
     public bool IsNotBusy => !IsBusy;
 
     /// <summary>
-    /// Выполняет действие. Повторный вызов во время работы игнорируется (защита от двойного нажатия).
-    /// Возвращает true, если действие завершилось без ошибки.
+    /// Runs an action. A repeated call while it is working is ignored (protection against a double tap).
+    /// Returns true if the action finished without an error.
     /// </summary>
     protected async Task<bool> RunAsync(Func<Task> action, string errorTitle = "Не удалось выполнить действие")
     {
@@ -49,7 +49,7 @@ public abstract partial class ViewModelBase : ObservableObject
         {
             return false;
         }
-#pragma warning disable CA1031 // На границе интерфейса перехватываем всё: пользователь увидит сообщение, а не падение программы.
+#pragma warning disable CA1031 // At the interface boundary we catch everything: the user will see a message, not a crash of the program.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

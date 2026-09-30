@@ -8,7 +8,7 @@ using TaskManager.Core.Services;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Пункт боковой панели: раздел, иконка, горячая клавиша и счётчик справа.</summary>
+/// <summary>A side panel item: a section, an icon, a shortcut and a counter on the right.</summary>
 public sealed partial class NavItemViewModel : ObservableObject
 {
     public NavItemViewModel(string title, string icon, string route, string hint, bool separatorAbove = false)
@@ -22,13 +22,13 @@ public sealed partial class NavItemViewModel : ObservableObject
 
     private readonly string _titleKey;
 
-    /// <summary>Название раздела на текущем языке.</summary>
+    /// <summary>The section name in the current language.</summary>
     public string Title => Loc.T(_titleKey);
 
-    /// <summary>Подсказка горячей клавиши: по-немецки «Strg».</summary>
+    /// <summary>The shortcut hint: in German "Strg".</summary>
     public string HintText => Loc.T(Hint);
 
-    /// <summary>Пересчитать подписи после смены языка.</summary>
+    /// <summary>Recalculate the labels after a language change.</summary>
     public void Relocalize()
     {
         OnPropertyChanged(nameof(Title));
@@ -53,7 +53,7 @@ public sealed partial class NavItemViewModel : ObservableObject
     public bool HasCount => Count.Length > 0;
 }
 
-/// <summary>Боковая панель: разделы, выбранный раздел и счётчики (всего задач, в корзине).</summary>
+/// <summary>The side panel: sections, the selected section and counters (all tasks, in the trash).</summary>
 public sealed partial class SidebarViewModel : ObservableObject
 {
     private readonly ServiceRunner _runner;
@@ -78,24 +78,24 @@ public sealed partial class SidebarViewModel : ObservableObject
         ];
         Items[0].IsSelected = true;
 
-        // Задачу выполнили из блока напоминаний: счётчики в панели меняются.
+        // A task was completed from the reminders block: the counters in the panel change.
         WeakReferenceMessenger.Default.Register<SidebarViewModel, TasksChangedMessage>(
             this, (r, _) => MainThread.BeginInvokeOnMainThread(async () => await r.RefreshCountsAsync()));
     }
 
     public ObservableCollection<NavItemViewModel> Items { get; }
 
-    /// <summary>Баннер напоминаний: в узкой панели вместо него показывается колокольчик со значком.</summary>
+    /// <summary>The reminders banner: in the narrow panel a bell with a badge is shown instead.</summary>
     public ReminderBannerViewModel Reminders { get; }
 
-    /// <summary>Окно узкое (около 1024): панель сворачивается до значков.</summary>
+    /// <summary>The window is narrow (about 1024): the panel folds into icons.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsExpanded))]
     private bool isCompact;
 
     public bool IsExpanded => !IsCompact;
 
-    /// <summary>Подсвечивает раздел по текущему адресу Shell (например, "//tasks/taskdetails?id=3" это «Задачи»).</summary>
+    /// <summary>Highlights the section by the current Shell address (for example "//tasks/taskdetails?id=3" is "Tasks").</summary>
     public void SelectRoute(string? location)
     {
         var segment = (location ?? string.Empty).TrimStart('/').Split('/', '?')[0];
@@ -105,7 +105,7 @@ public sealed partial class SidebarViewModel : ObservableObject
         }
     }
 
-    /// <summary>Язык сменился: названия разделов перечитываются.</summary>
+    /// <summary>The language changed: the section names are read again.</summary>
     public void Relocalize()
     {
         foreach (var item in Items)
@@ -117,12 +117,12 @@ public sealed partial class SidebarViewModel : ObservableObject
     [RelayCommand]
     private Task OpenAsync(NavItemViewModel item) => _navigation.GoToAsync("//" + item.Route);
 
-    /// <summary>Обновляет счётчик задач. Ошибка не мешает работе: счётчик просто остаётся прежним.</summary>
+    /// <summary>Refreshes the task counter. An error does not interfere: the counter simply stays as it was.</summary>
     public async Task RefreshCountsAsync()
     {
         try
         {
-            // Оба числа в одной области зависимостей и дешёвыми запросами COUNT.
+            // Both numbers in one dependency scope and with cheap COUNT queries.
             var (tasks, trashed) = await _runner.RunAsync(async sp =>
                 (await sp.GetRequiredService<TaskService>().CountAsync(new TaskFilter()),
                     await sp.GetRequiredService<TrashService>().CountAsync()));
@@ -130,7 +130,7 @@ public sealed partial class SidebarViewModel : ObservableObject
             Items[0].Count = tasks.ToString(System.Globalization.CultureInfo.InvariantCulture);
             Items[3].Count = trashed == 0 ? string.Empty : trashed.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
-#pragma warning disable CA1031 // Счётчик в панели не должен ронять приложение.
+#pragma warning disable CA1031 // The counter in the panel must not bring the application down.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

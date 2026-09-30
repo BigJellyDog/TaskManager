@@ -12,7 +12,7 @@
     <ScrollView>
         <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,340" ColumnSpacing="20" RowSpacing="14" Padding="28,20,28,20">
 
-            <!-- Хлебные крошки: ‹ Задачи / Родитель / Название -->
+            <!-- Breadcrumbs: ‹ Tasks / Parent / Title -->
             <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Spacing="8" VerticalOptions="Center">
                 <HorizontalStackLayout Spacing="4">
                     <HorizontalStackLayout.GestureRecognizers>
@@ -31,7 +31,7 @@
                 <Label Text="{Binding Title}" FontSize="13" FontAttributes="Bold" TextColor="{DynamicResource InkMuted}" LineBreakMode="TailTruncation" MaximumWidthRequest="420" />
             </HorizontalStackLayout>
 
-            <!-- Левая колонка: название, сведения, описание, подзадачи, зависимости -->
+            <!-- Left column: title, details, description, subtasks, dependencies -->
             <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="14">
 
                 <VerticalStackLayout Spacing="10">
@@ -77,7 +77,7 @@
                     <Label Text="{Binding Description}" IsVisible="{Binding HasDescription}" TextColor="{DynamicResource InkMuted}" MaximumWidthRequest="640" HorizontalOptions="Start" />
                 </VerticalStackLayout>
 
-                <!-- Подзадачи -->
+                <!-- Subtasks -->
                 <VerticalStackLayout IsVisible="{Binding HasSubtasks}" Spacing="4">
                     <HorizontalStackLayout Spacing="10" Margin="0,0,0,4">
                         <Label Text="{loc:Extension 'Подзадачи'}" FontSize="15" FontAttributes="Bold" VerticalOptions="Center" />
@@ -139,7 +139,7 @@
                     </VerticalStackLayout>
                 </VerticalStackLayout>
 
-                <!-- Зависимости -->
+                <!-- Dependencies -->
                 <VerticalStackLayout Spacing="6">
                     <Label Text="{loc:Extension 'Зависимости'}" FontSize="15" FontAttributes="Bold" />
 
@@ -198,7 +198,7 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,4,0,0">
-                        <!-- Список задач в стиле приложения (системный Picker открывал окно Windows не в нашей теме) -->
+                        <!-- A task list in the style of the application (the system Picker opened a Windows window that is not in our theme) -->
                         <controls:DropField Grid.Column="0" HeightRequest="34" ItemsSource="{Binding DependencyCandidates}"
                                             SelectedItem="{Binding SelectedCandidate}" Placeholder="{loc:Extension 'Добавить зависимость…'}" />
                         <controls:SignalButton Grid.Column="1" Variant="Secondary" Text="{loc:Extension 'Добавить'}" Command="{Binding AddDependencyCommand}" />
@@ -206,7 +206,7 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <!-- Правая колонка: действия, свойства, история -->
+            <!-- Right column: actions, properties, history -->
             <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="12">
 
                 <Border Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="14">

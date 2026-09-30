@@ -28,7 +28,7 @@ public class TagRepository : ITagRepository
 
     public async Task<IReadOnlyList<Tag>> ListUnusedAsync(CancellationToken cancellationToken = default)
     {
-        // Удалённые задачи тоже считаются: после восстановления у них должны остаться теги.
+        // Deleted tasks are counted too: after a restore they must keep their tags.
         var usedTagIds = _context.Tasks
             .IgnoreQueryFilters()
             .SelectMany(t => t.Tags)
@@ -42,7 +42,7 @@ public class TagRepository : ITagRepository
 
     public async Task<IReadOnlyList<TaskManager.Core.Services.TagUsage>> ListUsageAsync(CancellationToken cancellationToken = default)
     {
-        // Фильтр мягкого удаления скрывает удалённые задачи: так считаются только живые.
+        // The soft-delete filter hides deleted tasks: this way only live ones are counted.
         var live = await _context.Tasks
             .SelectMany(t => t.Tags)
             .GroupBy(tag => tag.Id)

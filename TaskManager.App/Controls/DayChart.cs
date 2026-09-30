@@ -7,9 +7,9 @@ using TaskManager.App.ViewModels;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Столбчатый график по дням: на каждый день подложка и заливка снизу, число над столбцом, подпись под ним.
-/// Рисуется целиком одним полотном, поэтому столбцы ровные при любом числе дней (7 или 30), а подписи шире столбца
-/// просто центрируются по нему и не сдвигают соседей.
+/// A bar chart by day: for every day a track and a fill from the bottom, the number above the bar and a label below it.
+/// It is drawn as one canvas, so the bars are even for any number of days (7 or 30), and labels wider than a bar
+/// are simply centred on it and do not push the neighbours.
 /// </summary>
 public sealed class DayChart : GraphicsView
 {
@@ -20,13 +20,13 @@ public sealed class DayChart : GraphicsView
 
     public DayChart()
     {
-        // Число сверху 16 + зазор 4 + дорожка 78 + зазор 4 + подпись 18.
+        // Number on top 16 + gap 4 + track 78 + gap 4 + label 18.
         HeightRequest = 120;
         Drawable = _painter;
         ThemeManager.Changed += OnThemeChanged;
     }
 
-    /// <summary>Столбцы графика (<see cref="ChartColumnViewModel"/>); перерисовка при любом изменении набора.</summary>
+    /// <summary>The chart columns (<see cref="ChartColumnViewModel"/>); redrawn on any change of the set.</summary>
     public IEnumerable? Columns
     {
         get => (IEnumerable?)GetValue(ColumnsProperty);
@@ -88,7 +88,7 @@ public sealed class DayChart : GraphicsView
             var width = dirtyRect.Width;
             var columnWidth = width / n;
 
-            // Узкие столбцы (месяц) почти вплотную, широкие (неделя) с воздухом, но не шире разумного.
+            // Narrow bars (month) almost touching, wide ones (week) with some air, but not wider than reasonable.
             var dense = n > 12;
             var barWidth = (float)Math.Clamp(columnWidth - (dense ? 2 : 8), 2, 56);
 

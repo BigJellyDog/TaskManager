@@ -1,17 +1,17 @@
 namespace TaskManager.Core.Abstractions;
 
-/// <summary>Единица работы: записывает накопленные изменения одной транзакцией.</summary>
+/// <summary>A unit of work: writes the accumulated changes in one transaction.</summary>
 public interface IUnitOfWork
 {
     /// <summary>
-    /// Сохраняет все изменения (задачи, теги, история) атомарно: либо всё, либо ничего.
+    /// Saves all changes (tasks, tags, history) atomically: all or nothing.
     /// </summary>
-    /// <exception cref="ConcurrencyConflictException">Данные успели изменить с момента чтения.</exception>
+    /// <exception cref="ConcurrencyConflictException">The data was changed since it was read.</exception>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Выполняет несколько шагов (в том числе несколько сохранений) в одной транзакции.
-    /// Исключение внутри откатывает всё. Вложенный вызов присоединяется к уже открытой транзакции.
+    /// Runs several steps (several saves included) in one transaction.
+    /// An exception inside rolls everything back. A nested call joins the transaction that is already open.
     /// </summary>
     Task<T> ExecuteInTransactionAsync<T>(Func<CancellationToken, Task<T>> action, CancellationToken cancellationToken = default);
 

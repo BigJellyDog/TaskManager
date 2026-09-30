@@ -12,7 +12,7 @@ public partial class TrashPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    // Корзина пополняется на других экранах, поэтому перечитываем при каждом показе.
+    // The trash is filled on other screens, so we read it again on every show.
     protected override async void OnAppearing()
     {
         base.OnAppearing();

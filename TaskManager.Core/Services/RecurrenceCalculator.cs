@@ -3,23 +3,23 @@ using TaskManager.Core.Domain;
 namespace TaskManager.Core.Services;
 
 /// <summary>
-/// Вычисляет следующую дату повторяющейся задачи. Чистая математика дат, без базы данных.
-/// Все вычисления идут по локальному календарю часового пояса <c>zone</c>, а результат возвращается моментом времени.
+/// Calculates the next date of a recurring task. Pure date arithmetic, without a database.
+/// All calculations follow the local calendar of the time zone <c>zone</c>, and the result is returned as a point in time.
 /// </summary>
 public static class RecurrenceCalculator
 {
     /// <summary>
-    /// Следующее срабатывание правила после момента <paramref name="current"/>.
-    /// В режиме <see cref="RecurrenceMode.ByCalendar"/> <paramref name="current"/> это предыдущий срок задачи,
-    /// в режиме <see cref="RecurrenceMode.AfterCompletion"/> это момент выполнения.
+    /// The next occurrence of the rule after the moment <paramref name="current"/>.
+    /// In the <see cref="RecurrenceMode.ByCalendar"/> mode <paramref name="current"/> is the previous due date of the task,
+    /// in the <see cref="RecurrenceMode.AfterCompletion"/> mode it is the moment of completion.
     /// </summary>
     /// <remarks>
-    /// Крайние случаи:
-    /// 31-е число: в коротком месяце берётся последний день месяца, а в следующем подходящем снова 31-е (день берётся из якоря);
-    /// 29 февраля: в невисокосный год 28 февраля, в високосный снова 29-е;
-    /// смена времени: время суток берётся из якоря, поэтому задача на 9:00 остаётся на 9:00 по местным часам.
-    /// Если время попало в "дыру" весеннего перевода, оно сдвигается на час вперёд. Если время повторяется
-    /// при осеннем переводе, берётся его первое наступление.
+    /// Edge cases:
+    /// the 31st: in a short month the last day of the month is taken, and in the next suitable one the 31st again (the day is taken from the anchor);
+    /// 29 February: in a non-leap year 28 February, in a leap year the 29th again;
+    /// clock change: the time of day is taken from the anchor, so a task at 9:00 stays at 9:00 local time.
+    /// If the time falls into the "gap" of the spring clock change, it is shifted an hour forward. If the time repeats
+    /// at the autumn change, its first occurrence is taken.
     /// </remarks>
     public static DateTimeOffset GetNext(RecurrenceRule rule, DateTimeOffset current, TimeZoneInfo zone)
     {
@@ -29,7 +29,7 @@ public static class RecurrenceCalculator
         var local = TimeZoneInfo.ConvertTime(current, zone).DateTime;
         var timeOfDay = rule.Anchor?.TimeOfDay ?? local.TimeOfDay;
 
-        // В режиме "по календарю" день месяца помним из якоря. "После выполнения" отсчитывает от даты выполнения.
+        // In the "by calendar" mode we remember the day of month from the anchor. "After completion" counts from the completion date.
         var anchorDay = rule.Mode == RecurrenceMode.ByCalendar && rule.Anchor is { } anchor ? anchor.Day : local.Day;
 
         var date = rule.Frequency switch
@@ -45,8 +45,8 @@ public static class RecurrenceCalculator
     }
 
     /// <summary>
-    /// Следующий выбранный день недели: сначала ищем в той же неделе (неделя с понедельника) после текущего дня,
-    /// если нет, то берём первый выбранный день недели через <paramref name="interval"/> недель.
+    /// The next chosen weekday: first we look in the same week (the week starts on Monday) after the current day,
+    /// if there is none, we take the first chosen weekday after <paramref name="interval"/> weeks.
     /// </summary>
     private static DateTime NextWeeklyDate(DateTime date, WeekDays days, int interval)
     {
@@ -70,7 +70,7 @@ public static class RecurrenceCalculator
             }
         }
 
-        // Недостижимо: правило без дней недели создать нельзя.
+        // Unreachable: a rule without weekdays cannot be created.
         throw new InvalidOperationException("Для еженедельного повторения не выбран ни один день недели.");
     }
 
@@ -90,7 +90,7 @@ public static class RecurrenceCalculator
         return days.HasFlag(flag);
     }
 
-    /// <summary>Сдвигает месяц, а день берёт из <paramref name="anchorDay"/>, но не дальше конца месяца.</summary>
+    /// <summary>Shifts the month and takes the day from <paramref name="anchorDay"/>, but not beyond the end of the month.</summary>
     private static DateTime AddMonths(DateTime date, int months, int anchorDay)
     {
         var firstOfTarget = new DateTime(date.Year, date.Month, 1).AddMonths(months);
@@ -100,13 +100,13 @@ public static class RecurrenceCalculator
 
     private static DateTimeOffset ToDateTimeOffset(DateTime local, TimeZoneInfo zone)
     {
-        // Весенний перевод: такого времени не существует, сдвигаем на час вперёд.
+        // The spring clock change: such a time does not exist, we shift it an hour forward.
         if (zone.IsInvalidTime(local))
         {
             local = local.AddHours(1);
         }
 
-        // Осенний перевод: время бывает дважды. Больший сдвиг от UTC это более раннее наступление.
+        // The autumn clock change: the time happens twice. The larger offset from UTC is the earlier occurrence.
         var offset = zone.IsAmbiguousTime(local)
             ? zone.GetAmbiguousTimeOffsets(local).Max()
             : zone.GetUtcOffset(local);

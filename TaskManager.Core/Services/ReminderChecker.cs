@@ -4,9 +4,9 @@ using TaskManager.Core.Domain;
 namespace TaskManager.Core.Services;
 
 /// <summary>
-/// Одна проверка дедлайнов: находит задачи, о которых пора напомнить, и ещё не показанные напоминания
-/// отдаёт <see cref="IReminderNotifier"/>. Что показано, запоминается в БД, поэтому после перезапуска
-/// приложения напоминание не повторится.
+/// One deadline check: finds the tasks that need a reminder and gives the reminders not yet shown
+/// to <see cref="IReminderNotifier"/>. What was shown is remembered in the database, so after the application
+/// restarts the reminder will not repeat.
 /// </summary>
 public class ReminderChecker
 {
@@ -23,7 +23,7 @@ public class ReminderChecker
         _clock = clock;
     }
 
-    /// <returns>Показанные при этой проверке напоминания (пусто, если нового нет).</returns>
+    /// <returns>The reminders shown during this check (empty if there is nothing new).</returns>
     public async Task<IReadOnlyList<Reminder>> CheckAsync(CancellationToken cancellationToken = default)
     {
         var now = _clock.GetUtcNow();
@@ -56,7 +56,7 @@ public class ReminderChecker
 
         var reminders = fresh.Select(c => new Reminder(c.Task.Id, c.Task.Title, c.Deadline, c.Kind!.Value)).ToList();
 
-        // Сначала показываем, потом запоминаем: если показ упадёт, напоминание повторится, а не потеряется.
+        // First we show, then we remember: if showing fails, the reminder repeats instead of being lost.
         await _notifier.NotifyAsync(reminders, cancellationToken);
 
         await _reminders.AddSentAsync(

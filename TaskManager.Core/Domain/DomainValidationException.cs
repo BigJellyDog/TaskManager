@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Нарушено бизнес-правило домена (пустое название, дедлайн в прошлом и т.п.). Сообщение пригодно для показа пользователю.</summary>
+/// <summary>A business rule of the domain was violated (an empty title, a deadline in the past, etc.). The message is suitable to show to the user.</summary>
 public class DomainValidationException : Exception
 {
     public DomainValidationException()

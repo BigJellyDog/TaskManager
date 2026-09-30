@@ -1,8 +1,8 @@
 namespace TaskManager.App.Services;
 
-/// <summary>Перезапуск приложения (например, чтобы применить восстановление базы из копии).</summary>
+/// <summary>Restart of the application (for example, to apply a database restore from a backup).</summary>
 public interface IAppRestarter
 {
-    /// <summary>Запускает новый экземпляр приложения и закрывает текущий.</summary>
+    /// <summary>Starts a new instance of the application and closes the current one.</summary>
     void Restart();
 }

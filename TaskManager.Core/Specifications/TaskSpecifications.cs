@@ -4,7 +4,7 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Core.Specifications;
 
-/// <summary>Задачи с одним из перечисленных статусов.</summary>
+/// <summary>Tasks with one of the listed statuses.</summary>
 public sealed class StatusSpecification : Specification<TaskItem>
 {
     private readonly TaskStatus[] _statuses;
@@ -22,7 +22,7 @@ public sealed class StatusSpecification : Specification<TaskItem>
     }
 }
 
-/// <summary>Задачи с заданным приоритетом.</summary>
+/// <summary>Tasks with the given priority.</summary>
 public sealed class PrioritySpecification : Specification<TaskItem>
 {
     private readonly Priority _priority;
@@ -39,7 +39,7 @@ public sealed class PrioritySpecification : Specification<TaskItem>
     }
 }
 
-/// <summary>Задачи с тегом. Имя сравнивается без учёта регистра (в том числе для кириллицы).</summary>
+/// <summary>Tasks with a tag. The name is compared ignoring case (Cyrillic included).</summary>
 public sealed class TagSpecification : Specification<TaskItem>
 {
     private readonly string _normalizedName;
@@ -57,8 +57,8 @@ public sealed class TagSpecification : Specification<TaskItem>
 }
 
 /// <summary>
-/// Задачи с дедлайном в диапазоне. Границы включительно, любую можно не указывать.
-/// Задачи без дедлайна под условие не попадают.
+/// Tasks with a deadline in a range. The bounds are inclusive, either may be omitted.
+/// Tasks without a deadline do not match.
 /// </summary>
 public sealed class DeadlineRangeSpecification : Specification<TaskItem>
 {
@@ -88,8 +88,8 @@ public sealed class DeadlineRangeSpecification : Specification<TaskItem>
 }
 
 /// <summary>
-/// Полнотекстовый поиск по названию и описанию без учёта регистра. Запрос из нескольких слов:
-/// в тексте должны встретиться все слова (в любом порядке). Пустой запрос подходит любой задаче.
+/// Full-text search by title and description ignoring case. A query of several words:
+/// all the words must occur in the text (in any order). An empty query matches any task.
 /// </summary>
 public sealed class TextSpecification : Specification<TaskItem>
 {

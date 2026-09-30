@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Язык интерфейса: код, название на самом языке, короткая метка для кнопки и культура для дат и чисел.</summary>
+/// <summary>An interface language: the code, the name in the language itself, a short label for the button and the culture for dates and numbers.</summary>
 public sealed record Language(string Code, string Name, string Label, CultureInfo Culture);
 
 /// <summary>
-/// Перевод интерфейса на русский, английский, немецкий и украинский. Ключ — русский текст, как в макете: если перевода
-/// нет, показывается он сам. Так любой пропущенный перевод виден как русская строка, а не как пустое место.
-/// Смена языка вызывает <see cref="Changed"/>: приложение пересобирает окно, и все подписи читаются заново.
+/// Translation of the interface into Russian, English, German and Ukrainian. The key is the Russian text, as in the mockup: if there is no
+/// translation, the key itself is shown. So any missing translation is visible as a Russian line, not as an empty place.
+/// A language change raises <see cref="Changed"/>: the application rebuilds the window and all labels are read again.
 /// </summary>
 public static class Loc
 {
@@ -28,7 +28,7 @@ public static class Loc
 
     private static bool IsRussian => Current.Code == "ru";
 
-    /// <summary>Столбец текущего языка в таблице переводов: строка — [ru, en, de, uk], порядок языков в меню на него не влияет.</summary>
+    /// <summary>The column of the current language in the translation table: a row is [ru, en, de, uk], the order of languages in the menu does not affect it.</summary>
     private static int Column => Current.Code switch { "en" => 1, "de" => 2, "ua" => 3, _ => 0 };
 
     private static int IndexOf(string? code)
@@ -46,13 +46,13 @@ public static class Loc
 
     public static CultureInfo Culture => Current.Culture;
 
-    /// <summary>Язык изменился.</summary>
+    /// <summary>The language changed.</summary>
     public static event Action? Changed;
 
-    /// <summary>Выбирает язык по коду («ru», «en», «de», «ua»). Неизвестный код — русский.</summary>
+    /// <summary>Chooses a language by code ("ru", "en", "de", "ua"). An unknown code means Russian.</summary>
     public static void Set(string? code)
     {
-        // Раньше украинский сохранялся как «uk».
+        // Ukrainian used to be saved as "uk".
         var index = IndexOf(code == "uk" ? "ua" : code);
         index = index < 0 ? IndexOf("ru") : index;
         if (index == s_index && Equals(CultureInfo.DefaultThreadCurrentCulture, Culture))
@@ -63,7 +63,7 @@ public static class Loc
         var changed = index != s_index;
         s_index = index;
 
-        // Даты, числа и названия дней недели берутся из культуры языка.
+        // Dates, numbers and weekday names are taken from the culture of the language.
         CultureInfo.DefaultThreadCurrentCulture = Culture;
         CultureInfo.DefaultThreadCurrentUICulture = Culture;
         CultureInfo.CurrentCulture = Culture;
@@ -75,7 +75,7 @@ public static class Loc
         }
     }
 
-    /// <summary>Перевод русской строки. Нет перевода: возвращает саму строку.</summary>
+    /// <summary>Translation of a Russian string. No translation: returns the string itself.</summary>
     public static string T(string ru)
     {
         if (IsRussian || string.IsNullOrEmpty(ru))
@@ -83,7 +83,7 @@ public static class Loc
             return ru;
         }
 
-        // Клавиша Ctrl по-немецки называется Strg.
+        // In German the Ctrl key is called Strg.
         if (ru.StartsWith("Ctrl", StringComparison.Ordinal))
         {
             return Current.Code == "de" ? "Strg" + ru[4..] : ru;
@@ -92,12 +92,12 @@ public static class Loc
         return Table.TryGetValue(ru, out var forms) && forms[Column].Length > 0 ? forms[Column] : ru;
     }
 
-    /// <summary>Перевод шаблона с подстановкой: <c>Loc.F("Найдено задач: {0}", n)</c>.</summary>
+    /// <summary>Translation of a template with substitution: <c>Loc.F("Найдено задач: {0}", n)</c>.</summary>
     public static string F(string ruFormat, params object?[] args) => string.Format(Culture, T(ruFormat), args);
 
     /// <summary>
-    /// Нужная форма слова для числа. Ключ — три русские формы через «|» («задача|задачи|задач»), перевод хранит
-    /// формы своего языка в том же порядке (у английского и немецкого вторая и третья совпадают).
+    /// The right word form for a number. The key is three Russian forms separated by "|" ("задача|задачи|задач"), the translation keeps
+    /// the forms of its language in the same order (in English and German the second and third are the same).
     /// </summary>
     public static string Plural(int n, string ruForms)
     {
@@ -113,12 +113,12 @@ public static class Loc
         return forms[Math.Min(form, forms.Length - 1)];
     }
 
-    /// <summary>Число вместе с нужной формой слова: «5 задач», «1 task».</summary>
+    /// <summary>A number together with the right word form: "5 задач", "1 task".</summary>
     public static string Count(int n, string ruForms) => $"{n.ToString(Culture)} {Plural(n, ruForms)}";
 
     /// <summary>
-    /// Перевод сообщения об ошибке из ядра приложения (оно написано по-русски и иногда содержит числа и названия).
-    /// Сначала точное совпадение, затем шаблоны с подстановкой.
+    /// Translation of an error message from the application core (it is written in Russian and sometimes contains numbers and names).
+    /// First an exact match, then templates with substitution.
     /// </summary>
     public static string Message(string? ru)
     {
@@ -162,7 +162,7 @@ public static class Loc
     }
 }
 
-/// <summary>Шаблоны сообщений ядра с числами и названиями: ключ шаблона лежит в таблице переводов с «{0}», «{1}».</summary>
+/// <summary>Templates of core messages with numbers and names: the template key is in the translation table with "{0}", "{1}".</summary>
 internal static partial class MessagePatterns
 {
     [GeneratedRegex(@"^Нельзя перевести задачу из (.+) в (.+): (.+)$")]

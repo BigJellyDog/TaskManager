@@ -5,8 +5,8 @@ using TaskManager.Core.Services;
 namespace TaskManager.App.Services;
 
 /// <summary>
-/// Показ напоминаний пользователю: баннер в боковой панели. Заодно пишет их в журнал, как раньше.
-/// Регистрируется до <c>AddInfrastructure</c>, поэтому заменяет запись в журнал, которая используется по умолчанию.
+/// Showing reminders to the user: a banner in the side panel. It also writes them to the log, as before.
+/// Registered before <c>AddInfrastructure</c>, so it replaces the log writer that is used by default.
 /// </summary>
 public sealed class ReminderNotifier(ReminderBannerViewModel banner, UserSettings settings, ILogger<ReminderNotifier> logger)
     : IReminderNotifier
@@ -25,12 +25,12 @@ public sealed class ReminderNotifier(ReminderBannerViewModel banner, UserSetting
                 reminder.Deadline);
         }
 
-        // Если показать не удалось, исключение вернётся сервису напоминаний: напоминания не отметятся показанными
-        // и будут предложены снова на следующей проверке.
+        // If showing failed, the exception returns to the reminder service: the reminders are not marked as shown
+        // and will be offered again at the next check.
         await banner.ShowAsync(reminders);
 
 #if WINDOWS
-        // Системное уведомление: самое ближайшее напоминание и сколько ещё осталось. Включается в настройках.
+        // A system notification: the nearest reminder and how many more are left. Switched on in the settings.
         if (settings.ShowWindowsToast && reminders.Count > 0)
         {
             var first = reminders.OrderBy(r => r.Deadline).First();

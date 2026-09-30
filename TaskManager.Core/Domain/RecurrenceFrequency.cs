@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Как часто повторяется задача.</summary>
+/// <summary>How often a task repeats.</summary>
 public enum RecurrenceFrequency
 {
     Daily = 0,

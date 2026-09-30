@@ -3,9 +3,9 @@ namespace TaskManager.App.Platforms.Windows;
 using System.Runtime.InteropServices;
 
 /// <summary>
-/// Выводит окно приложения на передний план при запуске. Windows не даёт процессу, который не в фокусе (например,
-/// запущенному из Проводника, консоли или IDE), просто забрать фокус, поэтому окно поднимается несколькими способами:
-/// восстановление, кратковременное «поверх всех» и запрос на передний план.
+/// Brings the application window to the front at start-up. Windows does not let a process that is not in focus (for example
+/// one started from Explorer, a console or an IDE) simply take the focus, so the window is raised in several ways:
+/// restore, a brief "always on top" and a request for the foreground.
 /// </summary>
 public static class WindowActivator
 {
@@ -20,7 +20,7 @@ public static class WindowActivator
     private static readonly IntPtr HwndTopmost = new(-1);
     private static readonly IntPtr HwndNotTopmost = new(-2);
 
-    /// <summary>Поднимает окно с описателем <paramref name="handle"/> поверх остальных и передаёт ему фокус.</summary>
+    /// <summary>Raises the window with the handle <paramref name="handle"/> above the others and gives it the focus.</summary>
     public static void BringToFront(IntPtr handle)
     {
         if (handle == IntPtr.Zero)
@@ -37,11 +37,11 @@ public static class WindowActivator
             ShowWindow(handle, SwShow);
         }
 
-        // Нажатие Alt снимает ограничение Windows на смену окна переднего плана для этого процесса.
+        // Pressing Alt lifts the Windows restriction on changing the foreground window for this process.
         keybd_event(VkMenu, 0, 0, UIntPtr.Zero);
         keybd_event(VkMenu, 0, KeyEventKeyUp, UIntPtr.Zero);
 
-        // Кратко «поверх всех» и сразу обратно: окно оказывается выше остальных, но не остаётся закреплённым.
+        // Briefly "always on top" and straight back: the window ends up above the others but is not pinned.
         SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
         SetWindowPos(handle, HwndNotTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
         SetForegroundWindow(handle);

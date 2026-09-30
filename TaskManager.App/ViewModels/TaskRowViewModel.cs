@@ -5,7 +5,7 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Одна строка списка задач. Только для чтения: всё подготовлено заранее, шаблон лишь показывает.</summary>
+/// <summary>One row of the task list. Read-only: everything is prepared in advance, the template only shows it.</summary>
 public sealed class TaskRowViewModel
 {
     public TaskRowViewModel(TaskItem task, DateTimeOffset now, TimeZoneInfo zone)
@@ -52,7 +52,7 @@ public sealed class TaskRowViewModel
 
         ParentTitle = task.Parent?.Title ?? string.Empty;
 
-        // Дети загружает запрос списка, поэтому прогресс считается без дополнительных обращений к базе.
+        // The children are loaded by the list query, so the progress is calculated without additional database calls.
         var progress = task.GetProgress();
         ProgressText = progress.HasSubtasks ? progress.ToString() : string.Empty;
     }
@@ -71,14 +71,14 @@ public sealed class TaskRowViewModel
 
     public Color StatusColor { get; }
 
-    /// <summary>Имя иконки статуса в наборе Signal.</summary>
+    /// <summary>The name of the status icon in the Signal set.</summary>
     public string StatusIcon { get; }
 
     public string PriorityText { get; }
 
     public Color PriorityColor { get; }
 
-    /// <summary>Сколько столбиков значка приоритета залито: 1 (низкий) … 4 (критический).</summary>
+    /// <summary>How many bars of the priority icon are filled: 1 (low) ... 4 (critical).</summary>
     public int PriorityLevel { get; }
 
     public bool IsClosed { get; }
@@ -91,24 +91,24 @@ public sealed class TaskRowViewModel
 
     public bool HasDeadline => DeadlineText.Length > 0;
 
-    /// <summary>Дедлайн на карточке доски: у просроченных с пометкой «просрочено».</summary>
+    /// <summary>The deadline on a board card: for overdue ones with the note "overdue".</summary>
     public string BoardDeadlineText => IsOverdue ? Loc.T("просрочено · ") + DeadlineText : DeadlineText;
 
     public string TagsText { get; }
 
     public bool HasTags => TagsText.Length > 0;
 
-    /// <summary>Название родителя для подзадачи (пусто у корневых задач).</summary>
+    /// <summary>The name of the parent for a subtask (empty for root tasks).</summary>
     public string ParentTitle { get; }
 
     public bool HasParent => ParentTitle.Length > 0;
 
-    /// <summary>Прогресс подзадач вида "1/2" (пусто, если подзадач нет).</summary>
+    /// <summary>The subtask progress like "1/2" (empty if there are no subtasks).</summary>
     public string ProgressText { get; }
 
     /// <summary>
-    /// Всё, что видно в строке. Если подписи двух выборок совпадают, список на экране не перестраивается:
-    /// переключение вкладок не пересоздаёт десятки карточек, когда данные не менялись.
+    /// Everything that is visible in the row. If the labels of two selections are equal, the list on the screen is not rebuilt:
+    /// switching tabs does not recreate dozens of cards when the data has not changed.
     /// </summary>
     public string Signature =>
         $"{Id}|{RowVersion}|{Title}|{StatusText}|{PriorityText}|{TagsText}|{ParentTitle}|{ProgressText}|{DeadlineText}|{IsOverdue}";

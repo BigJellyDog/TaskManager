@@ -9,7 +9,7 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Tests;
 
-/// <summary>Доменные правила подзадач, без базы данных.</summary>
+/// <summary>The domain rules of subtasks, without a database.</summary>
 public class SubtaskDomainTests
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);
@@ -26,7 +26,7 @@ public class SubtaskDomainTests
         return task;
     }
 
-    // ---- Прогресс ----
+    // ---- Progress ----
 
     [Fact]
     public void Progress_WithoutSubtasks_IsEmptyAndComplete()
@@ -72,7 +72,7 @@ public class SubtaskDomainTests
         Assert.Equal("1/2", parent.GetProgress().ToString());
     }
 
-    // ---- Закрытие родителя ----
+    // ---- Closing the parent ----
 
     [Fact]
     public void ChangeStatus_Done_WithOpenSubtasks_Throws()
@@ -114,7 +114,7 @@ public class SubtaskDomainTests
         Assert.Equal(TaskStatus.Cancelled, parent.Status);
     }
 
-    // ---- Привязка к родителю ----
+    // ---- Attaching to a parent ----
 
     [Fact]
     public void SetParent_Self_Throws()
@@ -180,7 +180,7 @@ public class SubtaskDomainTests
     }
 }
 
-/// <summary>Сценарии подзадач через сервис и реальную БД.</summary>
+/// <summary>Subtask scenarios through the service and a real database.</summary>
 public sealed class SubtaskServiceTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);
@@ -219,7 +219,7 @@ public sealed class SubtaskServiceTests : IDisposable
         return (await NewService(context).GetHistoryAsync(id)).ToList();
     }
 
-    // ---- Создание и глубина ----
+    // ---- Creation and depth ----
 
     [Fact]
     public async Task Create_Subtask_IsLinkedToParent()
@@ -273,7 +273,7 @@ public sealed class SubtaskServiceTests : IDisposable
             () => NewService(context).CreateAsync(new CreateTaskRequest("новая", ParentId: parent)));
     }
 
-    // ---- Прогресс и закрытие родителя ----
+    // ---- Progress and closing the parent ----
 
     [Fact]
     public async Task ParentProgress_FollowsSubtaskStatuses()
@@ -334,7 +334,7 @@ public sealed class SubtaskServiceTests : IDisposable
         await Assert.ThrowsAsync<DomainValidationException>(() => NewService(context).ReopenAsync(child));
     }
 
-    // ---- Перенос ----
+    // ---- Moving ----
 
     [Fact]
     public async Task SetParent_MovesTask_AndRecordsHistory()
@@ -390,7 +390,7 @@ public sealed class SubtaskServiceTests : IDisposable
     [Fact]
     public async Task SetParent_ConsidersHeightOfMovedSubtree()
     {
-        // Дерево A -> B (высота 2) и дерево X -> Y. Перенос A под Y даёт X -> Y -> A -> B: 4 уровня.
+        // The tree A -> B (height 2) and the tree X -> Y. Moving A under Y gives X -> Y -> A -> B: 4 levels.
         var a = await CreateAsync("A");
         await CreateAsync("B", a);
         var x = await CreateAsync("X");
@@ -401,7 +401,7 @@ public sealed class SubtaskServiceTests : IDisposable
             await Assert.ThrowsAsync<DomainValidationException>(() => NewService(context).SetParentAsync(a, y));
         }
 
-        // Одиночную задачу под Y перенести можно: X -> Y -> Z это 3 уровня.
+        // A single task can be moved under Y: X -> Y -> Z is 3 levels.
         var z = await CreateAsync("Z");
         await using (var context = _db.CreateContext())
         {
@@ -411,7 +411,7 @@ public sealed class SubtaskServiceTests : IDisposable
         Assert.Equal(y, (await GetAsync(z)).ParentId);
     }
 
-    // ---- Удаление и восстановление ----
+    // ---- Deleting and restoring ----
 
     [Fact]
     public async Task Delete_Parent_DeletesWholeSubtask_WithHistoryForEach()
@@ -490,7 +490,7 @@ public sealed class SubtaskServiceTests : IDisposable
         var child = await CreateAsync("ребёнок", parent);
         await using (var context = _db.CreateContext())
         {
-            // Удаляем только подзадачу, потом закрываем родителя без неё.
+            // We delete only the subtask, then close the parent without it.
             await NewService(context).DeleteAsync(child);
         }
 

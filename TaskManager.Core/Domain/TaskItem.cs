@@ -1,15 +1,15 @@
 namespace TaskManager.Core.Domain;
 
 /// <summary>
-/// Задача. Главная сущность домена. Состояние меняется только методами ниже:
-/// каждый метод сам проверяет бизнес-правила и бросает <see cref="DomainValidationException"/>
-/// или <see cref="InvalidStatusTransitionException"/>.
+/// The task. The main entity of the domain. The state is changed only by the methods below:
+/// each method checks the business rules itself and throws <see cref="DomainValidationException"/>
+/// or <see cref="InvalidStatusTransitionException"/>.
 /// </summary>
 public class TaskItem
 {
     public const int MaxTitleLength = 200;
 
-    /// <summary>Максимальная вложенность: задача верхнего уровня это уровень 1.</summary>
+    /// <summary>The maximum nesting: a top-level task is level 1.</summary>
     public const int MaxDepth = 3;
 
     private TaskItem(string title, Priority priority, DateTimeOffset createdAt)
@@ -19,7 +19,7 @@ public class TaskItem
         CreatedAt = createdAt;
     }
 
-    // Нужен EF Core.
+    // Needed by EF Core.
     private TaskItem()
     {
         Title = string.Empty;
@@ -28,8 +28,8 @@ public class TaskItem
     public int Id { get; private set; }
 
     /// <summary>
-    /// Версия строки для оптимистичной блокировки. Увеличивается инфраструктурой при каждом сохранении.
-    /// Если задачу успели изменить между чтением и сохранением, версии не совпадут и сохранение будет отклонено.
+    /// The row version for optimistic locking. Increased by the infrastructure on every save.
+    /// If the task was changed between reading and saving, the versions will not match and the save will be rejected.
     /// </summary>
     public long RowVersion { get; private set; }
 
@@ -38,8 +38,8 @@ public class TaskItem
     public string? Description { get; private set; }
 
     /// <summary>
-    /// Название и описание в верхнем регистре, по ним работает поиск. SQLite не умеет менять регистр кириллицы
-    /// (UPPER и LIKE работают только с латиницей), поэтому нормализуем в C# и сохраняем рядом с данными.
+    /// The title and description in upper case, search works on them. SQLite cannot change the case of Cyrillic
+    /// (UPPER and LIKE work only with Latin), so we normalise in C# and store it next to the data.
     /// </summary>
     public string SearchText { get; private set; } = string.Empty;
 
@@ -51,13 +51,13 @@ public class TaskItem
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    /// <summary>Когда задача стала Done. Нужно для статистики (вовремя ли, сколько заняла).</summary>
+    /// <summary>When the task became Done. Needed for statistics (whether on time, how long it took).</summary>
     public DateTimeOffset? CompletedAt { get; private set; }
 
-    /// <summary>Мягкое удаление: запись остаётся в БД, но скрыта фильтром.</summary>
+    /// <summary>Soft delete: the record stays in the database but is hidden by a filter.</summary>
     public bool IsDeleted { get; private set; }
 
-    /// <summary>Родительская задача (null для задач верхнего уровня).</summary>
+    /// <summary>The parent task (null for top-level tasks).</summary>
     public int? ParentId { get; private set; }
 
     public TaskItem? Parent { get; private set; }
@@ -66,24 +66,24 @@ public class TaskItem
 
     public ICollection<Tag> Tags { get; } = new List<Tag>();
 
-    /// <summary>От каких задач зависит эта.</summary>
+    /// <summary>Which tasks this one depends on.</summary>
     public ICollection<TaskDependency> Dependencies { get; } = new List<TaskDependency>();
 
-    /// <summary>Какие задачи зависят от этой.</summary>
+    /// <summary>Which tasks depend on this one.</summary>
     public ICollection<TaskDependency> Dependents { get; } = new List<TaskDependency>();
 
-    /// <summary>Правило повторения (null, если задача не повторяющаяся).</summary>
+    /// <summary>The recurrence rule (null if the task is not recurring).</summary>
     public RecurrenceRule? Recurrence { get; private set; }
 
     /// <summary>
-    /// Следующая копия повторяющейся задачи уже создана (при завершении или по расписанию).
-    /// Нужна, чтобы не получить две копии одного срока.
+    /// The next copy of a recurring task has already been created (on completion or by schedule).
+    /// Needed so as not to get two copies of one due date.
     /// </summary>
     public bool SuccessorCreated { get; private set; }
 
     /// <summary>
-    /// Создаёт задачу. Дедлайн в прошлом проверяется только здесь, при создании:
-    /// у уже существующей задачи дедлайн имеет право "протухнуть".
+    /// Creates a task. A deadline in the past is checked only here, at creation:
+    /// for an existing task the deadline is allowed to "go stale".
     /// </summary>
     public static TaskItem Create(
         string title,
@@ -130,7 +130,7 @@ public class TaskItem
         Priority = EnsurePriority(priority);
     }
 
-    /// <summary>Меняет дедлайн. Прошедшая дата здесь допустима, правило "не в прошлом" действует только при создании.</summary>
+    /// <summary>Changes the deadline. A past date is acceptable here, the "not in the past" rule applies only at creation.</summary>
     public void SetDeadline(DateTimeOffset? deadline)
     {
         EnsureNotDeleted();
@@ -163,7 +163,7 @@ public class TaskItem
         Tags.Remove(tag);
     }
 
-    /// <summary>Меняет статус обычным переходом. Запрещённые переходы отклоняет <see cref="TaskStateMachine"/>.</summary>
+    /// <summary>Changes the status by an ordinary transition. Forbidden transitions are rejected by <see cref="TaskStateMachine"/>.</summary>
     public void ChangeStatus(TaskStatus to, TimeProvider clock)
     {
         ArgumentNullException.ThrowIfNull(clock);
@@ -179,7 +179,7 @@ public class TaskItem
         CompletedAt = to == TaskStatus.Done ? clock.GetUtcNow() : null;
     }
 
-    /// <summary>Переоткрывает выполненную (Done) или отменённую (Cancelled) задачу.</summary>
+    /// <summary>Reopens a completed (Done) or cancelled (Cancelled) task.</summary>
     public void Reopen()
     {
         EnsureNotDeleted();
@@ -196,8 +196,8 @@ public class TaskItem
     }
 
     /// <summary>
-    /// Прогресс по подзадачам: считаются прямые дети без отменённых и удалённых.
-    /// Дети должны быть загружены (<see cref="Children"/>).
+    /// Progress by subtasks: direct children are counted, without cancelled and deleted ones.
+    /// The children must be loaded (<see cref="Children"/>).
     /// </summary>
     public TaskProgress GetProgress()
     {
@@ -206,9 +206,9 @@ public class TaskItem
     }
 
     /// <summary>
-    /// Привязывает задачу к родителю (или делает её задачей верхнего уровня при null).
-    /// Здесь проверяются правила, которые видны из самих объектов. Глубину вложенности и циклы
-    /// проверяет <c>TaskService</c>, потому что для этого нужно ходить по дереву в БД.
+    /// Attaches the task to a parent (or makes it a top-level task when null).
+    /// Here the rules visible from the objects themselves are checked. The nesting depth and cycles
+    /// are checked by <c>TaskService</c>, because that requires walking the tree in the database.
     /// </summary>
     public void SetParent(TaskItem? parent)
     {
@@ -234,13 +234,13 @@ public class TaskItem
         }
 
         Parent = parent;
-        // У ещё не сохранённого родителя Id пока 0: связь тогда установит EF по ссылке Parent при сохранении.
+        // A parent that is not saved yet has Id 0: then EF will set the link by the Parent reference on save.
         ParentId = parent is { Id: not 0 } ? parent.Id : null;
     }
 
     /// <summary>
-    /// Воссоздаёт задачу из внешних данных (импорт): статус и даты переносятся как есть, поэтому автомат статусов
-    /// и правило "дедлайн не в прошлом" не применяются. Остальные проверки полей действуют как обычно.
+    /// Recreates a task from external data (import): the status and dates are carried over as they are, so the status machine
+    /// and the "deadline not in the past" rule do not apply. The other field checks work as usual.
     /// </summary>
     public static TaskItem CreateImported(
         string title,
@@ -281,13 +281,13 @@ public class TaskItem
         return task;
     }
 
-    /// <summary>Помечает, что следующая копия повторяющейся задачи создана.</summary>
+    /// <summary>Marks that the next copy of a recurring task has been created.</summary>
     public void MarkSuccessorCreated() => SuccessorCreated = true;
 
     /// <summary>
-    /// Создаёт следующую копию повторяющейся задачи: название, описание, приоритет и теги берутся у
-    /// <paramref name="source"/>, статус Todo. Дедлайн может быть в прошлом (задачу закрыли с опозданием),
-    /// поэтому правило "не в прошлом" здесь не применяется. Подзадачи копирует <c>TaskService</c>.
+    /// Creates the next copy of a recurring task: the title, description, priority and tags are taken from
+    /// <paramref name="source"/>, the status is Todo. The deadline may be in the past (the task was closed late),
+    /// so the "not in the past" rule does not apply here. Subtasks are copied by <c>TaskService</c>.
     /// </summary>
     public static TaskItem CreateSuccessor(TaskItem source, DateTimeOffset? deadline, RecurrenceRule? recurrence, TimeProvider clock)
     {
@@ -334,7 +334,7 @@ public class TaskItem
         IsDeleted = false;
     }
 
-    /// <summary>Приводит текст к виду, в котором он хранится в <see cref="SearchText"/>. Запрос поиска нормализуется так же.</summary>
+    /// <summary>Brings text to the form in which it is stored in <see cref="SearchText"/>. The search query is normalised the same way.</summary>
     public static string NormalizeSearchText(string text)
     {
         ArgumentNullException.ThrowIfNull(text);

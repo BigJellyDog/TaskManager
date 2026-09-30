@@ -1,9 +1,9 @@
 ﻿namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Подсветка элемента под указателем мыши, как в макете Signal: пункты меню и строки списка получают фон «приподнятой»
-/// поверхности, карточки на доске обводку акцентом. Цвета задаются ключами ресурсов, поэтому подсветка следует за темой.
-/// Если <see cref="IsSuppressed"/> истинно (например, пункт уже выбран или карточка просрочена), подсветка не включается.
+/// Highlight of the element under the mouse pointer, as in the Signal mockup: menu items and list rows get the background of the "raised"
+/// surface, cards on the board get an accent outline. The colours are set by resource keys, so the highlight follows the theme.
+/// If <see cref="IsSuppressed"/> is true (for example the item is already selected or the card is overdue), the highlight is not switched on.
 /// </summary>
 public sealed class HoverBehavior : Behavior<View>
 {
@@ -23,21 +23,21 @@ public sealed class HoverBehavior : Behavior<View>
     private PointerGestureRecognizer? _pointer;
     private bool _hovering;
 
-    /// <summary>Ключ цвета фона под указателем; пусто, если фон не меняется.</summary>
+    /// <summary>The key of the background colour under the pointer; empty if the background does not change.</summary>
     public string HoverBackground
     {
         get => (string)GetValue(HoverBackgroundProperty);
         set => SetValue(HoverBackgroundProperty, value);
     }
 
-    /// <summary>Ключ кисти обводки под указателем (только для Border); пусто, если обводка не меняется.</summary>
+    /// <summary>The key of the outline brush under the pointer (Border only); empty if the outline does not change.</summary>
     public string HoverStroke
     {
         get => (string)GetValue(HoverStrokeProperty);
         set => SetValue(HoverStrokeProperty, value);
     }
 
-    /// <summary>Ключ кисти обводки в покое.</summary>
+    /// <summary>The key of the outline brush at rest.</summary>
     public string RestStroke
     {
         get => (string)GetValue(RestStrokeProperty);
@@ -60,7 +60,7 @@ public sealed class HoverBehavior : Behavior<View>
         _pointer.PointerExited += (_, _) => Set(false);
         bindable.GestureRecognizers.Add(_pointer);
 
-        // Поведение подключается позже, чем создаётся элемент, и наследует его контекст привязки.
+        // The behaviour is attached later than the element is created and inherits its binding context.
         BindingContext = bindable.BindingContext;
         bindable.BindingContextChanged += OnViewContextChanged;
     }
@@ -103,7 +103,7 @@ public sealed class HoverBehavior : Behavior<View>
 
         if (HoverBackground.Length > 0)
         {
-            // Фон в XAML задан значением, а оно сильнее динамического ресурса, поэтому цвет подставляем сами.
+            // The background is set as a value in XAML, which is stronger than a dynamic resource, so we apply the colour ourselves.
             _view.BackgroundColor = on && Application.Current?.Resources.TryGetValue(HoverBackground, out var value) == true && value is Color color
                 ? color
                 : Colors.Transparent;

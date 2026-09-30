@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14" Padding="28,20,28,14">
 
-        <!-- Заголовок: название, сводка, переключатель Доска/Список, главная кнопка -->
+        <!-- Header: title, summary, Board/List switch, main button -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <Label Text="{loc:Extension 'Задачи'}" FontSize="30" FontAttributes="Bold" />
@@ -44,7 +44,7 @@
                                    Command="{Binding NewTaskCommand}" />
         </Grid>
 
-        <!-- Поиск и быстрые фильтры -->
+        <!-- Search and quick filters -->
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8">
             <Border Grid.Column="0" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 12" Padding="10,0" HeightRequest="34">
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
@@ -71,7 +71,7 @@
                                  Command="{Binding ToggleHideClosedCommand}" />
         </Grid>
 
-        <!-- Доска: колонки по статусам -->
+        <!-- Board: columns by status -->
         <Grid Grid.Row="2" IsVisible="{Binding IsBoard}" ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
             <controls:BoardColumn Grid.Column="0" ColumnTitle="{loc:Extension 'К выполнению'}" ColumnIcon="circle" Count="{Binding TodoCount}" ItemsSource="{Binding TodoColumn}" />
             <controls:BoardColumn Grid.Column="1" ColumnTitle="{loc:Extension 'В работе'}" ColumnIcon="half" Count="{Binding InProgressCount}" ItemsSource="{Binding InProgressColumn}" />
@@ -79,7 +79,7 @@
             <controls:BoardColumn Grid.Column="3" ColumnTitle="{loc:Extension 'Выполнена'}" ColumnIcon="done" Count="{Binding DoneCount}" ItemsSource="{Binding DoneColumn}" />
         </Grid>
 
-        <!-- Таблица задач -->
+        <!-- Task table -->
         <Border Grid.Row="2" IsVisible="{Binding IsList}" Style="{StaticResource CardBorder}" StrokeShape="RoundRectangle 16" Padding="0">
             <Grid RowDefinitions="Auto,*">
                 <Grid Grid.Row="0" BackgroundColor="{DynamicResource Side}" HeightRequest="32" Padding="12,0" ColumnSpacing="8"
@@ -114,7 +114,7 @@
                                                           CommandParameter="{Binding .}" />
                                 </Grid.GestureRecognizers>
 
-                                <!-- Флажок: выполнить / вернуть в работу -->
+                                <!-- Check box: complete / return to work -->
                                 <Border Grid.Column="0" WidthRequest="16" HeightRequest="16" StrokeShape="RoundRectangle 4" StrokeThickness="1.6"
                                         Stroke="{DynamicResource InkMutedBrush}" BackgroundColor="Transparent"
                                         HorizontalOptions="Start" VerticalOptions="Center">
@@ -133,7 +133,7 @@
 
                                 <controls:Icon Grid.Column="1" Kind="{Binding StatusIcon}" Size="14" Color="{Binding StatusColor}" HorizontalOptions="Start" />
 
-                                <!-- Название, родитель и прогресс подзадач -->
+                                <!-- Title, parent and subtask progress -->
                                 <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
                                     <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="14" LineBreakMode="TailTruncation"
                                            TextDecorations="{Binding TitleDecorations}" VerticalOptions="Center">
@@ -190,7 +190,7 @@
             </Grid>
         </Border>
 
-        <!-- Низ: сколько найдено, обновить и переключение страниц -->
+        <!-- Bottom: how many found, refresh and page switching -->
         <Grid Grid.Row="3" IsVisible="{Binding IsList}" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="12">
             <Label Grid.Column="0" Text="{Binding SummaryText}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
             <controls:SignalButton Grid.Column="1" Variant="Ghost" Icon="refresh" Text="{loc:Extension 'Обновить'}" Command="{Binding RefreshCommand}" Compact="True" />

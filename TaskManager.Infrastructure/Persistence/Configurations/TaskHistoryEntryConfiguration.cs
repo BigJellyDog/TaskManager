@@ -18,13 +18,13 @@ public class TaskHistoryEntryConfiguration : IEntityTypeConfiguration<TaskHistor
         builder.Property(h => h.OldValue).HasMaxLength(4000);
         builder.Property(h => h.NewValue).HasMaxLength(4000);
 
-        // Навигации в сущности нет, поэтому связь описана через дженерик-перегрузку.
+        // There is no navigation in the entity, so the relation is described with the generic overload.
         builder.HasOne<TaskItem>()
             .WithMany()
             .HasForeignKey(h => h.TaskId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // История задачи читается в хронологическом порядке.
+        // The task history is read in chronological order.
         builder.HasIndex(h => new { h.TaskId, h.ChangedAt });
     }
 }

@@ -2,7 +2,7 @@ using TaskManager.Core.Domain;
 
 namespace TaskManager.Core.Services;
 
-/// <summary>Данные для создания задачи.</summary>
+/// <summary>The data for creating a task.</summary>
 public sealed record CreateTaskRequest(
     string Title,
     Priority Priority = Priority.Medium,
@@ -13,10 +13,10 @@ public sealed record CreateTaskRequest(
     int? ParentId = null);
 
 /// <summary>
-/// Данные для редактирования: форма целиком, как её отправляет интерфейс.
-/// Сервис сам сравнит с текущей задачей и запишет в историю только то, что реально изменилось.
-/// <paramref name="ExpectedRowVersion"/>: версия задачи (<see cref="TaskItem.RowVersion"/>), которую видела форма.
-/// Если с тех пор задачу изменили, сохранение отклоняется (оптимистичная блокировка, FR-10).
+/// The data for editing: the whole form, as the interface sends it.
+/// The service compares it with the current task itself and writes to the history only what really changed.
+/// <paramref name="ExpectedRowVersion"/>: the task version (<see cref="TaskItem.RowVersion"/>) that the form saw.
+/// If the task was changed since then, the save is rejected (optimistic locking, FR-10).
 /// </summary>
 public sealed record EditTaskRequest(
     int Id,

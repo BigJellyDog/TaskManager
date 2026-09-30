@@ -2,24 +2,24 @@
 
 namespace TaskManager.Core.Abstractions;
 
-/// <summary>Корзина: просмотр удалённых задач и окончательное удаление.</summary>
+/// <summary>The trash: viewing deleted tasks and deleting them for good.</summary>
 public interface ITrashRepository
 {
     /// <summary>
-    /// Удалённые задачи верхнего уровня (корни удалённых поддеревьев), свежие сверху.
-    /// Подзадачи удалённой задачи отдельными строками не показываются, они учтены в счётчике.
+    /// Deleted top-level tasks (roots of deleted subtrees), the newest on top.
+    /// The subtasks of a deleted task are not shown as separate rows, they are counted in the counter.
     /// </summary>
     Task<IReadOnlyList<TrashEntry>> ListAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Сколько строк в корзине (удалённых задач верхнего уровня). Дешёвый счётчик для боковой панели.</summary>
+    /// <summary>How many rows are in the trash (deleted top-level tasks). A cheap counter for the side panel.</summary>
     Task<int> CountAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Идентификаторы удалённых потомков задачи (подзадачи любой глубины), родители раньше детей.</summary>
+    /// <summary>The identifiers of the deleted descendants of a task (subtasks of any depth), parents before children.</summary>
     Task<IReadOnlyList<int>> GetDeletedDescendantIdsAsync(int rootId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Окончательно удаляет задачи вместе со всеми потомками, историей, напоминаниями и связями зависимостей.
-    /// Возвращает, сколько задач удалено.
+    /// Deletes tasks for good together with all descendants, history, reminders and dependency links.
+    /// Returns how many tasks were deleted.
     /// </summary>
     Task<int> PurgeAsync(IReadOnlyCollection<int> rootIds, CancellationToken cancellationToken = default);
 }

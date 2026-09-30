@@ -5,7 +5,7 @@ using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Tests;
 
-/// <summary>Корзина: список, восстановление, окончательное удаление (в том числе родителя с подзадачами и зависимостями).</summary>
+/// <summary>The trash: a list, restore, delete for good (including a parent with subtasks and dependencies).</summary>
 public sealed class TrashTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);
@@ -42,7 +42,7 @@ public sealed class TrashTests : IDisposable
     [Fact]
     public async Task Purge_ParentWithSubtasksAndDependencies_RemovesThemAndKeepsOthers()
     {
-        // Регрессия: SQLite проверяет ON DELETE RESTRICT построчно, а фильтр мягкого удаления прятал связи зависимостей.
+        // Regression: SQLite checks ON DELETE RESTRICT row by row, and the soft-delete filter was hiding the dependency links.
         var parent = await CreateAsync("родитель");
         var child = await CreateAsync("подзадача", parent);
         var other = await CreateAsync("другая");

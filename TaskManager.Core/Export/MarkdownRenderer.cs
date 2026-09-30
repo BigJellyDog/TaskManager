@@ -5,13 +5,13 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Core.Export;
 
-/// <summary>Превращает документ экспорта в Markdown: чек-лист с вложенными подзадачами.</summary>
+/// <summary>Turns the export document into Markdown: a checklist with nested subtasks.</summary>
 public static class MarkdownRenderer
 {
-    /// <param name="document">Что выводить.</param>
-    /// <param name="zone">Часовой пояс, в котором показываются дедлайны.</param>
+    /// <param name="document">What to output.</param>
+    /// <param name="zone">The time zone in which deadlines are shown.</param>
     /// <param name="translate">
-    /// Перевод русских подписей («Задачи», «в работе», «Высокий» и других) на язык пользователя. Без неё документ русский.
+    /// Translation of the Russian labels ("Задачи", "в работе", "Высокий" and others) into the user's language. Without it the document is Russian.
     /// </param>
     public static string Render(ExportDocument document, TimeZoneInfo zone, Func<string, string>? translate = null)
     {
@@ -25,7 +25,7 @@ public static class MarkdownRenderer
             .Where(t => t.ParentId is { } p && ids.Contains(p))
             .ToLookup(t => t.ParentId!.Value);
 
-        // Корни: задачи без родителя и задачи, чей родитель не попал в экспорт (например, удалён).
+        // Roots: tasks without a parent and tasks whose parent did not get into the export (for example, deleted).
         var roots = document.Tasks.Where(t => t.ParentId is not { } p || !ids.Contains(p));
 
         var text = new StringBuilder();
@@ -52,7 +52,7 @@ public static class MarkdownRenderer
         var title = Inline(task.Title);
         var box = task.Status == TaskStatus.Done ? "x" : " ";
 
-        // Отменённую задачу зачёркиваем: галочки у неё нет, но и "открытой" она не выглядит.
+        // A cancelled task is struck through: it has no check mark, but it does not look "open" either.
         var shown = task.Status == TaskStatus.Cancelled ? $"~~{title}~~" : title;
 
         text.Append(CultureInfo.InvariantCulture, $"{indent}- [{box}] {shown}");
@@ -90,7 +90,7 @@ public static class MarkdownRenderer
 
         text.Append(" (").AppendJoin(", ", details).Append(")\n");
 
-        // Описание цитатой под пунктом: отступ на два пробела глубже самого пункта.
+        // The description as a quote under the item: indented two spaces deeper than the item itself.
         if (!string.IsNullOrWhiteSpace(task.Description))
         {
             foreach (var line in task.Description.ReplaceLineEndings("\n").Split('\n'))
@@ -105,6 +105,6 @@ public static class MarkdownRenderer
         }
     }
 
-    // Название в Markdown остаётся одной строкой.
+    // The title in Markdown stays on one line.
     private static string Inline(string value) => value.ReplaceLineEndings(" ");
 }

@@ -7,7 +7,7 @@
              x:Name="Root"
              x:DataType="controls:BoardColumn">
 
-    <!-- Колонка доски: заголовок со счётчиком и прокручиваемый список карточек -->
+    <!-- A board column: a header with a counter and a scrollable list of cards -->
     <Border BackgroundColor="{DynamicResource Column}" Stroke="{DynamicResource LineBrush}" StrokeShape="RoundRectangle 16" Padding="8">
         <Grid RowDefinitions="Auto,*" RowSpacing="8">
             <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="4,2,4,4">
@@ -18,7 +18,7 @@
                        FontSize="12" TextColor="{DynamicResource InkMuted}" VerticalOptions="Center" />
             </Grid>
 
-            <!-- Отступ между карточками задаёт сам список: поле у карточки в списке WinUI считалось неровно. Значение 3 даёт видимые 8 пикселей, как в макете. -->
+            <!-- The gap between cards is set by the list itself: the card margin was measured unevenly in the WinUI list. The value 3 gives a visible 8 pixels, as in the mockup. -->
             <CollectionView Grid.Row="1" ItemsSource="{Binding ItemsSource, Source={x:Reference Root}}" SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="3" />

@@ -6,7 +6,7 @@ using DomainTaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Превращает запись истории (поле, старое и новое значение, команда) в читаемую строку для пользователя.</summary>
+/// <summary>Turns a history entry (field, old and new value, command) into a readable line for the user.</summary>
 public static class HistoryFormatter
 {
     private const string Dash = "—";
@@ -32,7 +32,7 @@ public static class HistoryFormatter
             _ => $"{FieldName(entry.FieldName)}: {Value(entry.FieldName, entry.OldValue, zone)} → {Value(entry.FieldName, entry.NewValue, zone)}",
         };
 
-        // Пометка, если изменение сделано не пользователем напрямую.
+        // A note when the change was not made by the user directly.
         var origin = entry.Command switch
         {
             TaskService.AutoBlockCommand or TaskService.AutoUnblockCommand => Loc.T(" (автоматически из-за зависимостей)"),

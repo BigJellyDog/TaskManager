@@ -2,13 +2,13 @@ using System.Linq.Expressions;
 
 namespace TaskManager.Core.Specifications;
 
-/// <summary>Фабрики спецификаций (отдельным классом, потому что статические члены в generic-типах не рекомендуются).</summary>
+/// <summary>Specification factories (a separate class, because static members in generic types are discouraged).</summary>
 public static class Specification
 {
-    /// <summary>Условие, которому удовлетворяет любой объект. Нужно, когда фильтров нет вообще.</summary>
+    /// <summary>A condition that any object satisfies. Needed when there are no filters at all.</summary>
     public static Specification<T> All<T>() => new ExpressionSpecification<T>(_ => true);
 
-    /// <summary>Создаёт спецификацию из готового выражения, без отдельного класса.</summary>
+    /// <summary>Creates a specification from a ready expression, without a separate class.</summary>
     public static Specification<T> From<T>(Expression<Func<T, bool>> expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
@@ -17,8 +17,8 @@ public static class Specification
 }
 
 /// <summary>
-/// Базовый класс спецификаций. Конкретные условия наследуются от него и реализуют <see cref="ToExpression"/>,
-/// а комбинаторы <see cref="And"/>, <see cref="Or"/>, <see cref="Not"/> склеивают условия в новые.
+/// The base class of specifications. Concrete conditions inherit from it and implement <see cref="ToExpression"/>,
+/// and the combinators <see cref="And"/>, <see cref="Or"/>, <see cref="Not"/> glue conditions into new ones.
 /// </summary>
 public abstract class Specification<T> : ISpecification<T>
 {
@@ -28,26 +28,26 @@ public abstract class Specification<T> : ISpecification<T>
 
     public bool IsSatisfiedBy(T entity)
     {
-        // Компиляция выражения дорогая, поэтому делаем её один раз.
+        // Compiling an expression is expensive, so we do it once.
         _compiled ??= ToExpression().Compile();
         return _compiled(entity);
     }
 
-    /// <summary>Оба условия сразу (логическое И).</summary>
+    /// <summary>Both conditions at once (logical AND).</summary>
     public Specification<T> And(ISpecification<T> other)
     {
         ArgumentNullException.ThrowIfNull(other);
         return new AndSpecification<T>(this, other);
     }
 
-    /// <summary>Хотя бы одно из условий (логическое ИЛИ).</summary>
+    /// <summary>At least one of the conditions (logical OR).</summary>
     public Specification<T> Or(ISpecification<T> other)
     {
         ArgumentNullException.ThrowIfNull(other);
         return new OrSpecification<T>(this, other);
     }
 
-    /// <summary>Противоположное условие (логическое НЕ).</summary>
+    /// <summary>The opposite condition (logical NOT).</summary>
     public Specification<T> Not() => new NotSpecification<T>(this);
 }
 
@@ -110,8 +110,8 @@ internal sealed class NotSpecification<T> : Specification<T>
 }
 
 /// <summary>
-/// Склеивает два выражения в одно. У каждого выражения свой параметр (t => ..., x => ...),
-/// поэтому перед склейкой их надо привести к одному общему параметру.
+/// Glues two expressions into one. Each expression has its own parameter (t => ..., x => ...),
+/// so before gluing they must be brought to one common parameter.
 /// </summary>
 internal static class ExpressionCombiner
 {

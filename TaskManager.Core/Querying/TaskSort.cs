@@ -1,20 +1,20 @@
 namespace TaskManager.Core.Querying;
 
-/// <summary>Поле, по которому можно сортировать список задач.</summary>
+/// <summary>A field by which the task list can be sorted.</summary>
 public enum TaskSortField
 {
     Priority = 0,
 
-    /// <summary>Задачи без дедлайна всегда в конце списка, при любом направлении сортировки.</summary>
+    /// <summary>Tasks without a deadline are always at the end of the list, in any sort direction.</summary>
     Deadline = 1,
 
     CreatedAt = 2,
 
-    /// <summary>Алфавитный порядок без учёта регистра (в том числе для кириллицы).</summary>
+    /// <summary>Alphabetical order ignoring case (Cyrillic included).</summary>
     Title = 3,
 
     Status = 4,
 }
 
-/// <summary>Одно правило сортировки: поле и направление.</summary>
+/// <summary>One sorting rule: a field and a direction.</summary>
 public sealed record TaskSort(TaskSortField Field, bool Descending = false);

@@ -5,8 +5,8 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.Core.Services;
 
 /// <summary>
-/// Слепок отслеживаемых полей задачи в виде строк. Сравнение двух слепков (до и после изменения)
-/// даёт список записей для истории: поле, старое значение, новое значение.
+/// A snapshot of the tracked fields of a task as strings. Comparing two snapshots (before and after a change)
+/// gives a list of records for the history: the field, the old value, the new value.
 /// </summary>
 internal sealed record TaskSnapshot(
     string Title,
@@ -33,7 +33,7 @@ internal sealed record TaskSnapshot(
             task.ParentId);
     }
 
-    /// <summary>Поля, значение которых отличается. Пустой список значит, что менять нечего.</summary>
+    /// <summary>The fields whose value differs. An empty list means there is nothing to change.</summary>
     public static List<(string Field, string? OldValue, string? NewValue)> Diff(TaskSnapshot before, TaskSnapshot after)
     {
         var changes = new List<(string, string?, string?)>();
@@ -58,7 +58,7 @@ internal sealed record TaskSnapshot(
         }
     }
 
-    // Дата в ISO 8601: однозначная строка, интерфейс сам отформатирует её для пользователя.
+    // The date in ISO 8601: an unambiguous string, the interface formats it for the user itself.
     private static string? Format(DateTimeOffset? value) =>
         value?.ToString("O", CultureInfo.InvariantCulture);
 

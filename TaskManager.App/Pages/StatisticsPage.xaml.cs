@@ -11,7 +11,7 @@ public partial class StatisticsPage : ContentPage
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
 
-        // В узком окне (около 1024) макет оставляет две панели, остальные прячет.
+        // In a narrow window (about 1024) the layout keeps two panels and hides the others.
         SizeChanged += (_, _) =>
         {
             var narrow = Width is > 0 and < NarrowWidth;
@@ -22,7 +22,7 @@ public partial class StatisticsPage : ContentPage
 
     private const double NarrowWidth = 1000;
 
-    // Цифры могли измениться на других экранах, поэтому пересчитываем при каждом показе.
+    // The figures may have changed on other screens, so we recalculate on every show.
     protected override async void OnAppearing()
     {
         base.OnAppearing();

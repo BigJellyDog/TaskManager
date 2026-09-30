@@ -8,13 +8,13 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 
 /// <summary>
-/// Окно сообщения или подтверждения в стиле Signal: поверхность и рамка из токенов, заголовок моноширинным шрифтом,
-/// свои кнопки. Это ContentDialog без штатных кнопок, поэтому окно всегда в теме приложения
-/// (штатные кнопки и фон рисует Windows по своей теме).
+/// A message or confirmation window in the Signal style: the surface and the border from tokens, the title in a monospaced font,
+/// its own buttons. It is a ContentDialog without the standard buttons, so the window is always in the theme of the application
+/// (the standard buttons and background are drawn by Windows in its own theme).
 /// </summary>
 public static class SignalDialog
 {
-    // ContentDialog в окне может быть открыт только один: следующие ждут своей очереди.
+    // Only one ContentDialog can be open in a window: the next ones wait for their turn.
     private static readonly SemaphoreSlim Gate = new(1, 1);
 
     private static global::Windows.UI.Color Token(string key)
@@ -29,7 +29,7 @@ public static class SignalDialog
 
     private static SolidColorBrush Brush(string key) => new(Token(key));
 
-    /// <summary>Показывает окно. <paramref name="cancel"/> равно null: одна кнопка (сообщение). Возвращает true при нажатии основной кнопки.</summary>
+    /// <summary>Shows the window. <paramref name="cancel"/> equal to null: one button (a message). Returns true when the primary button is pressed.</summary>
     public static async Task<bool> ShowAsync(string title, string message, string accept, string? cancel)
     {
         var root = (Microsoft.Maui.Controls.Application.Current?.Windows is { Count: > 0 } windows
@@ -137,7 +137,7 @@ public static class SignalDialog
 
             dialog.Content = content;
 
-            // Enter подтверждает, Esc закрывает окно как отмену (штатное поведение ContentDialog).
+            // Enter confirms, Esc closes the window as a cancel (the standard ContentDialog behaviour).
             dialog.KeyDown += (_, e) =>
             {
                 if (e.Key == global::Windows.System.VirtualKey.Enter)

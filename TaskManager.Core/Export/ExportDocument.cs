@@ -4,18 +4,18 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.Core.Export;
 
 /// <summary>
-/// Документ экспорта: то, что записывается в JSON и читается при импорте. Задачи идут плоским списком,
-/// иерархию задаёт <see cref="ExportTask.ParentId"/>. История изменений не экспортируется.
+/// The export document: what is written to JSON and read on import. Tasks come as a flat list,
+/// the hierarchy is set by <see cref="ExportTask.ParentId"/>. The change history is not exported.
 /// </summary>
-/// <param name="Version">Версия формата (<see cref="ExportFormat.CurrentVersion"/>), по ней импорт проверяет совместимость.</param>
-/// <param name="ExportedAt">Когда сделан экспорт.</param>
-/// <param name="Tasks">Задачи.</param>
+/// <param name="Version">The format version (<see cref="ExportFormat.CurrentVersion"/>), the import checks compatibility by it.</param>
+/// <param name="ExportedAt">When the export was made.</param>
+/// <param name="Tasks">The tasks.</param>
 public sealed record ExportDocument(int Version, DateTimeOffset ExportedAt, IReadOnlyList<ExportTask> Tasks);
 
-/// <summary>Одна задача в документе экспорта.</summary>
-/// <param name="Id">Номер задачи в базе на момент экспорта. Нужен, чтобы сослаться на неё в <c>ParentId</c> и <c>DependsOn</c>.</param>
-/// <param name="ParentId">Id родительской задачи или null.</param>
-/// <param name="DependsOn">Id задач, от которых зависит эта (только среди экспортированных).</param>
+/// <summary>One task in the export document.</summary>
+/// <param name="Id">The task number in the database at the time of export. Needed to refer to it in <c>ParentId</c> and <c>DependsOn</c>.</param>
+/// <param name="ParentId">The Id of the parent task or null.</param>
+/// <param name="DependsOn">The Ids of the tasks this one depends on (only among the exported ones).</param>
 public sealed record ExportTask(
     int Id,
     int? ParentId,
@@ -32,7 +32,7 @@ public sealed record ExportTask(
     IReadOnlyList<int> DependsOn,
     ExportRecurrence? Recurrence);
 
-/// <summary>Правило повторения в документе экспорта.</summary>
+/// <summary>The recurrence rule in the export document.</summary>
 public sealed record ExportRecurrence(
     RecurrenceFrequency Frequency,
     int Interval,

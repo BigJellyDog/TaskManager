@@ -3,8 +3,8 @@ using Microsoft.Maui.Controls.Shapes;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Горизонтальная полоса-индикатор на подложке: заливка занимает долю <see cref="Fraction"/> (0–1) от ширины.
-/// Нужна для гистограмм статистики, где ширина зависит от доступного места, а не от пикселей.
+/// A horizontal indicator bar on a track: the fill takes the share <see cref="Fraction"/> (0-1) of the width.
+/// Needed for statistics histograms, where the width depends on the available space, not on pixels.
 /// </summary>
 public sealed class BarMeter : Border
 {
@@ -31,7 +31,7 @@ public sealed class BarMeter : Border
         ApplyFraction();
     }
 
-    /// <summary>Доля заливки от 0 до 1.</summary>
+    /// <summary>The share of the fill from 0 to 1.</summary>
     public double Fraction
     {
         get => (double)GetValue(FractionProperty);

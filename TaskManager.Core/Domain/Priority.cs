@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Приоритет задачи. Числа растут вместе с важностью, поэтому сортировка по значению работает как надо.</summary>
+/// <summary>The task priority. The numbers grow with importance, so sorting by value works as it should.</summary>
 public enum Priority
 {
     Low = 0,

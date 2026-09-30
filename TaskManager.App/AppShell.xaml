@@ -10,12 +10,12 @@
     FlyoutWidth="228"
     FlyoutBackgroundColor="{DynamicResource Side}">
 
-    <!-- Постоянная боковая панель Signal: разделы, счётчики и напоминания -->
+    <!-- The permanent Signal side panel: sections, counters and reminders -->
     <Shell.FlyoutContent>
         <controls:SidebarView />
     </Shell.FlyoutContent>
 
-    <!-- Страницы создаются через DI, поэтому принимают зависимости в конструкторе. -->
+    <!-- Pages are created through DI, so they take their dependencies in the constructor. -->
     <ShellContent ContentTemplate="{DataTemplate pages:TasksPage}" Route="tasks" />
     <ShellContent ContentTemplate="{DataTemplate pages:StatisticsPage}" Route="statistics" />
     <ShellContent ContentTemplate="{DataTemplate pages:DataPage}" Route="data" />

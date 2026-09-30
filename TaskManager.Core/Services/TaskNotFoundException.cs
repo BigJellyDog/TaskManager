@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Services;
 
-/// <summary>Задачи с таким Id нет (или она удалена).</summary>
+/// <summary>There is no task with this Id (or it is deleted).</summary>
 public class TaskNotFoundException : Exception
 {
     public TaskNotFoundException()

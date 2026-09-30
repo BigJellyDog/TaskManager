@@ -1,8 +1,8 @@
 namespace TaskManager.Core.Domain;
 
 /// <summary>
-/// Статус задачи. Допустимые переходы между статусами описывает <c>TaskStateMachine</c>.
-/// Внимание: имя совпадает с <see cref="System.Threading.Tasks.TaskStatus"/>, в других пространствах имён используй алиас.
+/// The task status. The allowed transitions between statuses are described by <c>TaskStateMachine</c>.
+/// Note: the name matches <see cref="System.Threading.Tasks.TaskStatus"/>, in other namespaces use an alias.
 /// </summary>
 public enum TaskStatus
 {

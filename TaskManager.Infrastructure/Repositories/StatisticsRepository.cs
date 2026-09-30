@@ -22,8 +22,8 @@ public class StatisticsRepository : IStatisticsRepository
 
     public async Task<TaskStatistics> GetAsync(StatisticsQuery query, CancellationToken cancellationToken = default)
     {
-        // Глобальный фильтр мягкого удаления действует на все запросы ниже: удалённые задачи не считаются.
-        // Запросы идут по очереди: один DbContext не поддерживает параллельные запросы.
+        // The global soft-delete filter applies to all queries below: deleted tasks are not counted.
+        // The queries run one after another: one DbContext does not support parallel queries.
         var tasks = _context.Tasks.AsNoTracking();
         var done = tasks.Where(t => t.Status == TaskStatus.Done && t.CompletedAt != null);
         var open = tasks.Where(new OpenTaskSpecification().ToExpression());
@@ -33,10 +33,10 @@ public class StatisticsRepository : IStatisticsRepository
         var completedWeek = await done.CountAsync(t => t.CompletedAt >= weekSince, cancellationToken);
         var completedMonth = await done.CountAsync(t => t.CompletedAt >= monthSince, cancellationToken);
 
-        // «Вовремя» считаем только по задачам, выполненным в выбранном периоде.
+        // "On time" is counted only over tasks completed in the chosen period.
         var inPeriod = query.PeriodSince is { } since ? done.Where(t => t.CompletedAt >= since) : done;
 
-        // Выполнено вовремя: у задачи был дедлайн и её закрыли не позже него. Без дедлайна «вовремя» не определено.
+        // Completed on time: the task had a deadline and was closed not later than it. Without a deadline "on time" is undefined.
         var withDeadline = inPeriod.Where(t => t.Deadline != null);
         var completedWithDeadline = await withDeadline.CountAsync(cancellationToken);
         var completedOnTime = await withDeadline.CountAsync(t => t.CompletedAt <= t.Deadline, cancellationToken);
@@ -79,7 +79,7 @@ public class StatisticsRepository : IStatisticsRepository
             topTags.Select(x => new TagCount(x.Name, x.Count)).ToList());
     }
 
-    /// <summary>Выполненные задачи за последние N дней, разложенные по календарным дням местного времени.</summary>
+    /// <summary>Tasks completed in the last N days, laid out by calendar days of local time.</summary>
     private static async Task<IReadOnlyList<DayCount>> GetCompletedByDayAsync(
         IQueryable<TaskItem> done, StatisticsQuery query, CancellationToken cancellationToken)
     {
@@ -95,7 +95,7 @@ public class StatisticsRepository : IStatisticsRepository
         return CountByDay(completed, first, query.ChartDays, query.TimeZone);
     }
 
-    /// <summary>Дедлайны открытых задач на сегодня и 6 следующих дней. Просроченные считаются отдельно.</summary>
+    /// <summary>The deadlines of open tasks for today and the next 6 days. Overdue ones are counted separately.</summary>
     private static async Task<IReadOnlyList<DayCount>> GetDeadlinesByDayAsync(
         IQueryable<TaskItem> open, StatisticsQuery query, CancellationToken cancellationToken)
     {
@@ -130,8 +130,8 @@ public class StatisticsRepository : IStatisticsRepository
     }
 
     /// <summary>
-    /// Среднее время от создания до выполнения. EF Core не умеет вычитать даты, которые мы храним как тики (число),
-    /// поэтому считаем одним SQL-запросом AVG по этим колонкам. Фильтр мягкого удаления здесь надо указать вручную.
+    /// The average time from creation to completion. EF Core cannot subtract dates that we store as ticks (a number),
+    /// so we count it with one SQL AVG query over these columns. The soft-delete filter has to be specified manually here.
     /// </summary>
     private async Task<TimeSpan?> GetAverageCompletionTimeAsync(DateTimeOffset? since, CancellationToken cancellationToken)
     {

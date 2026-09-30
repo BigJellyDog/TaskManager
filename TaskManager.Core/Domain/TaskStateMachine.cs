@@ -1,9 +1,9 @@
 namespace TaskManager.Core.Domain;
 
 /// <summary>
-/// Конечный автомат статусов. Единственное место, где описано, какие переходы разрешены.
-/// Обычные переходы лежат в <see cref="Transitions"/>, переоткрытие (Done и Cancelled) вынесено отдельно
-/// и доступно только через <see cref="EnsureReopen"/>.
+/// The status state machine. The only place that describes which transitions are allowed.
+/// Ordinary transitions are in <see cref="Transitions"/>, reopening (Done and Cancelled) is separate
+/// and available only through <see cref="EnsureReopen"/>.
 /// </summary>
 public static class TaskStateMachine
 {
@@ -17,7 +17,7 @@ public static class TaskStateMachine
             [TaskStatus.Cancelled] = [],
         };
 
-    // Статус, в который задача возвращается при переоткрытии.
+    // The status to which a task returns when reopened.
     private static readonly Dictionary<TaskStatus, TaskStatus> ReopenTargets =
         new Dictionary<TaskStatus, TaskStatus>
         {
@@ -25,19 +25,19 @@ public static class TaskStateMachine
             [TaskStatus.Cancelled] = TaskStatus.Todo,
         };
 
-    /// <summary>Разрешён ли обычный переход (без переоткрытия).</summary>
+    /// <summary>Whether an ordinary transition (without reopening) is allowed.</summary>
     public static bool CanTransition(TaskStatus from, TaskStatus to) =>
         Transitions.TryGetValue(from, out var allowed) && allowed.Contains(to);
 
-    /// <summary>Статусы, в которые можно перейти из <paramref name="from"/> обычным путём.</summary>
+    /// <summary>The statuses reachable from <paramref name="from"/> in the ordinary way.</summary>
     public static IReadOnlyCollection<TaskStatus> GetAllowedTransitions(TaskStatus from) =>
         Transitions.TryGetValue(from, out var allowed) ? allowed : [];
 
-    /// <summary>Можно ли переоткрыть задачу в этом статусе, и если да, то в какой статус она вернётся.</summary>
+    /// <summary>Whether a task in this status can be reopened and, if so, to which status it returns.</summary>
     public static bool TryGetReopenTarget(TaskStatus from, out TaskStatus target) =>
         ReopenTargets.TryGetValue(from, out target);
 
-    /// <summary>Бросает <see cref="InvalidStatusTransitionException"/>, если обычный переход запрещён.</summary>
+    /// <summary>Throws <see cref="InvalidStatusTransitionException"/> if an ordinary transition is forbidden.</summary>
     public static void EnsureTransition(TaskStatus from, TaskStatus to)
     {
         if (CanTransition(from, to))
@@ -56,7 +56,7 @@ public static class TaskStateMachine
         throw new InvalidStatusTransitionException(from, to, reason);
     }
 
-    /// <summary>Проверяет, что задачу можно переоткрыть, и возвращает статус, в который она вернётся.</summary>
+    /// <summary>Checks that the task can be reopened and returns the status it will return to.</summary>
     public static TaskStatus EnsureReopen(TaskStatus from)
     {
         if (TryGetReopenTarget(from, out var target))

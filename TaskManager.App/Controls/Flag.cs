@@ -1,8 +1,8 @@
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Флаг страны для кнопки языка. Эмодзи-флаги в Windows показываются буквами («DE»), поэтому флаги рисуются сами:
-/// это прямоугольник 18×12 с тонкой рамкой.
+/// A country flag for the language button. Emoji flags show as letters ("DE") on Windows, so the flags are drawn by hand:
+/// a rectangle of 18×12 with a thin border.
 /// </summary>
 public sealed class Flag : GraphicsView, IDrawable
 {
@@ -18,7 +18,7 @@ public sealed class Flag : GraphicsView, IDrawable
         VerticalOptions = LayoutOptions.Center;
     }
 
-    /// <summary>Код языка: «de», «en», «ru», «ua».</summary>
+    /// <summary>The language code: "de", "en", "ru", "ua".</summary>
     public string Code
     {
         get => (string)GetValue(CodeProperty);
@@ -53,7 +53,7 @@ public sealed class Flag : GraphicsView, IDrawable
 
         canvas.RestoreState();
 
-        // Тонкая рамка, чтобы белая полоса не сливалась со светлым фоном.
+        // A thin border so that the white stripe does not merge with a light background.
         canvas.StrokeColor = Color.FromRgba(128, 128, 128, 110);
         canvas.StrokeSize = 1;
         canvas.DrawRoundedRectangle(0.5f, 0.5f, w - 1, h - 1, 2);

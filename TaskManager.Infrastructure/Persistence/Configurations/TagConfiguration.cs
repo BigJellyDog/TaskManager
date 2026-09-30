@@ -15,8 +15,8 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(Tag.MaxNameLength);
 
-        // Уникальность по NormalizedName: "Работа" и "работа" это один тег.
-        // Коллация NOCASE в SQLite различает регистр кириллицы, поэтому она тут не подходит.
+        // Uniqueness by NormalizedName: "Работа" and "работа" are one tag.
+        // The NOCASE collation in SQLite distinguishes the case of Cyrillic, so it is not suitable here.
         builder.Property(t => t.NormalizedName).IsRequired().HasMaxLength(Tag.MaxNameLength);
         builder.HasIndex(t => t.NormalizedName).IsUnique();
     }

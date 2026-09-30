@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Одна запись аудита: какое поле задачи изменилось, с какого значения на какое, когда и какой командой.</summary>
+/// <summary>One audit record: which field of the task changed, from which value to which, when and by which command.</summary>
 public class TaskHistoryEntry
 {
     public TaskHistoryEntry(int taskId, DateTimeOffset changedAt, string command, string fieldName, string? oldValue, string? newValue)
@@ -13,7 +13,7 @@ public class TaskHistoryEntry
         NewValue = newValue;
     }
 
-    // Нужен EF Core.
+    // Needed by EF Core.
     private TaskHistoryEntry()
     {
         Command = string.Empty;
@@ -26,7 +26,7 @@ public class TaskHistoryEntry
 
     public DateTimeOffset ChangedAt { get; private set; }
 
-    /// <summary>Команда, вызвавшая изменение (add, edit, done...).</summary>
+    /// <summary>The command that caused the change (add, edit, done...).</summary>
     public string Command { get; private set; }
 
     public string FieldName { get; private set; }

@@ -9,7 +9,7 @@ using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Tests;
 
-/// <summary>Резервная копия базы и восстановление из неё (настоящие файлы во временной папке).</summary>
+/// <summary>A database backup and restore from it (real files in a temporary folder).</summary>
 public sealed class BackupTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);
@@ -26,7 +26,7 @@ public sealed class BackupTests : IDisposable
 
     public void Dispose()
     {
-        // Пул соединений держит файл открытым: без этого папку не удалить.
+        // The connection pool keeps the file open: without this the folder cannot be deleted.
         SqliteConnection.ClearAllPools();
         Directory.Delete(_folder, recursive: true);
     }

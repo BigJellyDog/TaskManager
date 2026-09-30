@@ -6,8 +6,8 @@ using TaskManager.Core.Services;
 namespace TaskManager.Infrastructure.Reminders;
 
 /// <summary>
-/// Показ напоминаний по умолчанию: запись в лог. Приложение подменяет его своей реализацией
-/// (баннер, уведомление Windows), зарегистрированной до вызова <c>AddInfrastructure</c>.
+/// The default way to show reminders: a log entry. The application replaces it with its own implementation
+/// (banner, Windows notification) registered before the call to <c>AddInfrastructure</c>.
 /// </summary>
 public class LoggingReminderNotifier : IReminderNotifier
 {

@@ -3,8 +3,8 @@ using Microsoft.Maui.Controls.Shapes;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Сегментный выбор Signal («7 дней | 30 дней | Всё время»): подложка с закруглением, выбранный пункт светлее и жирнее.
-/// Пункты задаются строкой через «|», выбранный номер привязывается в обе стороны.
+/// The Signal segmented choice ("7 days | 30 days | All time"): a rounded track, the selected item lighter and bolder.
+/// The items are given as a string separated by "|", the selected number is bound in both directions.
 /// </summary>
 public sealed class SegmentedChoice : Border
 {
@@ -27,7 +27,7 @@ public sealed class SegmentedChoice : Border
         Content = _row;
     }
 
-    /// <summary>Подписи пунктов через «|».</summary>
+    /// <summary>The item labels separated by "|".</summary>
     public string Items
     {
         get => (string)GetValue(ItemsProperty);

@@ -1,6 +1,6 @@
 namespace TaskManager.App.Services;
 
-/// <summary>Диалоги для пользователя. Модели представления работают через интерфейс и не знают про страницы.</summary>
+/// <summary>Dialogs for the user. View models work through the interface and know nothing about pages.</summary>
 public interface IDialogService
 {
     Task AlertAsync(string title, string message);

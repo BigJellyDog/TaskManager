@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Правило повторения. Хранится внутри задачи как часть её данных (owned-тип в EF Core).</summary>
+/// <summary>The recurrence rule. Stored inside the task as part of its data (an owned type in EF Core).</summary>
 public class RecurrenceRule
 {
     public RecurrenceRule(
@@ -30,32 +30,32 @@ public class RecurrenceRule
         Mode = mode;
         WeekDays = weekDays;
 
-        // Якорь хранится как локальная дата и время без часового пояса.
+        // The anchor is stored as a local date and time without a time zone.
         Anchor = anchor is { } a ? DateTime.SpecifyKind(a, DateTimeKind.Unspecified) : null;
     }
 
-    // Нужен EF Core.
+    // Needed by EF Core.
     private RecurrenceRule()
     {
     }
 
     public RecurrenceFrequency Frequency { get; private set; }
 
-    /// <summary>Шаг: 1 = каждый день/неделю/месяц/год, 2 = через один и т.д.</summary>
+    /// <summary>The step: 1 = every day/week/month/year, 2 = every other, etc.</summary>
     public int Interval { get; private set; } = 1;
 
     public RecurrenceMode Mode { get; private set; }
 
-    /// <summary>Дни недели, только для <see cref="RecurrenceFrequency.Weekly"/>.</summary>
+    /// <summary>The weekdays, only for <see cref="RecurrenceFrequency.Weekly"/>.</summary>
     public WeekDays WeekDays { get; private set; }
 
     /// <summary>
-    /// Локальные дата и время первого срабатывания. Из них берутся день месяца (чтобы после 28 февраля вернуться
-    /// к 31-му) и время суток (чтобы после перевода часов задача не уезжала на час). Если не задан,
-    /// калькулятор берёт их из текущей даты.
+    /// The local date and time of the first occurrence. From them the day of month is taken (to come back to the 31st
+    /// after 28 February) and the time of day (so that the task does not drift by an hour after a clock change). If not set,
+    /// the calculator takes them from the current date.
     /// </summary>
     public DateTime? Anchor { get; private set; }
 
-    /// <summary>Копия правила с заданным якорем (правило неизменяемо).</summary>
+    /// <summary>A copy of the rule with the given anchor (the rule is immutable).</summary>
     public RecurrenceRule WithAnchor(DateTime anchor) => new(Frequency, Interval, Mode, WeekDays, anchor);
 }

@@ -1,11 +1,11 @@
 namespace TaskManager.App.Services;
 
-/// <summary>Одна тема для меню: выбор в настройках, название и три цвета для образца (фон, поверхность, акцент).</summary>
+/// <summary>One theme for the menu: the choice in the settings, the name and three colours for the sample (background, surface, accent).</summary>
 public sealed record ThemeInfo(ThemeChoice Choice, string Name, string Bg, string Surface, string Accent);
 
 /// <summary>
-/// Список тем как в макете Signal: две основные (тёмная и светлая) и пять дополнительных. «Системная» следует за Windows
-/// и стоит первой. Цвета дополнительных тем лежат здесь же и превращаются в словарь ресурсов <see cref="PaletteTheme"/>.
+/// The list of themes as in the Signal mockup: two main ones (dark and light) and five additional ones. "System" follows Windows
+/// and comes first. The colours of the additional themes are here too and are turned into the resource dictionary <see cref="PaletteTheme"/>.
 /// </summary>
 public static class ThemeCatalog
 {
@@ -25,10 +25,10 @@ public static class ThemeCatalog
 
     public static ThemeInfo Of(ThemeChoice choice) => All.First(t => t.Choice == choice);
 
-    /// <summary>Название на языке интерфейса (у Dracula, Nord и других оно одинаково на всех языках).</summary>
+    /// <summary>The name in the interface language (for Dracula, Nord and others it is the same in all languages).</summary>
     public static string DisplayName(ThemeInfo theme) => Loc.T(theme.Name);
 
-    /// <summary>Образец темы для меню; у «Системной» берётся образец темы, которая сейчас включена.</summary>
+    /// <summary>A sample of the theme for the menu; for "System" the sample of the theme that is currently on is taken.</summary>
     public static string[] Swatch(ThemeChoice choice)
     {
         var info = choice == ThemeChoice.System
@@ -37,7 +37,7 @@ public static class ThemeCatalog
         return [info.Bg, info.Surface, info.Accent];
     }
 
-    // Статусные и приоритетные цвета: у тёмных тем общие, у Solarized Light свои (как у «Светлой»).
+    // Status and priority colours: the dark themes share them, Solarized Light has its own (as the "Light" one).
     private static readonly Dictionary<string, string> DarkStatus = new()
     {
         ["PCrit"] = "#FF7B7B", ["PHigh"] = "#F5A04A", ["PMed"] = "#6FB4FF", ["PLow"] = "#9BA7B6",
@@ -50,10 +50,10 @@ public static class ThemeCatalog
         ["SToDo"] = "#4C5662", ["SProg"] = "#0B57A6", ["SBlock"] = "#B31F28", ["SDone"] = "#11662D", ["SCancel"] = "#5B5B63",
     };
 
-    /// <summary>Цвета дополнительной темы под теми же ключами, что в DarkTheme.xaml и LightTheme.xaml.</summary>
+    /// <summary>The colours of an additional theme under the same keys as in DarkTheme.xaml and LightTheme.xaml.</summary>
     public static Dictionary<string, string> Palette(ThemeMode mode)
     {
-        // Порядок: Bg, Side, Surface, SurfaceRaised, Line, Ink, InkMuted, Accent, OnAccent, AccentSoft.
+        // Order: Bg, Side, Surface, SurfaceRaised, Line, Ink, InkMuted, Accent, OnAccent, AccentSoft.
         var v = mode switch
         {
             ThemeMode.Dracula => new[] { "#282A36", "#1F2029", "#2B2D3A", "#2D3040", "#44475A", "#F8F8F2", "#B9BDD3", "#BD93F9", "#1E1033", "#3A3558" },
@@ -72,10 +72,10 @@ public static class ThemeCatalog
             palette[keys[i]] = v[i];
         }
 
-        // Колонка доски: приподнятая поверхность на 55% поверх фона, как в макете.
+        // Board column: the raised surface at 55% over the background, as in the mockup.
         palette["Column"] = Mix(v[3], v[0], 0.55);
 
-        // Фон метки «просрочено»: цвет просрочки на 10% поверх поверхности.
+        // The background of the "overdue" tag: the overdue colour at 10% over the surface.
         var light = ThemeManager.IsLight(mode);
         palette["PCritBg"] = Mix(light ? LightStatus["PCrit"] : DarkStatus["PCrit"], v[2], 0.1);
 
@@ -84,7 +84,7 @@ public static class ThemeCatalog
             palette[pair.Key] = pair.Value;
         }
 
-        // Второй цвет градиента (кнопка, полосы, свечение): пара к акценту у каждой темы.
+        // The second colour of the gradient (button, bars, glow): the partner of the accent in every theme.
         palette["A2"] = mode switch
         {
             ThemeMode.Dracula => "#8BE9FD",
@@ -108,7 +108,7 @@ public static class ThemeCatalog
     }
 }
 
-/// <summary>Тема, собранная из таблицы цветов: цвета и кисти под теми же ключами, что в DarkTheme и LightTheme.</summary>
+/// <summary>A theme built from a colour table: colours and brushes under the same keys as in DarkTheme and LightTheme.</summary>
 public sealed class PaletteTheme : ResourceDictionary
 {
     public PaletteTheme(IReadOnlyDictionary<string, string> colors)
@@ -126,9 +126,9 @@ public sealed class PaletteTheme : ResourceDictionary
 }
 
 /// <summary>
-/// Кисти дизайна Aurora: фон страницы, градиент карточек, основной кнопки и выбранного пункта меню. Каждая кисть создаётся
-/// один раз и лежит в ресурсах приложения, а при смене темы только перекрашивается на месте. Замена самой кисти в словаре
-/// темы не годится: элементы со стилем на DynamicResource-кисть иногда оставались в цветах прежней темы.
+/// Brushes of the Aurora design: the page background, the gradient of cards, of the primary button and of the selected menu item. Each brush is created
+/// once and lives in the application resources, and on a theme change it is only recoloured in place. Replacing the brush itself in the
+/// theme dictionary does not work: elements with a style bound to a DynamicResource brush sometimes stayed in the colours of the previous theme.
 /// </summary>
 public static class GlowBrushes
 {
@@ -146,7 +146,7 @@ public static class GlowBrushes
 
     private static readonly SolidColorBrush AccentBorder = new(Colors.Black);
 
-    /// <summary>Кладёт кисти в ресурсы приложения (один раз) и перекрашивает их под цвета темы.</summary>
+    /// <summary>Puts the brushes into the application resources (once) and recolours them to the colours of the theme.</summary>
     public static void Apply(ResourceDictionary appResources, ResourceDictionary theme, bool light)
     {
         ArgumentNullException.ThrowIfNull(appResources);
@@ -165,26 +165,26 @@ public static class GlowBrushes
         var surface = Get("Surface", bg);
         var raised = Get("SurfaceRaised", surface);
 
-        // Фон страницы: мягкое пятно акцента в левом верхнем углу.
+        // Page background: a soft spot of the accent in the top left corner.
         PageGlow.GradientStops[0].Color = Color.FromArgb(ThemeCatalog.Mix(accent.ToArgbHex(), bg.ToArgbHex(), light ? 0.12 : 0.20));
         PageGlow.GradientStops[1].Color = bg;
 
-        // Карточки и панели: сверху чуть светлее (приподнятая поверхность на 60%), книзу обычная поверхность.
+        // Cards and panels: slightly lighter at the top (the raised surface at 60%), the ordinary surface at the bottom.
         CardGradient.GradientStops[0].Color = Color.FromArgb(ThemeCatalog.Mix(raised.ToArgbHex(), surface.ToArgbHex(), 0.6));
         CardGradient.GradientStops[1].Color = surface;
 
-        // Выбранный пункт меню: градиент от акцента (22%) к второму цвету (8%) и рамка акцента (45%).
+        // The selected menu item: a gradient from the accent (22%) to the second colour (8%) and an accent border (45%).
         AccentSoftGradient.GradientStops[0].Color = accent.WithAlpha(0.22f);
         AccentSoftGradient.GradientStops[1].Color = second.WithAlpha(0.08f);
         AccentBorder.Color = accent.WithAlpha(0.45f);
 
-        // Основная кнопка и полосы: от акцента ко второму цвету темы.
+        // The primary button and bars: from the accent to the second colour of the theme.
         AccentGradient.GradientStops[0].Color = accent;
         AccentGradient.GradientStops[1].Color = second;
     }
 }
 
-/// <summary>Цвета свечения и второго акцента темы (тень акцентных элементов, цвет A2). Простые цвета и кисти меняются словарём.</summary>
+/// <summary>The glow colours and the second accent of the theme (the shadow of accent elements, the colour A2). Plain colours and brushes are swapped with the dictionary.</summary>
 public sealed class GlowTheme : ResourceDictionary
 {
     public GlowTheme(ResourceDictionary theme, bool light)

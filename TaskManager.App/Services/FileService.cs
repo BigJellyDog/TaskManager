@@ -7,10 +7,10 @@ namespace TaskManager.App.Services;
 
 public sealed class FileService(ILogger<FileService> logger) : IFileService
 {
-    // Слишком большой файл для импорта почти наверняка не файл экспорта: не читаем его в память целиком.
+    // A file that is too large for an import is almost certainly not an export file: we do not read it into memory whole.
     private const long MaxImportBytes = 50 * 1024 * 1024;
 
-    // UTF-8 без BOM: JSON и Markdown так читаются любыми редакторами.
+    // UTF-8 without BOM: JSON and Markdown are read this way by any editor.
     private static readonly UTF8Encoding Utf8NoBom = new(encoderShouldEmitUTF8Identifier: false);
 
     public async Task<string?> SaveWithDialogAsync(string suggestedFileName, string content, CancellationToken cancellationToken = default)
@@ -23,7 +23,7 @@ public sealed class FileService(ILogger<FileService> logger) : IFileService
             return result.FilePath;
         }
 
-        // Пользователь закрыл окно (самый частый случай) или файл не удалось записать: подробности только в журнал.
+        // The user closed the window (the most common case) or the file could not be written: details go only to the log.
         logger.LogInformation(result.Exception, "Файл не сохранён через диалог: {FileName}", suggestedFileName);
         return null;
     }
@@ -103,7 +103,7 @@ public sealed class FileService(ILogger<FileService> logger) : IFileService
 
     public void RevealInFolder(string path)
     {
-        // Проводник откроется с выделенным файлом. Windows-only приложение, поэтому explorer.exe доступен всегда.
+        // Explorer opens with the file selected. A Windows-only application, so explorer.exe is always available.
         Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
     }
 }

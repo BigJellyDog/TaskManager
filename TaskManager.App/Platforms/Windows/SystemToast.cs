@@ -3,19 +3,19 @@ namespace TaskManager.App.Platforms.Windows;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 
-/// <summary>Системное уведомление Windows (центр уведомлений). Любой сбой только пишется в журнал: баннер в приложении остаётся.</summary>
+/// <summary>A Windows system notification (the notification centre). Any failure is only written to the log: the banner in the application stays.</summary>
 public static class SystemToast
 {
     private static bool _registered;
 
-    /// <summary>Показывает уведомление из заголовка и одной-двух строк текста.</summary>
+    /// <summary>Shows a notification made of a title and one or two lines of text.</summary>
     public static void Show(string title, params string[] lines)
     {
         try
         {
             if (!_registered)
             {
-                // Приложение запускается без пакета MSIX: перед первым показом его нужно зарегистрировать в системе уведомлений.
+                // The application starts without an MSIX package: before the first show it has to be registered with the notification system.
                 AppNotificationManager.Default.Register();
                 _registered = true;
             }
@@ -28,7 +28,7 @@ public static class SystemToast
 
             AppNotificationManager.Default.Show(builder.BuildNotification());
         }
-#pragma warning disable CA1031 // Уведомление необязательно: сбой системы уведомлений не должен ломать напоминания.
+#pragma warning disable CA1031 // A notification is optional: a failure of the notification system must not break the reminders.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

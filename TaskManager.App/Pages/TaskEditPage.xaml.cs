@@ -35,7 +35,7 @@ public partial class TaskEditPage : ContentPage
         }
     }
 
-    // Загружаем один раз: повторное появление страницы не должно затирать то, что пользователь уже ввёл.
+    // Load once: the page appearing again must not overwrite what the user has already typed.
     protected override async void OnAppearing()
     {
         base.OnAppearing();

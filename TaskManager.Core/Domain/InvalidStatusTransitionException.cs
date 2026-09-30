@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Попытка перевести задачу в статус, который запрещён таблицей переходов.</summary>
+/// <summary>An attempt to move a task to a status that the transition table forbids.</summary>
 public class InvalidStatusTransitionException : InvalidOperationException
 {
     public InvalidStatusTransitionException()

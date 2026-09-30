@@ -16,8 +16,8 @@ public enum ThemeMode
 }
 
 /// <summary>
-/// Переключение темы Signal. Цвета лежат в двух словарях с одинаковыми ключами (DarkTheme и LightTheme);
-/// при смене темы подменяется словарь, а стили, использующие DynamicResource, перекрашиваются сами.
+/// Switching the Signal theme. The colours are in two dictionaries with the same keys (DarkTheme and LightTheme);
+/// on a theme change the dictionary is replaced, and styles that use DynamicResource are recoloured by themselves.
 /// </summary>
 public static class ThemeManager
 {
@@ -26,8 +26,8 @@ public static class ThemeManager
     private static readonly WeakEventManager Events = new();
 
     /// <summary>
-    /// Тема сменилась. Нужна тому, что красит себя в коде и не обновляется само: подписка слабая, поэтому на экранах,
-    /// которые закрылись, она не держит память. Обработчик должен быть методом объекта, а не лямбдой.
+    /// The theme changed. Needed by whatever colours itself in code and does not update by itself: the subscription is weak, so on screens
+    /// that have closed it does not hold memory. The handler must be an instance method, not a lambda.
     /// </summary>
     public static event EventHandler? Changed
     {
@@ -35,7 +35,7 @@ public static class ThemeManager
         remove => Events.RemoveEventHandler(value);
     }
 
-    /// <summary>Применяет выбор из настроек. «Системная» следует за темой Windows и меняется вместе с ней.</summary>
+    /// <summary>Applies the choice from the settings. "System" follows the Windows theme and changes together with it.</summary>
     public static void Apply(ThemeChoice choice)
     {
         if (Application.Current is not { } app)
@@ -53,7 +53,7 @@ public static class ThemeManager
         Apply(Enum.Parse<ThemeMode>(choice.ToString()));
     }
 
-    /// <summary>Светлые темы: обычная светлая, Solarized Light и Aurora Light. Остальные тёмные.</summary>
+    /// <summary>Light themes: the ordinary light one, Solarized Light and Aurora Light. The others are dark.</summary>
     public static bool IsLight(ThemeMode mode) => mode is ThemeMode.Light or ThemeMode.Solar or ThemeMode.AuroraLight;
 
     public static void Apply(ThemeMode mode) => Apply(mode, keepUserTheme: false);
@@ -71,7 +71,7 @@ public static class ThemeManager
             merged.Remove(old);
         }
 
-        // Порядок словарей не важен: стили берут цвета через DynamicResource и найдут их в любом месте.
+        // The order of the dictionaries does not matter: styles take colours through DynamicResource and will find them anywhere.
         ResourceDictionary theme = mode switch
         {
             ThemeMode.Dark => new DarkTheme(),
@@ -80,11 +80,11 @@ public static class ThemeManager
         };
         merged.Add(theme);
 
-        // Свечение Aurora (фон страницы, тень акцентных элементов) собирается из цветов только что выбранной темы.
+        // The Aurora glow (page background, shadow of accent elements) is built from the colours of the theme just chosen.
         merged.Add(new GlowTheme(theme, IsLight(mode)));
         GlowBrushes.Apply(app.Resources, theme, IsLight(mode));
 
-        // Стандартные элементы (меню, диалоги, полосы прокрутки) берут тему системы, пока мы не скажем иначе.
+        // Standard elements (menus, dialogs, scroll bars) take the system theme until we say otherwise.
         ApplyToWindow(mode, keepUserTheme);
 
         if (!keepUserTheme)
@@ -96,7 +96,7 @@ public static class ThemeManager
         Events.HandleEvent(null!, EventArgs.Empty, nameof(Changed));
     }
 
-    /// <summary>Окно, созданное после выбора темы, тоже получает её (раскрывающиеся списки берут тему от корня окна).</summary>
+    /// <summary>A window created after the theme was chosen gets it too (drop-down lists take the theme from the window root).</summary>
     public static void AttachWindow(Window window)
     {
         _window = window;
@@ -106,8 +106,8 @@ public static class ThemeManager
     private static Window? _window;
     private static bool _followSystem;
 
-    // Раскрывающиеся списки и меню рисует Windows: без этого они берут тему системы и могут быть светлыми в тёмном приложении.
-    // Тему получают корень окна и каждый такой элемент: список раскрывается из своего элемента, а не из корня.
+    // Drop-down lists and menus are drawn by Windows: without this they take the system theme and may be light in a dark application.
+    // The theme is given to the window root and to each such element: a list opens from its own element, not from the root.
     private static void ApplyToWindow(ThemeMode mode, bool keepUserTheme)
     {
         _followSystem = keepUserTheme;
@@ -142,7 +142,7 @@ public static class ThemeManager
             ? Microsoft.UI.Xaml.ElementTheme.Default
             : IsLight(_mode) ? Microsoft.UI.Xaml.ElementTheme.Light : Microsoft.UI.Xaml.ElementTheme.Dark;
 
-    /// <summary>Текущая тема приложения в виде темы WinUI, для окон, которые мы рисуем сами.</summary>
+    /// <summary>The current theme of the application as a WinUI theme, for the windows that we draw ourselves.</summary>
     public static Microsoft.UI.Xaml.ElementTheme NativeTheme => ElementThemeNow();
 #endif
 

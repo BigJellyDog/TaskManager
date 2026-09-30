@@ -1,8 +1,8 @@
 namespace TaskManager.App.Services;
 
 /// <summary>
-/// Перевод подписи прямо в XAML: <c>Text="{loc:T 'Новая задача'}"</c>. Ключ — русский текст. Значение читается при
-/// создании страницы; при смене языка окно пересобирается, и страницы создаются заново на новом языке.
+/// Translation of a label right in XAML: <c>Text="{loc:T 'Новая задача'}"</c>. The key is the Russian text. The value is read when
+/// the page is created; on a language change the window is rebuilt and the pages are created again in the new language.
 /// </summary>
 [ContentProperty(nameof(Key))]
 public sealed class Extension : IMarkupExtension<string>

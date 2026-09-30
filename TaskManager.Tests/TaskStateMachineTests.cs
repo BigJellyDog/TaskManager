@@ -32,7 +32,7 @@ public class TaskStateMachineTests
         }
     }
 
-    // Все остальные пары из 25, включая переход в тот же статус.
+    // All the other pairs out of 25, including the transition to the same status.
     public static TheoryData<TaskStatus, TaskStatus> ForbiddenTransitions
     {
         get

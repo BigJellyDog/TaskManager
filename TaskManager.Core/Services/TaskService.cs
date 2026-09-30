@@ -6,12 +6,12 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.Core.Services;
 
 /// <summary>
-/// Сценарии работы с задачей. Каждая операция сохраняет и саму задачу, и запись в истории одним
-/// <see cref="IUnitOfWork.SaveChangesAsync"/>, то есть в одной транзакции.
+/// Scenarios of working with a task. Each operation saves both the task itself and the history record with one
+/// <see cref="IUnitOfWork.SaveChangesAsync"/>, that is in one transaction.
 /// </summary>
 public class TaskService
 {
-    // Названия операций для поля "какая команда" в истории.
+    // The names of the operations for the "which command" field in the history.
     public const string CreateCommand = "create";
     public const string EditCommand = "edit";
     public const string ChangeStatusCommand = "status";
@@ -21,7 +21,7 @@ public class TaskService
     public const string MoveCommand = "move";
     public const string RecurrenceCommand = "recurrence";
 
-    /// <summary>Сколько пропущенных копий одной серии создаётся за один вызов догона. Остаток создаст следующий вызов.</summary>
+    /// <summary>How many missed copies of one series are created in one catch-up call. The rest will be created by the next call.</summary>
     public const int MaxCatchUpOccurrences = 50;
     public const string AddDependencyCommand = "depend";
     public const string RemoveDependencyCommand = "undepend";
@@ -44,13 +44,13 @@ public class TaskService
     public async Task<TaskItem> GetAsync(int id, CancellationToken cancellationToken = default) =>
         await _tasks.GetWithDetailsAsync(id, cancellationToken) ?? throw new TaskNotFoundException(id);
 
-    /// <summary>Страница задач по фильтру и сортировке.</summary>
+    /// <summary>A page of tasks by filter and sorting.</summary>
     public Task<PagedResult<TaskItem>> ListAsync(TaskQuery query, CancellationToken cancellationToken = default) =>
         _tasks.ListAsync(query, cancellationToken);
 
     /// <summary>
-    /// Поиск по фильтрам пользователя: фильтры комбинируются через И, "просроченные", "на сегодня" и "на неделю"
-    /// считаются от текущего времени сервиса.
+    /// Search by the user's filters: the filters are combined with AND, "overdue", "for today" and "for the week"
+    /// are counted from the current time of the service.
     /// </summary>
     public Task<PagedResult<TaskItem>> SearchAsync(
         TaskFilter filter,
@@ -63,7 +63,7 @@ public class TaskService
         return _tasks.ListAsync(new TaskQuery(filter.ToSpecification(_clock), sort, page, pageSize), cancellationToken);
     }
 
-    /// <summary>Сколько задач подходит под фильтр. Дешевле <see cref="SearchAsync"/>, когда нужно только число.</summary>
+    /// <summary>How many tasks match the filter. Cheaper than <see cref="SearchAsync"/> when only the number is needed.</summary>
     public Task<int> CountAsync(TaskFilter filter, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(filter);
@@ -74,8 +74,8 @@ public class TaskService
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        // Две записи в одной транзакции: Id задачи появляется только после первого сохранения,
-        // а запись истории без Id задачи создать нельзя.
+        // Two records in one transaction: the task Id appears only after the first save,
+        // and a history record cannot be created without the task Id.
         return _unitOfWork.ExecuteInTransactionAsync(
             async ct =>
             {
@@ -86,7 +86,7 @@ public class TaskService
                     var parent = await _tasks.GetByIdAsync(parentId, includeDeleted: false, ct)
                         ?? throw new TaskNotFoundException(parentId);
 
-                    // Новая подзадача: на уровень глубже родителя.
+                    // A new subtask: one level deeper than the parent.
                     EnsureDepthAllowed(await GetDepthAsync(parent, ct) + 1);
                     task.SetParent(parent);
                 }
@@ -122,8 +122,8 @@ public class TaskService
         task.SetDescription(request.Description);
         task.SetPriority(request.Priority);
 
-        // Дедлайн и правило повторения связаны (по календарю нужен дедлайн), поэтому порядок важен:
-        // правило снимаем до удаления дедлайна, а новое правило ставим после установки дедлайна.
+        // The deadline and the recurrence rule are linked (by calendar a deadline is needed), so the order matters:
+        // we remove the rule before removing the deadline, and we set the new rule after setting the deadline.
         var rule = PrepareRule(request.Recurrence, request.Deadline, deadlineChanged: request.Deadline != task.Deadline);
         if (rule is null)
         {
@@ -142,7 +142,7 @@ public class TaskService
         return task;
     }
 
-    /// <param name="expectedRowVersion">Версия задачи, которую видел пользователь. Если задачу изменили, операция отклоняется.</param>
+    /// <param name="expectedRowVersion">The task version the user saw. If the task was changed, the operation is rejected.</param>
     public async Task<TaskItem> ChangeStatusAsync(
         int id,
         TaskStatus newStatus,
@@ -153,8 +153,8 @@ public class TaskService
         EnsureNotStale(task, expectedRowVersion);
         var before = TaskSnapshot.From(task);
 
-        // В Todo, InProgress и Done можно перейти только когда все зависимости выполнены.
-        // Blocked и Cancelled доступны всегда.
+        // A task can move to Todo, InProgress and Done only when all dependencies are done.
+        // Blocked and Cancelled are always available.
         if (newStatus is TaskStatus.Todo or TaskStatus.InProgress or TaskStatus.Done)
         {
             await EnsureDependenciesDoneAsync(task, newStatus, cancellationToken);
@@ -165,8 +165,8 @@ public class TaskService
         var entries = BuildEntries(task, before, ChangeStatusCommand);
         await ReconcileAfterStatusChangeAsync(task, before.Status, entries, cancellationToken);
 
-        // Завершение повторяющейся задачи создаёт следующую копию. Для её записи в историю нужен Id,
-        // то есть несколько сохранений подряд, поэтому всё выполняется одной транзакцией.
+        // Completing a recurring task creates the next copy. Writing it to the history needs an Id,
+        // that is several saves in a row, so everything runs in one transaction.
         await _unitOfWork.ExecuteInTransactionAsync(
             async ct =>
             {
@@ -183,7 +183,7 @@ public class TaskService
         return task;
     }
 
-    /// <summary>Переоткрывает выполненную или отменённую задачу.</summary>
+    /// <summary>Reopens a completed or cancelled task.</summary>
     public async Task<TaskItem> ReopenAsync(int id, long? expectedRowVersion = null, CancellationToken cancellationToken = default)
     {
         var task = await GetAsync(id, cancellationToken);
@@ -199,8 +199,8 @@ public class TaskService
     }
 
     /// <summary>
-    /// Все подзадачи задачи плоским списком в порядке обхода дерева (сначала подзадача, потом её подзадачи),
-    /// с уровнем вложенности и прогрессом каждого узла.
+    /// All subtasks of a task as a flat list in tree traversal order (a subtask first, then its subtasks),
+    /// with the nesting level and the progress of each node.
     /// </summary>
     public async Task<IReadOnlyList<SubtaskEntry>> GetSubtaskTreeAsync(int id, CancellationToken cancellationToken = default)
     {
@@ -215,7 +215,7 @@ public class TaskService
         List<SubtaskEntry> entries,
         CancellationToken cancellationToken)
     {
-        // Глубина ограничена правилом вложенности; запас в один уровень защищает от бесконечной рекурсии при битых данных.
+        // The depth is limited by the nesting rule; a margin of one level protects against infinite recursion with corrupt data.
         if (level > TaskItem.MaxDepth + 1)
         {
             return;
@@ -232,8 +232,8 @@ public class TaskService
     }
 
     /// <summary>
-    /// Пользователь действует над тем, что прочитал раньше. Если задачу успели изменить, молча перезаписывать
-    /// чужие правки нельзя (оптимистичная блокировка).
+    /// The user acts on what was read earlier. If the task was changed in the meantime, other people's edits must not be
+    /// overwritten silently (optimistic locking).
     /// </summary>
     private static void EnsureNotStale(TaskItem task, long? expectedRowVersion)
     {
@@ -243,11 +243,11 @@ public class TaskService
         }
     }
 
-    /// <summary>Прогресс подзадач задачи, например 3/5.</summary>
+    /// <summary>The subtask progress of a task, for example 3/5.</summary>
     public async Task<TaskProgress> GetProgressAsync(int id, CancellationToken cancellationToken = default) =>
         (await GetAsync(id, cancellationToken)).GetProgress();
 
-    /// <summary>Делает задачу подзадачей другой (или задачей верхнего уровня при <paramref name="newParentId"/> = null).</summary>
+    /// <summary>Makes a task a subtask of another (or a top-level task when <paramref name="newParentId"/> = null).</summary>
     public async Task<TaskItem> SetParentAsync(int id, int? newParentId, CancellationToken cancellationToken = default)
     {
         var task = await GetAsync(id, cancellationToken);
@@ -263,7 +263,7 @@ public class TaskService
                 throw new DomainValidationException("Нельзя сделать задачу подзадачей самой себя или своей подзадачи.");
             }
 
-            // Итоговая глубина: уровень родителя + высота поддерева переносимой задачи.
+            // The resulting depth: the level of the parent plus the height of the subtree of the moved task.
             var depth = await GetDepthAsync(parent, cancellationToken) + await GetSubtreeHeightAsync(task.Id, cancellationToken);
             EnsureDepthAllowed(depth);
 
@@ -278,7 +278,7 @@ public class TaskService
         return task;
     }
 
-    /// <summary>Удаляет задачу вместе со всеми её подзадачами, чтобы подзадачи не остались без родителя.</summary>
+    /// <summary>Deletes a task together with all its subtasks, so that subtasks do not stay without a parent.</summary>
     public async Task DeleteAsync(int id, long? expectedRowVersion = null, CancellationToken cancellationToken = default)
     {
         var task = await _tasks.GetByIdAsync(id, includeDeleted: false, cancellationToken)
@@ -294,13 +294,13 @@ public class TaskService
             entries.Add(NewEntry(item.Id, DeleteCommand, "IsDeleted", "False", "True"));
         }
 
-        // Удалённая задача больше не блокирует тех, кто от неё зависел.
+        // A deleted task no longer blocks those who depended on it.
         await ReconcileAsync(await GetDependentIdsAsync(deletedIds, cancellationToken), entries, cancellationToken);
 
         await CommitAsync(entries, cancellationToken);
     }
 
-    /// <summary>Восстанавливает одну задачу. Её подзадачи остаются в корзине и восстанавливаются по отдельности.</summary>
+    /// <summary>Restores one task. Its subtasks stay in the trash and are restored separately.</summary>
     public async Task RestoreAsync(int id, CancellationToken cancellationToken = default)
     {
         var task = await _tasks.GetByIdAsync(id, includeDeleted: true, cancellationToken)
@@ -327,16 +327,16 @@ public class TaskService
 
         var entries = new List<TaskHistoryEntry> { NewEntry(task.Id, RestoreCommand, "IsDeleted", "True", "False") };
 
-        // Вернувшаяся задача может снова блокировать зависимых и сама может оказаться заблокированной.
+        // A returned task may block its dependents again, and may itself end up blocked.
         var affected = (await GetDependentIdsAsync([task.Id], cancellationToken)).Append(task.Id).ToList();
         await ReconcileAsync(affected, entries, cancellationToken);
 
         await CommitAsync(entries, cancellationToken);
     }
 
-    // ---- Зависимости ----
+    // ---- Dependencies ----
 
-    /// <summary>Добавляет зависимость "<paramref name="taskId"/> нельзя начать, пока <paramref name="dependsOnTaskId"/> не Done".</summary>
+    /// <summary>Adds the dependency "<paramref name="taskId"/> cannot be started until <paramref name="dependsOnTaskId"/> is Done".</summary>
     public Task AddDependencyAsync(int taskId, int dependsOnTaskId, CancellationToken cancellationToken = default) =>
         _unitOfWork.ExecuteInTransactionAsync(
             async ct =>
@@ -374,7 +374,7 @@ public class TaskService
                 await _tasks.AddDependencyAsync(new TaskDependency(taskId, dependsOnTaskId), ct);
                 await _unitOfWork.SaveChangesAsync(ct);
 
-                // Зависимость уже в БД, теперь можно пересчитать блокировку и записать историю одним сохранением.
+                // The dependency is already in the database, now the blocking can be recalculated and the history written with one save.
                 var entries = new List<TaskHistoryEntry>
                 {
                     NewEntry(taskId, AddDependencyCommand, "DependsOn", null, Describe(target)),
@@ -404,7 +404,7 @@ public class TaskService
             },
             cancellationToken);
 
-    /// <summary>Невыполненные зависимости задачи (удалённые задачи не считаются).</summary>
+    /// <summary>The unfinished dependencies of a task (deleted tasks do not count).</summary>
     public async Task<IReadOnlyList<TaskItem>> GetUnmetDependenciesAsync(int taskId, CancellationToken cancellationToken = default)
     {
         var edges = await _tasks.GetDependencyGraphAsync(cancellationToken);
@@ -425,13 +425,13 @@ public class TaskService
     private Task SaveWithHistoryAsync(TaskItem task, TaskSnapshot before, string command, CancellationToken cancellationToken) =>
         CommitAsync(BuildEntries(task, before, command), cancellationToken);
 
-    /// <summary>Записи истории по тому, что изменилось в задаче с момента слепка.</summary>
+    /// <summary>The history entries for what changed in the task since the snapshot.</summary>
     private List<TaskHistoryEntry> BuildEntries(TaskItem task, TaskSnapshot before, string command) =>
         TaskSnapshot.Diff(before, TaskSnapshot.From(task))
             .Select(c => NewEntry(task.Id, command, c.Field, c.OldValue, c.NewValue))
             .ToList();
 
-    /// <summary>Сохраняет все накопленные изменения вместе с записями истории одним сохранением.</summary>
+    /// <summary>Saves all accumulated changes together with the history entries in one save.</summary>
     private async Task CommitAsync(List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
     {
         if (entries.Count == 0)
@@ -463,8 +463,8 @@ public class TaskService
     }
 
     /// <summary>
-    /// Если задача перешла в Done или вышла из Done, зависимые от неё задачи могут разблокироваться или заблокироваться.
-    /// Переоткрытая отменённая задача сама может оказаться заблокированной.
+    /// If a task became Done or left Done, the tasks that depend on it may become unblocked or blocked.
+    /// A reopened cancelled task may itself end up blocked.
     /// </summary>
     private async Task ReconcileAfterStatusChangeAsync(
         TaskItem task,
@@ -483,9 +483,9 @@ public class TaskService
     }
 
     /// <summary>
-    /// Приводит статус к зависимостям: Todo с невыполненной зависимостью становится Blocked,
-    /// Blocked без невыполненных зависимостей возвращается в Todo. InProgress не трогаем: работа уже идёт.
-    /// Блокировку, поставленную вручную, пересчёт тоже снимет, если у задачи нет невыполненных зависимостей.
+    /// Brings the status in line with the dependencies: Todo with an unfinished dependency becomes Blocked,
+    /// Blocked without unfinished dependencies returns to Todo. InProgress is not touched: the work is already going on.
+    /// A block set manually is also lifted by the recalculation if the task has no unfinished dependencies.
     /// </summary>
     private async Task ReconcileAsync(List<int> taskIds, List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
     {
@@ -502,7 +502,7 @@ public class TaskService
 
         foreach (var target in targets.Where(t => !t.IsDeleted))
         {
-            // Удалённые задачи в dependencies могли попасть из БД до сохранения, поэтому проверяем флаг в памяти.
+            // Deleted tasks in dependencies could have come from the database before saving, so we check the flag in memory.
             var hasUnmet = edges.Any(e =>
                 e.TaskId == target.Id
                 && dependencies.TryGetValue(e.DependsOnTaskId, out var dependency)
@@ -523,12 +523,12 @@ public class TaskService
     }
 
     /// <summary>
-    /// Догон по календарю: для каждой повторяющейся "по календарю" задачи, у которой наступил срок следующего вхождения,
-    /// создаёт копию. Если пропущено несколько периодов, создаёт цепочку, пока ближайший срок не окажется в будущем
-    /// (но не больше <see cref="MaxCatchUpOccurrences"/> на серию за вызов). Пропущенные копии получают дедлайны в прошлом.
-    /// Серии отменённых и удалённых задач не продолжаются. Безопасно вызывать повторно: уже созданное не дублируется.
+    /// Calendar catch-up: for every task recurring "by calendar" whose next occurrence is due,
+    /// creates a copy. If several periods were missed, it creates a chain until the nearest due date is in the future
+    /// (but no more than <see cref="MaxCatchUpOccurrences"/> per series per call). The missed copies get deadlines in the past.
+    /// Series of cancelled and deleted tasks do not continue. Safe to call again: what is already created is not duplicated.
     /// </summary>
-    /// <returns>Сколько копий создано (подзадачи не считаются).</returns>
+    /// <returns>How many copies were created (subtasks are not counted).</returns>
     public async Task<int> GenerateDueOccurrencesAsync(CancellationToken cancellationToken = default)
     {
         var now = _clock.GetUtcNow();
@@ -537,7 +537,7 @@ public class TaskService
 
         foreach (var source in await _tasks.GetPendingCalendarRecurrencesAsync(cancellationToken))
         {
-            // Каждая серия в своей транзакции: сбой одной не откатывает уже обработанные.
+            // Each series in its own transaction: a failure of one does not roll back those already processed.
             total += await _unitOfWork.ExecuteInTransactionAsync(
                 async ct =>
                 {
@@ -569,7 +569,7 @@ public class TaskService
         return total;
     }
 
-    /// <summary>Приводит набор тегов задачи к списку имён: лишние снимает, недостающие берёт из БД или создаёт.</summary>
+    /// <summary>Brings the set of tags of a task to a list of names: removes the extra ones, takes the missing ones from the database or creates them.</summary>
     private async Task SyncTagsAsync(TaskItem task, IReadOnlyCollection<string> names, CancellationToken cancellationToken)
     {
         var wanted = new Dictionary<string, string>();
@@ -603,8 +603,8 @@ public class TaskService
     }
 
     /// <summary>
-    /// Якорь правила берётся из дедлайна (локальные день и время первого срабатывания). Если дедлайн не менялся
-    /// и у правила уже есть якорь, он сохраняется: иначе после сдвига на 28 февраля мы забыли бы про 31-е.
+    /// The rule anchor is taken from the deadline (the local day and time of the first occurrence). If the deadline did not change
+    /// and the rule already has an anchor, it is kept: otherwise after a shift to 28 February we would forget about the 31st.
     /// </summary>
     private RecurrenceRule? PrepareRule(RecurrenceRule? rule, DateTimeOffset? deadline, bool deadlineChanged)
     {
@@ -622,16 +622,16 @@ public class TaskService
     }
 
     /// <summary>
-    /// Создаёт следующую копию повторяющейся задачи вместе с подзадачами. Сохраняет всё, чтобы получить Id,
-    /// и дописывает в <paramref name="entries"/> записи истории о созданных задачах.
+    /// Creates the next copy of a recurring task together with its subtasks. Saves everything to get the Ids,
+    /// and appends to <paramref name="entries"/> the history records about the created tasks.
     /// </summary>
     private async Task<TaskItem?> SpawnSuccessorAsync(TaskItem source, List<TaskHistoryEntry> entries, CancellationToken cancellationToken)
     {
         var rule = source.Recurrence!;
         var zone = _clock.LocalTimeZone;
 
-        // По календарю следующий срок считается от прошлого срока, после выполнения: от момента выполнения.
-        // Без дедлайна (возможно только "после выполнения") у копии тоже нет дедлайна.
+        // By calendar the next due date is counted from the previous due date, after completion: from the moment of completion.
+        // Without a deadline (possible only "after completion") the copy has no deadline either.
         DateTimeOffset? nextDeadline = null;
         if (rule.Mode == RecurrenceMode.ByCalendar)
         {
@@ -676,7 +676,7 @@ public class TaskService
         return copy;
     }
 
-    /// <summary>Копирует подзадачи (всех уровней) в новую копию: статус Todo, дедлайн сдвигается на ту же величину.</summary>
+    /// <summary>Copies the subtasks (of all levels) into the new copy: status Todo, the deadline is shifted by the same amount.</summary>
     private async Task CopySubtasksAsync(
         TaskItem sourceParent,
         TaskItem copyParent,
@@ -706,13 +706,13 @@ public class TaskService
         }
     }
 
-    /// <summary>Уровень задачи в дереве: у задачи верхнего уровня 1. Идём вверх по родителям.</summary>
+    /// <summary>The level of a task in the tree: a top-level task has 1. We go up through the parents.</summary>
     private async Task<int> GetDepthAsync(TaskItem task, CancellationToken cancellationToken)
     {
         var depth = 1;
         TaskItem? current = task;
 
-        // Ограничение по числу шагов защищает от бесконечного цикла, если в БД окажется битое дерево.
+        // A limit on the number of steps protects against an infinite loop if a corrupt tree ends up in the database.
         while (current?.ParentId is { } parentId && depth <= 100)
         {
             current = await _tasks.GetByIdAsync(parentId, includeDeleted: true, cancellationToken);
@@ -725,7 +725,7 @@ public class TaskService
         return depth;
     }
 
-    /// <summary>Высота поддерева: 1 для задачи без подзадач, 2 если есть дети, и так далее.</summary>
+    /// <summary>The height of a subtree: 1 for a task without subtasks, 2 if there are children, and so on.</summary>
     private async Task<int> GetSubtreeHeightAsync(int taskId, CancellationToken cancellationToken)
     {
         var height = 1;
@@ -751,7 +751,7 @@ public class TaskService
         return height;
     }
 
-    /// <summary>Совпадает ли <paramref name="candidate"/> с задачей <paramref name="taskId"/> или лежит в её поддереве (идём вверх от кандидата).</summary>
+    /// <summary>Whether <paramref name="candidate"/> is the task <paramref name="taskId"/> or lies in its subtree (we go up from the candidate).</summary>
     private async Task<bool> IsDescendantOrSelfAsync(TaskItem candidate, int taskId, CancellationToken cancellationToken)
     {
         TaskItem? current = candidate;
@@ -771,7 +771,7 @@ public class TaskService
         return false;
     }
 
-    /// <summary>Задача и все её неудалённые потомки.</summary>
+    /// <summary>A task and all its non-deleted descendants.</summary>
     private async Task<List<TaskItem>> CollectSubtreeAsync(TaskItem root, CancellationToken cancellationToken)
     {
         var result = new List<TaskItem> { root };

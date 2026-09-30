@@ -9,13 +9,13 @@ using TaskManager.Core.Services;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Одна строка отчёта об импорте: вид, текст и цвет.</summary>
+/// <summary>One row of the import report: kind, text and colour.</summary>
 public sealed record ImportIssueRowViewModel(string Kind, string Text, Color Color);
 
-/// <summary>Страница «Данные»: экспорт в JSON и Markdown, импорт из JSON с отчётом.</summary>
+/// <summary>The "Data" page: export to JSON and Markdown, import from JSON with a report.</summary>
 public sealed partial class DataViewModel : ViewModelBase
 {
-    // В отчёте показываем не больше строк, чем помещается разумно: остальное сворачиваем в "и ещё N".
+    // The report shows no more rows than is reasonable: the rest is folded into "and N more".
     private const int MaxReportRows = 200;
 
     private readonly ServiceRunner _runner;
@@ -144,7 +144,7 @@ public sealed partial class DataViewModel : ViewModelBase
 
                 if (path is null)
                 {
-                    // Отказ: прежний путь сбрасываем, иначе под сообщением "не сохранён" осталась бы кнопка со старым файлом.
+                    // Cancelled: the previous path is reset, otherwise the button with the old file would remain under the message "not saved".
                     LastSavedPath = null;
                     StatusMessage = Loc.T("Файл не сохранён.");
                     return;
@@ -222,7 +222,7 @@ public sealed partial class DataViewModel : ViewModelBase
 
         if (withDialog)
         {
-            // Копия сначала собирается во временный файл, потом отдаётся окну "Сохранить как".
+            // The copy is first built in a temporary file, then handed to the "Save as" window.
             var temp = Path.Combine(Path.GetTempPath(), fileName);
             try
             {
@@ -259,7 +259,7 @@ public sealed partial class DataViewModel : ViewModelBase
             return;
         }
 
-        // Проверка до всякого подтверждения: плохой файл отклоняется с понятной причиной (DomainValidationException).
+        // Checked before any confirmation: a bad file is rejected with an understandable reason (DomainValidationException).
         var info = await _backup.InspectAsync(path);
 
         var confirmed = await Dialogs.ConfirmAsync(

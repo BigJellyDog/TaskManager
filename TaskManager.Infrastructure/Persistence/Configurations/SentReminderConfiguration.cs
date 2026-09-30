@@ -12,7 +12,7 @@ public class SentReminderConfiguration : IEntityTypeConfiguration<SentReminder>
 
         builder.ToTable("SentReminders");
 
-        // Одно и то же напоминание (задача, вид, дедлайн) не может быть записано дважды.
+        // The same reminder (task, kind, deadline) cannot be written twice.
         builder.HasKey(r => new { r.TaskId, r.Kind, r.Deadline });
 
         builder.HasOne<TaskItem>()

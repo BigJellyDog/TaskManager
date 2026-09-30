@@ -15,7 +15,7 @@ public partial class TaskDetailsPage : ContentPage
         BindingContext = _viewModel = viewModel;
         _hotKeys = hotKeys;
 
-        // Дополнительные действия: сетка в две колонки, пересобирается при смене статуса.
+        // More actions: a grid of two columns, rebuilt when the status changes.
         _viewModel.SecondaryActions.CollectionChanged += (_, _) => BuildSecondaryActions();
         BuildSecondaryActions();
     }
@@ -67,7 +67,7 @@ public partial class TaskDetailsPage : ContentPage
         }
     }
 
-    // Обновляем при каждом показе: после правки в форме или перехода назад данные карточки могли измениться.
+    // We refresh on every show: after an edit in the form or a step back the card data may have changed.
     protected override async void OnAppearing()
     {
         base.OnAppearing();

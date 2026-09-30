@@ -3,14 +3,14 @@ using TaskManager.Core.Services;
 namespace TaskManager.Core.Abstractions;
 
 /// <summary>
-/// Показ напоминаний пользователю. Core только вычисляет, что пора напомнить, а как показать (баннер,
-/// уведомление Windows, лог) решает реализация, которую подключает приложение.
+/// Showing reminders to the user. Core only calculates that it is time to remind, and how to show it (banner,
+/// Windows notification, log) is decided by the implementation that the application plugs in.
 /// </summary>
 public interface IReminderNotifier
 {
     /// <summary>
-    /// Показывает пачку напоминаний. Если метод бросит исключение, напоминания не считаются показанными
-    /// и будут предложены снова на следующей проверке.
+    /// Shows a batch of reminders. If the method throws, the reminders are not considered shown
+    /// and will be offered again at the next check.
     /// </summary>
     Task NotifyAsync(IReadOnlyList<Reminder> reminders, CancellationToken cancellationToken = default);
 }

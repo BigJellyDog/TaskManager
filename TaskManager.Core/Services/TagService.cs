@@ -3,14 +3,14 @@ using TaskManager.Core.Domain;
 
 namespace TaskManager.Core.Services;
 
-/// <summary>Тег и сколько задач его используют.</summary>
-/// <param name="Id">Идентификатор.</param>
-/// <param name="Name">Название.</param>
-/// <param name="TaskCount">Задач (не удалённых) с этим тегом.</param>
-/// <param name="CanDelete">Тег нигде не используется, даже в корзине, и его можно удалить.</param>
+/// <summary>A tag and how many tasks use it.</summary>
+/// <param name="Id">The identifier.</param>
+/// <param name="Name">The name.</param>
+/// <param name="TaskCount">Tasks (not deleted) with this tag.</param>
+/// <param name="CanDelete">The tag is not used anywhere, even in the trash, and can be deleted.</param>
 public sealed record TagUsage(int Id, string Name, int TaskCount, bool CanDelete);
 
-/// <summary>Управление тегами: список с числом задач, переименование, удаление неиспользуемых.</summary>
+/// <summary>Tag management: a list with the number of tasks, renaming, deleting the unused ones.</summary>
 public class TagService
 {
     private readonly ITagRepository _tags;
@@ -25,7 +25,7 @@ public class TagService
     public Task<IReadOnlyList<TagUsage>> ListAsync(CancellationToken cancellationToken = default) =>
         _tags.ListUsageAsync(cancellationToken);
 
-    /// <summary>Переименовывает тег во всех задачах. Имя, которое уже есть у другого тега, не допускается.</summary>
+    /// <summary>Renames a tag in all tasks. A name that another tag already has is not allowed.</summary>
     public async Task RenameAsync(int id, string newName, CancellationToken cancellationToken = default)
     {
         var tag = await _tags.GetByIdAsync(id, cancellationToken) ?? throw new DomainValidationException("Тег не найден.");
@@ -41,7 +41,7 @@ public class TagService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    /// <summary>Удаляет тег, который нигде не используется.</summary>
+    /// <summary>Deletes a tag that is not used anywhere.</summary>
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var tag = await _tags.GetByIdAsync(id, cancellationToken) ?? throw new DomainValidationException("Тег не найден.");

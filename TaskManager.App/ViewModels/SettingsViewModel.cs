@@ -8,7 +8,7 @@ using TaskManager.Core.Abstractions;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Настройки: каждый переключатель сразу записывается в <see cref="UserSettings"/> и применяется.</summary>
+/// <summary>Settings: each switch is written to <see cref="UserSettings"/> at once and applied.</summary>
 public sealed partial class SettingsViewModel : ViewModelBase
 {
     private readonly UserSettings _settings;
@@ -44,11 +44,11 @@ public sealed partial class SettingsViewModel : ViewModelBase
 
     public string PageSizeItems => string.Join('|', UserSettings.PageSizes);
 
-    /// <summary>Интервалы проверки напоминаний для выпадающего поля: «1 минута», «5 минут» ...</summary>
+    /// <summary>Reminder check intervals for the drop-down field: "1 minute", "5 minutes" ...</summary>
     public IList<string> ReminderOptions { get; } =
         UserSettings.ReminderMinutesOptions.Select(m => m == 0 ? Loc.T("Никогда") : Loc.T($"{m} {(m == 1 ? "минута" : "минут")}")).ToList();
 
-    /// <summary>Названия языков на самих языках: Русский, English, Deutsch, Українська.</summary>
+    /// <summary>Language names in the languages themselves: Русский, English, Deutsch, Українська.</summary>
     public IList<string> LanguageNames { get; } = Loc.Languages.Select(l => l.Name).ToList();
 
     [ObservableProperty]
@@ -57,7 +57,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private string selectedReminder = string.Empty;
 
-    /// <summary>Полный путь к файлу базы данных.</summary>
+    /// <summary>The full path of the database file.</summary>
     public string DatabasePath => Path.Combine(AppPaths.DatabaseDirectory, _options.Value.DatabaseFileName);
 
     [ObservableProperty]
@@ -66,7 +66,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private bool hideClosed;
 
-    /// <summary>Названия тем на языке интерфейса и образцы их цветов для списка.</summary>
+    /// <summary>Theme names in the interface language and samples of their colours for the list.</summary>
     public IList<string> ThemeNames { get; } = ThemeCatalog.All.Select(ThemeCatalog.DisplayName).ToList();
 
     public IList<string[]> ThemeSwatches { get; } = ThemeCatalog.All.Select(t => ThemeCatalog.Swatch(t.Choice)).ToList();
@@ -168,7 +168,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
             return;
         }
 
-        // Согласованная копия работающей базы; указатель меняется только после того, как копия готова.
+        // A consistent copy of the running database; the pointer changes only after the copy is ready.
         await _backup.CreateBackupAsync(target);
         AppPaths.SaveDatabaseDirectory(folder);
         _restarter.Restart();

@@ -25,11 +25,11 @@ public class TrashRepository : ITrashRepository
             .ToListAsync(cancellationToken);
         var deletedIds = deleted.Select(t => t.Id).ToHashSet();
 
-        // Корни: у задачи нет родителя или родитель не в корзине.
+        // Roots: the task has no parent or the parent is not in the trash.
         var roots = deleted.Where(t => t.ParentId is null || !deletedIds.Contains(t.ParentId.Value)).ToList();
         var childrenOf = deleted.Where(t => t.ParentId is not null).ToLookup(t => t.ParentId!.Value, t => t.Id);
 
-        // Когда удалили: последняя запись истории об удалении.
+        // When it was deleted: the last history record about deletion.
         var times = await _context.HistoryEntries.AsNoTracking()
             .Where(h => h.FieldName == "IsDeleted" && h.NewValue == "True" && deletedIds.Contains(h.TaskId))
             .Select(h => new { h.TaskId, h.ChangedAt })
@@ -83,7 +83,7 @@ public class TrashRepository : ITrashRepository
             return 0;
         }
 
-        // Удаляем только то, что действительно в корзине, и всех потомков.
+        // We delete only what is really in the trash, and all descendants.
         var links = await AllTasks.AsNoTracking()
             .Where(t => t.ParentId != null)
             .Select(t => new { t.Id, ParentId = t.ParentId!.Value })
@@ -113,17 +113,17 @@ public class TrashRepository : ITrashRepository
         var list = ids.ToList();
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
-        // Связи зависимостей с обеих сторон, затем история и напоминания, затем сами задачи.
-        // IgnoreQueryFilters обязателен: у связи есть навигация к задаче, и фильтр мягкого удаления скрывает связи
-        // с удалёнными задачами. Без него они не удалились бы, а удаление самих задач упало бы на внешнем ключе.
+        // The dependency links on both sides, then the history and the reminders, then the tasks themselves.
+        // IgnoreQueryFilters is required: the link has a navigation to the task, and the soft-delete filter hides links
+        // with deleted tasks. Without it they would not be deleted, and deleting the tasks themselves would fail on the foreign key.
         await _context.TaskDependencies.IgnoreQueryFilters().Where(d => list.Contains(d.TaskId) || list.Contains(d.DependsOnTaskId))
             .ExecuteDeleteAsync(cancellationToken);
         await _context.HistoryEntries.Where(h => list.Contains(h.TaskId)).ExecuteDeleteAsync(cancellationToken);
         await _context.SentReminders.Where(r => list.Contains(r.TaskId)).ExecuteDeleteAsync(cancellationToken);
 
-        // Внешний ключ ParentId — ON DELETE RESTRICT, а SQLite проверяет его сразу для каждой строки, а не в конце команды:
-        // родитель и подзадачи в одном DELETE падают с "FOREIGN KEY constraint failed" (зависит от порядка строк).
-        // Поэтому сначала разрываем связи между удаляемыми задачами.
+        // The ParentId foreign key is ON DELETE RESTRICT, and SQLite checks it at once for every row, not at the end of the command:
+        // a parent and subtasks in one DELETE fail with "FOREIGN KEY constraint failed" (it depends on the row order).
+        // So we first break the links between the tasks being deleted.
         await AllTasks.Where(t => list.Contains(t.Id) && t.ParentId != null)
             .ExecuteUpdateAsync(s => s.SetProperty(t => t.ParentId, (int?)null), cancellationToken);
         var removed = await AllTasks.Where(t => list.Contains(t.Id)).ExecuteDeleteAsync(cancellationToken);

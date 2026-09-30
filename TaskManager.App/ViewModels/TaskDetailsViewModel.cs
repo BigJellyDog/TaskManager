@@ -13,8 +13,8 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.App.ViewModels;
 
 /// <summary>
-/// Карточка задачи: сведения, действия над статусом, подзадачи деревом, зависимости, теги и история.
-/// Параметр страницы: <c>id</c>.
+/// The task card: details, status actions, subtasks as a tree, dependencies, tags and history.
+/// Page parameter: <c>id</c>.
 /// </summary>
 public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttributable
 {
@@ -25,7 +25,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     private int _taskId;
     private int? _parentId;
 
-    // Версия задачи на момент чтения: уходит в сервис вместе с действием, чтобы тот заметил чужие правки.
+    // The task version at the time of reading: it goes to the service together with the action, so that the service notices foreign edits.
     private long _rowVersion;
     private bool _hasSubtasksForDelete;
     private bool _loadedOnce;
@@ -43,7 +43,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
         _navigation = navigation;
     }
 
-    /// <summary>Остальные действия: прочие переходы статуса, «Изменить», «Подзадача».</summary>
+    /// <summary>The other actions: the remaining status transitions, "Edit", "Subtask".</summary>
     public ObservableCollection<ActionButtonViewModel> SecondaryActions { get; } = [];
 
     public ObservableCollection<SubtaskRowViewModel> Subtasks { get; } = [];
@@ -92,7 +92,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     [ObservableProperty]
     private int priorityLevel = 1;
 
-    /// <summary>Дедлайн для строки сведений: «до 05.11.2026 12:00 · осталось 20 ч» (пусто, если дедлайна нет).</summary>
+    /// <summary>The deadline for the details row: "until 05.11.2026 12:00 · 20 h left" (empty if there is no deadline).</summary>
     [ObservableProperty]
     private string deadlineChipText = string.Empty;
 
@@ -114,7 +114,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     [ObservableProperty]
     private double subtasksFraction;
 
-    /// <summary>Главное действие над статусом (одно на экран) и причина, по которой оно сейчас недоступно.</summary>
+    /// <summary>The main status action (one per screen) and the reason why it is unavailable right now.</summary>
     [ObservableProperty]
     private ActionButtonViewModel? primaryAction;
 
@@ -148,17 +148,17 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
 
     public bool HasPrimaryAction => PrimaryAction is not null;
 
-    /// <summary>Ширина заполненной части полосы прогресса подзадач (вся полоса 90).</summary>
+    /// <summary>The width of the filled part of the subtask progress bar (the whole bar is 90).</summary>
     public double SubtasksBarWidth => 90 * SubtasksFraction;
 
     public bool HasCancelAction => CancelAction is not null;
 
-    /// <summary>Цвет статуса и приоритета с 10% прозрачностью: подложка «пилюли» в сведениях.</summary>
+    /// <summary>The status and priority colour at 10% opacity: the background of the "pill" in the details.</summary>
     public Color StatusTint => StatusColor.WithAlpha(0.1f);
 
     public Color PriorityTint => PriorityColor.WithAlpha(0.1f);
 
-    /// <summary>Подпись выпадающего списка зависимостей: выбранная задача или подсказка.</summary>
+    /// <summary>The label of the dependencies drop-down: the chosen task or a hint.</summary>
     public string CandidateText => SelectedCandidate?.Title ?? Loc.T("Добавить зависимость…");
 
     public bool HasDeadlineChip => DeadlineChipText.Length > 0;
@@ -182,19 +182,19 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
         _taskId = query.TryGetValue("id", out var value) && int.TryParse(value?.ToString(), out var id) ? id : 0;
     }
 
-    /// <summary>Загружает карточку. Вызывается при каждом показе страницы: после правки в форме данные нужно обновить.</summary>
+    /// <summary>Loads the card. Called on every show of the page: after an edit in the form the data must be refreshed.</summary>
     public async Task LoadAsync()
     {
         var ok = await RunAsync(LoadCoreAsync, Loc.T("Не удалось загрузить задачу"));
 
-        // Задачи нет (удалена, неверный номер): показывать пустую карточку бессмысленно.
+        // The task does not exist (deleted, wrong number): showing an empty card makes no sense.
         if (!ok && !_loadedOnce)
         {
             await _navigation.GoBackAsync();
         }
     }
 
-    /// <summary>Флажок подзадачи: выполнить или вернуть в работу.</summary>
+    /// <summary>The subtask check box: complete or return to work.</summary>
     [RelayCommand]
     private async Task ToggleSubtaskAsync(SubtaskRowViewModel row)
     {
@@ -277,7 +277,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
             Loc.T("Не удалось добавить зависимость"));
     }
 
-    /// <summary>Выполняет изменение задачи и перезагружает карточку. Конфликт версий объясняется и обновляет данные.</summary>
+    /// <summary>Performs a change of the task and reloads the card. A version conflict is explained and the data is refreshed.</summary>
     private Task<bool> MutateAsync(Func<TaskService, Task> operation, string errorTitle) =>
         RunAsync(
             async () =>
@@ -313,7 +313,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
             var subtasks = await service.GetSubtaskTreeAsync(_taskId);
             var history = await service.GetHistoryAsync(_taskId);
 
-            // Кандидаты в зависимости: открытые задачи по алфавиту (до 200).
+            // Dependency candidates: open tasks alphabetically (up to 200).
             var candidates = (await service.SearchAsync(
                 new TaskFilter(Statuses: [TaskStatus.Todo, TaskStatus.InProgress, TaskStatus.Blocked]),
                 [new TaskSort(TaskSortField.Title)],
@@ -406,10 +406,10 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
             .Select(x => new DependencyRowViewModel(x.Task!, isUnmet: false, OpenCommand(x.TaskId), removeCommand: null));
         Replace(Blocks, blocksRows);
 
-        // История: новые изменения сверху.
+        // History: the newest changes on top.
         Replace(History, history.Reverse().Select(h => new HistoryRowViewModel(HistoryFormatter.When(h, zone), HistoryFormatter.Text(h, zone))));
 
-        // В кандидаты не попадают сама задача и те, от кого она уже зависит.
+        // The task itself and those it already depends on are not among the candidates.
         var already = task.Dependencies.Select(x => x.DependsOnTaskId).ToHashSet();
         Replace(
             DependencyCandidates,
@@ -447,11 +447,11 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
     }
 
     /// <summary>
-    /// Кнопки по таблице переходов автомата. Главное действие одно: из «К выполнению» это «В работу», из «В работе»
-    /// «Выполнить», из завершённых «Переоткрыть». Если оно сейчас недоступно (не завершены подзадачи или зависимости),
-    /// кнопка остаётся серой, а причина написана под ней.
+    /// Buttons follow the transition table of the state machine. There is one main action: from "To do" it is "Start", from "In progress"
+    /// "Complete", from the finished ones "Reopen". If it is unavailable right now (subtasks or dependencies are not finished),
+    /// the button stays grey and the reason is written under it.
     /// </summary>
-    /// <summary>Ctrl+D: выполняет задачу, если сейчас доступно действие «Выполнить» (а не «В работу» или «Переоткрыть»).</summary>
+    /// <summary>Ctrl+D: completes the task if the "Complete" action is available now (and not "Start" or "Reopen").</summary>
     public void TryComplete()
     {
         if (PrimaryAction is { IsEnabled: true } action && action.Title == Loc.T("Выполнить") && action.Command.CanExecute(null))
@@ -471,7 +471,7 @@ public sealed partial class TaskDetailsViewModel : ViewModelBase, IQueryAttribut
                 service => service.ChangeStatusAsync(_taskId, to, _rowVersion),
                 Loc.T("Не удалось сменить статус"))), variant, enabled);
 
-        // Причина, по которой нельзя выполнить.
+        // The reason why it cannot be completed.
         var directChildren = subtasks.Where(e => e.Level == 1).ToList();
         var openChildren = directChildren.Count(e => e.Task.Status is not (TaskStatus.Done or TaskStatus.Cancelled));
         var unmet = task.Dependencies.Count(x => x.DependsOnTask is { Status: not TaskStatus.Done });

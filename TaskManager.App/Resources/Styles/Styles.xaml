@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<!-- Стили дизайна Signal. Цвета берутся из словаря темы (DarkTheme/LightTheme.xaml) через DynamicResource,
-     поэтому при смене темы всё перекрашивается само. -->
+<!-- Styles of the Signal design. Colours come from the theme dictionary (DarkTheme/LightTheme.xaml) through DynamicResource,
+     so everything is recoloured by itself on a theme change. -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
@@ -11,7 +11,7 @@
     <x:Double x:Key="RadiusMd">12</x:Double>
     <x:Double x:Key="RadiusLg">18</x:Double>
 
-    <!-- ===== Базовые элементы ===== -->
+    <!-- ===== Base elements ===== -->
 
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{DynamicResource Accent}" />
@@ -45,7 +45,7 @@
         </Setter>
     </Style>
 
-    <!-- Основная кнопка: лайм (тёмная тема) или оливковый (светлая), одна на экран. -->
+    <!-- The primary button: lime (dark theme) or olive (light theme), one per screen. -->
     <Style x:Key="BaseButton" TargetType="Button">
         <Setter Property="TextColor" Value="{DynamicResource OnAccent}" />
         <Setter Property="BackgroundColor" Value="{DynamicResource Accent}" />
@@ -105,15 +105,15 @@
         <Setter Property="Shell.NavBarHasShadow" Value="False" />
     </Style>
 
-    <!-- ===== Текстовые стили дизайна ===== -->
+    <!-- ===== Text styles of the design ===== -->
 
-    <!-- Название задачи в списке. -->
+    <!-- The task title in the list. -->
     <Style x:Key="TitleLabel" TargetType="Label">
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontAttributes" Value="Bold" />
     </Style>
 
-    <!-- Подписи, статус, теги, дедлайн в строке. -->
+    <!-- Captions, status, tags, deadline in a row. -->
     <Style x:Key="CaptionLabel" TargetType="Label">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="TextColor" Value="{DynamicResource InkMuted}" />
@@ -124,7 +124,7 @@
         <Setter Property="TextColor" Value="{DynamicResource InkMuted}" />
     </Style>
 
-    <!-- Служебные подписи: заголовки панелей и колонок, даты, числа. В дизайне Aurora обычный шрифт и строчные буквы. -->
+    <!-- Service labels: panel and column headers, dates, numbers. In the Aurora design a normal font and lower case. -->
     <Style x:Key="MonoLabel" TargetType="Label">
         <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
         <Setter Property="FontSize" Value="12" />
@@ -132,14 +132,14 @@
         <Setter Property="TextColor" Value="{DynamicResource InkMuted}" />
     </Style>
 
-    <!-- Число метрики на экране статистики. -->
+    <!-- The metric figure on the statistics screen. -->
     <Style x:Key="MetricLabel" TargetType="Label">
         <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
         <Setter Property="FontSize" Value="34" />
         <Setter Property="FontAttributes" Value="Bold" />
     </Style>
 
-    <!-- Экран загрузки. -->
+    <!-- The loading screen. -->
     <Style x:Key="Headline" TargetType="Label">
         <Setter Property="FontSize" Value="32" />
         <Setter Property="FontAttributes" Value="Bold" />
@@ -153,7 +153,7 @@
         <Setter Property="HorizontalTextAlignment" Value="Center" />
     </Style>
 
-    <!-- Карточка, панель: поверхность с тонкой границей и радиусом 8. -->
+    <!-- A card or panel: a surface with a thin border and a radius of 8. -->
     <Style x:Key="CardBorder" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource CardGradient}" />
         <Setter Property="Stroke" Value="{DynamicResource LineBrush}" />
@@ -162,7 +162,7 @@
         <Setter Property="Padding" Value="16" />
     </Style>
 
-    <!-- Полосы прокрутки не показываем: прокрутка колесом мыши работает, а полоса в макете Signal не нужна. -->
+    <!-- We do not show scroll bars: scrolling with the mouse wheel works, and the Signal mockup has no bar. -->
     <Style TargetType="ScrollView">
         <Setter Property="VerticalScrollBarVisibility" Value="Never" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Never" />

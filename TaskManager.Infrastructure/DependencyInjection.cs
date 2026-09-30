@@ -14,8 +14,8 @@ namespace TaskManager.Infrastructure;
 public static class DependencyInjection
 {
     /// <summary>
-    /// Регистрирует DbContext, репозитории и IUnitOfWork. Все они scoped: на один scope (операцию) один DbContext,
-    /// поэтому репозитории и UnitOfWork работают с одними и теми же отслеживаемыми объектами.
+    /// Registers the DbContext, the repositories and IUnitOfWork. All of them are scoped: one DbContext per scope (operation),
+    /// so the repositories and UnitOfWork work with the same tracked objects.
     /// </summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string databasePath)
     {
@@ -30,8 +30,8 @@ public static class DependencyInjection
         services.AddScoped<IStatisticsRepository, StatisticsRepository>();
         services.AddScoped<ITrashRepository, TrashRepository>();
 
-        // Сервисы приложения. TimeProvider и IReminderNotifier регистрируются через TryAdd:
-        // приложение может заранее подставить свои (например, показ уведомлений в интерфейсе).
+        // Application services. TimeProvider and IReminderNotifier are registered with TryAdd:
+        // the application can substitute its own in advance (for example, showing notifications in the interface).
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddSingleton<IReminderNotifier, LoggingReminderNotifier>();
         services.AddScoped<TaskService>();

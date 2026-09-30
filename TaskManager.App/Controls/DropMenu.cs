@@ -1,12 +1,12 @@
 ﻿namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Строка выпадающего списка. <see cref="Level"/> больше нуля рисует значок приоритета (столбики) в цвете
-/// <see cref="ColorKey"/>; <see cref="Muted"/> делает текст приглушённым (теги); <see cref="Hint"/> — подпись справа (код языка); <see cref="Swatch"/> — три цвета образца темы.
+/// A row of the drop-down list. A <see cref="Level"/> above zero draws the priority icon (bars) in the colour
+/// <see cref="ColorKey"/>; <see cref="Muted"/> makes the text muted (tags); <see cref="Hint"/> is a label on the right (language code); <see cref="Swatch"/> is the three colours of a theme sample.
 /// </summary>
 public sealed record DropEntry(string Text, int Level = 0, string? ColorKey = null, bool Muted = false, string? Hint = null, string[]? Swatch = null);
 
-/// <summary>Открывает список в стиле Signal под элементом (чипом, полем). Сейчас только Windows.</summary>
+/// <summary>Opens a list in the Signal style under an element (chip, field). Windows only for now.</summary>
 public static class DropMenu
 {
     public static void Show(VisualElement anchor, IReadOnlyList<DropEntry> entries, int selected, Action<int> chosen, bool mono)

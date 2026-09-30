@@ -1,6 +1,6 @@
 namespace TaskManager.App.Pages;
 
-/// <summary>Экран на время запуска: пока применяются миграции базы данных.</summary>
+/// <summary>The screen for the time of start-up: while the database migrations are applied.</summary>
 public partial class LoadingPage : ContentPage
 {
     public LoadingPage()
@@ -8,7 +8,7 @@ public partial class LoadingPage : ContentPage
         InitializeComponent();
     }
 
-    /// <summary>Запуск не удался: убираем индикатор и показываем причину.</summary>
+    /// <summary>The start failed: we remove the indicator and show the reason.</summary>
     public void ShowError(string message)
     {
         Indicator.IsRunning = false;

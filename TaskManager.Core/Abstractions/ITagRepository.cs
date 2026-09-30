@@ -6,20 +6,20 @@ public interface ITagRepository
 {
     Task<Tag?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
-    /// <summary>Поиск по имени без учёта регистра (в том числе для кириллицы).</summary>
+    /// <summary>A search by name, ignoring case (Cyrillic included).</summary>
     Task<Tag?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 
-    /// <summary>Все теги по алфавиту.</summary>
+    /// <summary>All tags in alphabetical order.</summary>
     Task<IReadOnlyList<Tag>> ListAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Теги, которых нет ни у одной задачи (в том числе удалённой).</summary>
+    /// <summary>Tags that no task has (a deleted one included).</summary>
     Task<IReadOnlyList<Tag>> ListUnusedAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Все теги с числом живых задач и признаком "нигде не используется".</summary>
+    /// <summary>All tags with the number of live tasks and a flag "not used anywhere".</summary>
     Task<IReadOnlyList<TaskManager.Core.Services.TagUsage>> ListUsageAsync(CancellationToken cancellationToken = default);
 
     Task AddAsync(Tag tag, CancellationToken cancellationToken = default);
 
-    /// <summary>Физически удаляет тег. Теги не удаляются мягко: это справочник без истории.</summary>
+    /// <summary>Deletes a tag physically. Tags are not soft-deleted: it is a reference list without history.</summary>
     void Remove(Tag tag);
 }

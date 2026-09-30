@@ -4,8 +4,8 @@ using TaskManager.App.Services;
 namespace TaskManager.Tests;
 
 /// <summary>
-/// Таблицы переводов интерфейса (файлы Translations*.cs приложения подключены в тестовый проект как есть):
-/// строка = [русский ключ, английский, немецкий, украинский].
+/// The translation tables of the interface (the application's Translations*.cs files are linked into the test project as they are):
+/// a row = [Russian key, English, German, Ukrainian].
 /// </summary>
 public sealed partial class TranslationTests
 {
@@ -49,7 +49,7 @@ public sealed partial class TranslationTests
                     $"{table}: в переводе №{i} строки «{row[0]}» другие подстановки {{n}}");
             }
 
-            // Строки с формами через «|» (день|дня|дней, Доска|Список): число форм одинаково во всех языках.
+            // Rows with forms through "|" (день|дня|дней, Доска|Список): the number of forms is the same in all languages.
             var forms = row[0].Count(c => c == '|');
             for (var i = 1; i < row.Length; i++)
             {
@@ -61,7 +61,7 @@ public sealed partial class TranslationTests
     [Fact]
     public void SameKeyInSeveralRows_HasTheSameTranslation()
     {
-        // Таблицы сливаются в словарь, и побеждает последняя строка: расходящиеся переводы одного ключа это скрытая ошибка.
+        // The tables are merged into a dictionary and the last row wins: diverging translations of one key are a hidden error.
         foreach (var group in Tables.SelectMany(t => t.Rows).GroupBy(r => r[0]).Where(g => g.Count() > 1))
         {
             var first = group.First();

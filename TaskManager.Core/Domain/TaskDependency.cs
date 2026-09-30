@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Зависимость: задачу <see cref="TaskId"/> нельзя начать, пока <see cref="DependsOnTaskId"/> не Done.</summary>
+/// <summary>A dependency: the task <see cref="TaskId"/> cannot be started until <see cref="DependsOnTaskId"/> is Done.</summary>
 public class TaskDependency
 {
     public TaskDependency(int taskId, int dependsOnTaskId)
@@ -9,17 +9,17 @@ public class TaskDependency
         DependsOnTaskId = dependsOnTaskId;
     }
 
-    // Нужен EF Core.
+    // Needed by EF Core.
     private TaskDependency()
     {
     }
 
-    /// <summary>Зависимая задача ("A").</summary>
+    /// <summary>The dependent task ("A").</summary>
     public int TaskId { get; private set; }
 
     public TaskItem? Task { get; private set; }
 
-    /// <summary>Задача, от которой зависят ("B").</summary>
+    /// <summary>The task it depends on ("B").</summary>
     public int DependsOnTaskId { get; private set; }
 
     public TaskItem? DependsOnTask { get; private set; }

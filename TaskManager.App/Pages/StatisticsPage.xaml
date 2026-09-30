@@ -9,7 +9,7 @@
              Title="{loc:Extension 'Статистика'}">
 
     <ContentPage.Resources>
-        <!-- Плитка с показателем -->
+        <!-- A tile with a figure -->
         <Style x:Key="MetricTile" TargetType="Border" BasedOn="{StaticResource CardBorder}">
             <Setter Property="StrokeShape" Value="RoundRectangle 16" />
             <Setter Property="Padding" Value="14,12" />
@@ -49,7 +49,7 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12" Padding="28,20,28,14">
 
-        <!-- Заголовок, переключатель периода, обновление -->
+        <!-- Header, period switch, refresh -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <Label Text="{loc:Extension 'Статистика'}" FontSize="30" FontAttributes="Bold" />
@@ -119,7 +119,7 @@
             <controls:SignalButton Grid.Column="2" Icon="refresh" Text="{loc:Extension 'Обновить'}" Command="{Binding RefreshCommand}" />
         </Grid>
 
-        <!-- Шесть показателей -->
+        <!-- Six figures -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource MetricTile}">
                 <VerticalStackLayout Spacing="2">
@@ -159,7 +159,7 @@
                     <Label Text="{loc:Extension 'Просрочено'}" Style="{StaticResource MetricCaption}" />
                     <Label Text="{Binding OverdueCount}" Style="{StaticResource MetricValue}">
                         <Label.Triggers>
-                            <!-- Просроченные задачи подсвечиваются красным, пока они есть -->
+                            <!-- Overdue tasks are highlighted in red while there are any -->
                             <DataTrigger TargetType="Label" Binding="{Binding HasOverdue}" Value="True">
                                 <Setter Property="TextColor" Value="{DynamicResource PCrit}" />
                             </DataTrigger>
@@ -184,7 +184,7 @@
             </Border>
         </Grid>
 
-        <!-- Три панели: приоритеты, выполнено по дням, дедлайны на 7 дней -->
+        <!-- Three panels: priorities, done by day, deadlines for 7 days -->
         <Grid x:Name="ChartsRow" Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">
@@ -241,7 +241,7 @@
             </Border>
         </Grid>
 
-        <!-- Две панели: статусы и теги -->
+        <!-- Two panels: statuses and tags -->
         <Grid x:Name="BottomRow" Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
             <Border Grid.Column="0" Style="{StaticResource Panel}">
                 <VerticalStackLayout Spacing="10">

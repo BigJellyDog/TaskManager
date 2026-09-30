@@ -4,8 +4,8 @@ using Microsoft.Maui.Controls.Shapes;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Рамка поля ввода Signal: тонкая граница, а в фокусе сплошная обводка акцентом в 2 px. Внутри лежит Entry, Editor,
-/// DatePicker или TimePicker без собственной рамки: фокус рамка узнаёт сама.
+/// The Signal input frame: a thin border, and when focused a solid 2 px accent outline. Inside there is an Entry, Editor,
+/// DatePicker or TimePicker without a border of its own: the frame learns about focus by itself.
 /// </summary>
 public sealed class InputBox : Border
 {
@@ -60,8 +60,8 @@ public sealed class InputBox : Border
 }
 
 /// <summary>
-/// Выпадающее поле: показывает выбранный пункт и шеврон, нажатие открывает список в стиле Signal под полем.
-/// Используется там, где нужно поле высотой с обычный ввод (повторение, зависимость).
+/// The drop-down field: shows the chosen item and a chevron, a tap opens a Signal-style list under the field.
+/// Used where a field of the height of a normal input is needed (repeat, dependency).
 /// </summary>
 public sealed class DropField : Grid
 {
@@ -77,7 +77,7 @@ public sealed class DropField : Grid
     private readonly Label _label = new() { FontSize = 14, VerticalOptions = LayoutOptions.Center };
     private readonly InputBox _box;
 
-    /// <summary>Образцы цветов к пунктам списка (для выбора темы): по три цвета на пункт, в том же порядке.</summary>
+    /// <summary>Colour samples for the list items (for the theme choice): three colours per item, in the same order.</summary>
     public static readonly BindableProperty SwatchesProperty =
         BindableProperty.Create(nameof(Swatches), typeof(IList<string[]>), typeof(DropField), null);
 

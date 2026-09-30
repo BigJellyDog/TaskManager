@@ -5,7 +5,7 @@ using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Tests;
 
-/// <summary>Демо-данные: создание, перевод тега на язык интерфейса, удаление в корзину.</summary>
+/// <summary>Demo data: creation, translation of the tag into the interface language, deleting to the trash.</summary>
 public sealed class DemoDataTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);

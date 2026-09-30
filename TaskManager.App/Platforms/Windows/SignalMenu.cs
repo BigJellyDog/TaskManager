@@ -8,9 +8,9 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 
 /// <summary>
-/// Список под раскрывающимся чипом или полем в стиле Signal: поверхность и рамка из токенов, моноширинный текст,
-/// подсветка строки под указателем, выбранный пункт акцентом. Это обычный Flyout со своими элементами, поэтому он
-/// всегда в теме приложения (системный список Picker рисует Windows по своей теме).
+/// A list under a drop-down chip or field in the Signal style: the surface and the border from tokens, monospaced text,
+/// highlight of the row under the pointer, the selected item in the accent. It is an ordinary Flyout with its own elements, so it is
+/// always in the theme of the application (the system Picker list is drawn by Windows in its own theme).
 /// </summary>
 public static class SignalMenu
 {
@@ -28,7 +28,7 @@ public static class SignalMenu
 
     private static Canvas PriorityBars(int level, string colorKey)
     {
-        // Сетка 16x16 как у значка приоритета в списке: x, высота столбиков 4, 7, 10, 13 от нижнего края.
+        // A 16x16 grid like the priority icon in the list: x, the bar heights 4, 7, 10, 13 from the bottom edge.
         var canvas = new Canvas { Width = 16, Height = 16, VerticalAlignment = VerticalAlignment.Center };
         var heights = new[] { 4, 7, 10, 13 };
         for (var i = 0; i < 4; i++)
@@ -55,7 +55,7 @@ public static class SignalMenu
         return canvas;
     }
 
-    /// <summary>Открывает список текстов под <paramref name="anchor"/>; сообщает номер выбранного пункта.</summary>
+    /// <summary>Opens a list of texts under <paramref name="anchor"/>; reports the number of the chosen item.</summary>
     public static void ShowList(
         FrameworkElement anchor, IReadOnlyList<global::TaskManager.App.Controls.DropEntry> entries, int selected, Action<int> chosen, bool mono)
     {
@@ -89,7 +89,7 @@ public static class SignalMenu
 
             var text = new TextBlock
             {
-                // Теги в макете строчными (#работа), приоритеты и служебные подписи заглавными.
+                // Tags in lower case in the mockup (#work), priorities and service labels in upper case.
                 Text = mono && !entry.Muted ? entry.Text.ToUpperInvariant() : entry.Text,
                 Foreground = Brush(isSelected && entry.Level == 0 ? "Accent" : colorKey),
                 FontFamily = mono ? new FontFamily("Segoe UI Variable") : new FontFamily("Segoe UI Variable"),
@@ -99,8 +99,8 @@ public static class SignalMenu
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
-            // Выбранный пункт отмечен цветом и жирным шрифтом, без галочки. Приоритет: четыре столбика и подпись в цвете
-            // приоритета, как в списке и на карточках; справа приглушённая подпись. Отступы задаёт только то, что есть в строке.
+            // The selected item is marked with colour and a bold font, without a check mark. Priority: four bars and a label in the colour of
+            // the priority, as in the list and on cards; a muted label on the right. The padding comes only from what is in the row.
             UIElement content = text;
             var line = new Grid();
             line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -158,7 +158,7 @@ public static class SignalMenu
 
             content = line;
 
-            // Обычный Border, а не Button: шаблон кнопки красит наведение своим цветом.
+            // An ordinary Border, not a Button: the button template paints the hover state in its own colour.
             var item = new Border
             {
                 Child = (UIElement)content,

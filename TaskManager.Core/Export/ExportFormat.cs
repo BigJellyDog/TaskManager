@@ -3,15 +3,15 @@ using System.Text.Json.Serialization;
 
 namespace TaskManager.Core.Export;
 
-/// <summary>Общие настройки формата JSON: одни и те же для экспорта и импорта.</summary>
+/// <summary>Common settings of the JSON format: the same for export and import.</summary>
 public static class ExportFormat
 {
-    /// <summary>Текущая версия формата. Увеличивается, если формат меняется несовместимо.</summary>
+    /// <summary>The current format version. Increased when the format changes incompatibly.</summary>
     public const int CurrentVersion = 1;
 
     /// <summary>
-    /// Перечисления пишутся словами (<c>"High"</c>, <c>"InProgress"</c>), а не числами: файл читаем человеком
-    /// и не ломается, если порядок значений поменяется.
+    /// Enumerations are written as words (<c>"High"</c>, <c>"InProgress"</c>), not as numbers: the file is human-readable
+    /// and does not break if the order of the values changes.
     /// </summary>
     public static JsonSerializerOptions JsonOptions { get; } = new(JsonSerializerDefaults.Web)
     {
@@ -19,7 +19,7 @@ public static class ExportFormat
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Converters = { new JsonStringEnumConverter() },
 
-        // Кириллица в файле остаётся кириллицей, а не Да.
+        // Cyrillic stays Cyrillic in the file instead of being written as \uXXXX escapes.
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 }

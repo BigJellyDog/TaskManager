@@ -8,7 +8,7 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Строка корзины: удалённая задача, флажок выбора и подписи колонок.</summary>
+/// <summary>A trash row: a deleted task, a selection check box and the column labels.</summary>
 public sealed partial class TrashRowViewModel : ObservableObject
 {
     public TrashRowViewModel(TrashEntry entry)
@@ -47,7 +47,7 @@ public sealed partial class TrashRowViewModel : ObservableObject
     private bool isSelected;
 }
 
-/// <summary>Корзина: удалённые задачи, восстановление (с подзадачами) и удаление навсегда с подтверждением.</summary>
+/// <summary>The trash: deleted tasks, restore (with subtasks) and delete forever with a confirmation.</summary>
 public sealed partial class TrashViewModel : ViewModelBase
 {
     private readonly ServiceRunner _runner;
@@ -75,7 +75,7 @@ public sealed partial class TrashViewModel : ViewModelBase
 
     public bool HasRows => Count > 0;
 
-    /// <summary>Выбраны все строки: галочка в шапке таблицы.</summary>
+    /// <summary>All rows are selected: the check mark in the table header.</summary>
     public bool AllSelected => Count > 0 && SelectedCount == Count;
 
     public bool HasSelection => SelectedCount > 0;
@@ -104,7 +104,7 @@ public sealed partial class TrashViewModel : ViewModelBase
         Count = Rows.Count;
         SelectedCount = 0;
 
-        // Числа в боковой панели (задачи и корзина) меняются от восстановления и удаления.
+        // The numbers in the side panel (tasks and trash) change on restore and delete.
         await _sidebar.RefreshCountsAsync();
     }
 
@@ -119,7 +119,7 @@ public sealed partial class TrashViewModel : ViewModelBase
     [RelayCommand]
     private void ToggleSelect(TrashRowViewModel row) => row.IsSelected = !row.IsSelected;
 
-    /// <summary>Галочка в шапке: если выбраны все, снимает выбор, иначе выбирает все строки.</summary>
+    /// <summary>The check mark in the header: if all are selected it clears the selection, otherwise it selects all rows.</summary>
     [RelayCommand]
     private void ToggleSelectAll()
     {

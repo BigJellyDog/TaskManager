@@ -2,7 +2,7 @@ using TaskManager.App.ViewModels;
 
 namespace TaskManager.App.Controls;
 
-/// <summary>Боковая панель. Создаётся из XAML оболочки, поэтому модель берёт из контейнера.</summary>
+/// <summary>The side panel. Created from the shell XAML, so it takes the model from the container.</summary>
 public partial class SidebarView : ContentView
 {
     public SidebarView()
@@ -12,8 +12,8 @@ public partial class SidebarView : ContentView
     }
 
     /// <summary>
-    /// В узкой панели блока напоминаний нет: нажатие на колокольчик открывает его справа от панели.
-    /// Это тот же блок с теми же кнопками, он закрывается, когда напоминаний не остаётся.
+    /// The narrow panel has no reminders block: a tap on the bell opens it to the right of the panel.
+    /// It is the same block with the same buttons, and it closes when no reminders are left.
     /// </summary>
     private void OnBellTapped(object? sender, TappedEventArgs e)
     {
@@ -29,7 +29,7 @@ public partial class SidebarView : ContentView
         var native = Microsoft.Maui.Platform.ElementExtensions.ToPlatform(banner, context);
         native.RequestedTheme = Services.ThemeManager.NativeTheme;
 
-        // Окно без своей рамки и фона: рамку и поверхность рисует сам блок.
+        // A window without its own border and background: the border and the surface are drawn by the block itself.
         var style = new Microsoft.UI.Xaml.Style(typeof(Microsoft.UI.Xaml.Controls.FlyoutPresenter));
         style.Setters.Add(new Microsoft.UI.Xaml.Setter(Microsoft.UI.Xaml.Controls.Control.BackgroundProperty, new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent)));
         style.Setters.Add(new Microsoft.UI.Xaml.Setter(Microsoft.UI.Xaml.Controls.Control.BorderThicknessProperty, new Microsoft.UI.Xaml.Thickness(0)));
@@ -42,7 +42,7 @@ public partial class SidebarView : ContentView
             FlyoutPresenterStyle = style,
         };
 
-        // Выполнили последнее напоминание: окно закрывается само.
+        // The last reminder was completed: the window closes itself.
         void Close(object? s, System.ComponentModel.PropertyChangedEventArgs a)
         {
             if (a.PropertyName == nameof(reminders.IsVisible) && !reminders.IsVisible)

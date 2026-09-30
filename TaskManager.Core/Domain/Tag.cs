@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Тег. Связь с задачами многие-ко-многим.</summary>
+/// <summary>A tag. Many-to-many relation with tasks.</summary>
 public class Tag
 {
     public const int MaxNameLength = 50;
@@ -11,7 +11,7 @@ public class Tag
         NormalizedName = Normalize(Name);
     }
 
-    // Нужен EF Core для создания объекта при чтении из БД.
+    // Needed by EF Core to create the object when reading from the database.
     private Tag()
     {
         Name = string.Empty;
@@ -22,19 +22,19 @@ public class Tag
 
     public string Name { get; private set; }
 
-    /// <summary>Имя в верхнем регистре: по нему ищем дубли. SQLite NOCASE не умеет в кириллицу, поэтому нормализуем сами.</summary>
+    /// <summary>The name in upper case: duplicates are searched by it. SQLite NOCASE cannot handle Cyrillic, so we normalise ourselves.</summary>
     public string NormalizedName { get; private set; }
 
     public ICollection<TaskItem> Tasks { get; } = new List<TaskItem>();
 
-    /// <summary>Переименование тега затрагивает все задачи, потому что они ссылаются на один и тот же объект.</summary>
+    /// <summary>Renaming a tag affects all tasks, because they refer to the same object.</summary>
     public void Rename(string name)
     {
         Name = NormalizeName(name);
         NormalizedName = Normalize(Name);
     }
 
-    /// <summary>Приводит имя к виду, в котором сравниваются теги.</summary>
+    /// <summary>Brings a name to the form in which tags are compared.</summary>
     public static string Normalize(string name)
     {
         ArgumentNullException.ThrowIfNull(name);

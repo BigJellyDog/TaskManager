@@ -1,8 +1,8 @@
 namespace TaskManager.Core.Abstractions;
 
 /// <summary>
-/// Данные изменили между чтением и сохранением (оптимистичная блокировка).
-/// Core не знает про EF Core, поэтому инфраструктура превращает <c>DbUpdateConcurrencyException</c> в это исключение.
+/// The data was changed between reading and saving (optimistic locking).
+/// Core knows nothing about EF Core, so the infrastructure turns <c>DbUpdateConcurrencyException</c> into this exception.
 /// </summary>
 public class ConcurrencyConflictException : Exception
 {

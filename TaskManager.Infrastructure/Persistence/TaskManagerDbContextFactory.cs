@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore.Design;
 namespace TaskManager.Infrastructure.Persistence;
 
 /// <summary>
-/// Нужна только инструменту <c>dotnet ef</c> при создании миграций: он не умеет собирать DbContext из MAUI-приложения.
-/// Реальный путь к БД приложение задаёт само при запуске.
+/// Needed only by the <c>dotnet ef</c> tool when creating migrations: it cannot build a DbContext from the MAUI application.
+/// The application sets the real database path itself at start-up.
 /// </summary>
 public class TaskManagerDbContextFactory : IDesignTimeDbContextFactory<TaskManagerDbContext>
 {

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Таблицы переводов приложения: обычные массивы строк без MAUI, поэтому подключаем файлы как есть. -->
+    <!-- The translation tables of the application: plain arrays of strings without MAUI, so we link the files as they are. -->
     <Compile Include="..\TaskManager.App\Services\Translations.*.cs" LinkBase="Linked" />
   </ItemGroup>
 

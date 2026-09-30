@@ -8,10 +8,10 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Кнопка действия на карточке: статус, правка, подзадача. Недоступная остаётся на месте серой.</summary>
+/// <summary>An action button on the card: status, edit, subtask. An unavailable one stays in place, grey.</summary>
 public sealed record ActionButtonViewModel(string Title, string Icon, ICommand Command, ButtonVariant Variant = ButtonVariant.Secondary, bool IsEnabled = true);
 
-/// <summary>Иконка статуса в наборе Signal.</summary>
+/// <summary>A status icon in the Signal set.</summary>
 public static class StatusIcons
 {
     public static string For(TaskStatus status) => status switch
@@ -24,7 +24,7 @@ public static class StatusIcons
     };
 }
 
-/// <summary>Подзадача в дереве карточки. Отступ показывает уровень вложенности.</summary>
+/// <summary>A subtask in the card tree. The indent shows the nesting level.</summary>
 public sealed class SubtaskRowViewModel
 {
     private const double IndentPerLevel = 24;
@@ -83,7 +83,7 @@ public sealed class SubtaskRowViewModel
     public ICommand OpenCommand { get; }
 }
 
-/// <summary>Зависимость: задача, от которой зависит эта, или задача, которая зависит от этой.</summary>
+/// <summary>A dependency: the task this one depends on, or a task that depends on this one.</summary>
 public sealed class DependencyRowViewModel
 {
     public DependencyRowViewModel(TaskItem task, bool isUnmet, ICommand openCommand, ICommand? removeCommand)
@@ -107,23 +107,23 @@ public sealed class DependencyRowViewModel
 
     public string StatusIcon { get; }
 
-    /// <summary>Зависимость ещё не выполнена: именно она блокирует задачу.</summary>
+    /// <summary>The dependency is not done yet: it is the one blocking the task.</summary>
     public bool IsUnmet { get; }
 
     public ICommand OpenCommand { get; }
 
-    /// <summary>Убрать зависимость. Только у тех, от кого зависит текущая задача.</summary>
+    /// <summary>Remove the dependency. Only for those the current task depends on.</summary>
     public ICommand? RemoveCommand { get; }
 
     public bool CanRemove => RemoveCommand is not null;
 }
 
-/// <summary>Одна запись истории: время, название поля и значение (значение выделяется жирным).</summary>
+/// <summary>One history entry: the time, the field name and the value (the value is shown in bold).</summary>
 public sealed class HistoryRowViewModel
 {
     public HistoryRowViewModel(string when, string text)
     {
-        // "04.11.2026 10:40" -> "04.11 10:40": год в ленте не нужен.
+        // "04.11.2026 10:40" -> "04.11 10:40": the year is not needed in the feed.
         When = when.Length >= 16 ? when.Remove(5, 5) : when;
 
         var split = text.IndexOf(": ", StringComparison.Ordinal);

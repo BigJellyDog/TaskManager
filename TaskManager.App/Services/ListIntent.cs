@@ -1,8 +1,8 @@
 namespace TaskManager.App.Services;
 
 /// <summary>
-/// Просьба другого экрана открыть список задач с готовым фильтром («Показать в списке» на плитках статистики).
-/// Список забирает её при показе один раз.
+/// A request from another screen to open the task list with a ready filter ("Show in list" on the statistics tiles).
+/// The list takes it once when it is shown.
 /// </summary>
 public static class ListIntent
 {
@@ -14,7 +14,7 @@ public static class ListIntent
 
     public static void Request(string intent) => s_pending = intent;
 
-    /// <summary>Возвращает просьбу и сразу забывает её.</summary>
+    /// <summary>Returns the request and forgets it at once.</summary>
     public static string? Take()
     {
         var intent = s_pending;

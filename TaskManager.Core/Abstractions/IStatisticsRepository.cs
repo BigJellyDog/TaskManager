@@ -2,13 +2,13 @@ using TaskManager.Core.Services;
 
 namespace TaskManager.Core.Abstractions;
 
-/// <summary>Параметры подсчёта статистики.</summary>
-/// <param name="Now">Текущий момент: от него считается просрочка.</param>
-/// <param name="WeekSince">Начало окна «за неделю».</param>
-/// <param name="MonthSince">Начало окна «за месяц».</param>
-/// <param name="PeriodSince">Начало выбранного периода для «Вовремя», «Среднее время» и графика; null — всё время.</param>
-/// <param name="ChartDays">Сколько последних дней показывает график выполненных.</param>
-/// <param name="TimeZone">Часовой пояс, по которому задачи раскладываются по календарным дням.</param>
+/// <summary>The parameters of the statistics calculation.</summary>
+/// <param name="Now">The current moment: overdue is counted from it.</param>
+/// <param name="WeekSince">The start of the "last week" window.</param>
+/// <param name="MonthSince">The start of the "last month" window.</param>
+/// <param name="PeriodSince">The start of the chosen period for "On time", "Average time" and the chart; null means all time.</param>
+/// <param name="ChartDays">How many of the last days the completed-tasks chart shows.</param>
+/// <param name="TimeZone">The time zone by which tasks are put on calendar days.</param>
 public sealed record StatisticsQuery(
     DateTimeOffset Now,
     DateTimeOffset WeekSince,
@@ -20,7 +20,7 @@ public sealed record StatisticsQuery(
 public interface IStatisticsRepository
 {
     /// <summary>
-    /// Считает статистику запросами к БД. Удалённые задачи не учитываются.
+    /// Calculates statistics with database queries. Deleted tasks are not counted.
     /// </summary>
     Task<TaskStatistics> GetAsync(StatisticsQuery query, CancellationToken cancellationToken = default);
 }

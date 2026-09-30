@@ -3,7 +3,7 @@ using DomainTaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Русские названия перечислений для показа пользователю.</summary>
+/// <summary>Russian names of enumerations for showing to the user.</summary>
 public static class DisplayNames
 {
     public static string StatusName(DomainTaskStatus status) => status switch

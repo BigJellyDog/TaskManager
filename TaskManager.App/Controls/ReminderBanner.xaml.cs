@@ -2,14 +2,14 @@ using TaskManager.App.ViewModels;
 
 namespace TaskManager.App.Controls;
 
-/// <summary>Баннер напоминаний. Показывает общую модель, которую пополняет фоновый сервис.</summary>
+/// <summary>The reminder banner. Shows the shared model that the background service fills.</summary>
 public partial class ReminderBanner : ContentView
 {
     public ReminderBanner()
     {
         InitializeComponent();
 
-        // Контрол создаётся из XAML оболочки, у него нет внедрения зависимостей, поэтому берём модель из контейнера.
+        // The control is created from the shell XAML and has no dependency injection, so we take the model from the container.
         BindingContext = IPlatformApplication.Current?.Services.GetRequiredService<ReminderBannerViewModel>();
     }
 }

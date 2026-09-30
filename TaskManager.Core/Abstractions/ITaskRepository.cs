@@ -5,44 +5,44 @@ using TaskManager.Core.Specifications;
 namespace TaskManager.Core.Abstractions;
 
 /// <summary>
-/// Доступ к задачам, зависимостям и истории. Репозиторий ничего не сохраняет сам:
-/// изменения записываются через <see cref="IUnitOfWork"/>, поэтому задача и её история попадают в одну транзакцию.
+/// Access to tasks, dependencies and history. The repository saves nothing itself:
+/// changes are written through <see cref="IUnitOfWork"/>, so a task and its history end up in one transaction.
 /// </summary>
 public interface ITaskRepository
 {
-    /// <summary>Задача без связанных данных. Удалённые по умолчанию не возвращаются.</summary>
+    /// <summary>A task without related data. Deleted ones are not returned by default.</summary>
     Task<TaskItem?> GetByIdAsync(int id, bool includeDeleted = false, CancellationToken cancellationToken = default);
 
-    /// <summary>Задача вместе с родителем, подзадачами, тегами и зависимостями в обе стороны.</summary>
-    /// <summary>Сколько задач подходит под условие. Один запрос COUNT, без загрузки задач.</summary>
+    /// <summary>A task together with its parent, subtasks, tags and dependencies in both directions.</summary>
+    /// <summary>How many tasks match the condition. One COUNT query, without loading the tasks.</summary>
     Task<int> CountAsync(ISpecification<TaskItem> filter, CancellationToken cancellationToken = default);
 
     Task<TaskItem?> GetWithDetailsAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Страница задач по фильтру и сортировке. Фильтрация, сортировка и постраничность выполняются в БД.
-    /// Задачи приходят вместе с тегами и подзадачами (для списка с прогрессом).
+    /// A page of tasks by filter and sorting. Filtering, sorting and paging are done in the database.
+    /// The tasks arrive together with tags and subtasks (for a list with progress).
     /// </summary>
     Task<PagedResult<TaskItem>> ListAsync(TaskQuery query, CancellationToken cancellationToken = default);
 
-    /// <summary>Задачи по списку Id. Удалённые по умолчанию не возвращаются.</summary>
+    /// <summary>Tasks by a list of Ids. Deleted ones are not returned by default.</summary>
     Task<IReadOnlyList<TaskItem>> GetByIdsAsync(IReadOnlyCollection<int> ids, bool includeDeleted = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Все задачи по порядку Id вместе с тегами и правилом повторения, без отслеживания изменений (для экспорта).
+    /// All tasks in the order of Id together with tags and the recurrence rule, without change tracking (for export).
     /// </summary>
     Task<IReadOnlyList<TaskItem>> GetAllAsync(bool includeDeleted = false, CancellationToken cancellationToken = default);
 
-    /// <summary>Прямые подзадачи (удалённые не возвращаются).</summary>
+    /// <summary>Direct subtasks (deleted ones are not returned).</summary>
     Task<IReadOnlyList<TaskItem>> GetChildrenAsync(int parentId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Повторяющиеся "по календарю" задачи, у которых следующая копия ещё не создана (отменённые и удалённые не включены).
-    /// Нужны для догона пропущенных периодов.
+    /// "By calendar" recurring tasks whose next copy has not been created yet (cancelled and deleted ones are not included).
+    /// Needed to catch up on missed periods.
     /// </summary>
     Task<IReadOnlyList<TaskItem>> GetPendingCalendarRecurrencesAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Удалённые задачи ("корзина").</summary>
+    /// <summary>Deleted tasks ("the trash").</summary>
     Task<IReadOnlyList<TaskItem>> GetDeletedAsync(CancellationToken cancellationToken = default);
 
     Task AddAsync(TaskItem task, CancellationToken cancellationToken = default);
@@ -54,13 +54,13 @@ public interface ITaskRepository
     void RemoveDependency(TaskDependency dependency);
 
     /// <summary>
-    /// Все рёбра графа зависимостей, включая рёбра удалённых задач: цикл не должен появиться
-    /// после восстановления задачи. Нужно для поиска циклов.
+    /// All edges of the dependency graph, including the edges of deleted tasks: a cycle must not appear
+    /// after a task is restored. Needed to find cycles.
     /// </summary>
     Task<IReadOnlyList<(int TaskId, int DependsOnTaskId)>> GetDependencyGraphAsync(CancellationToken cancellationToken = default);
 
     Task AddHistoryAsync(IEnumerable<TaskHistoryEntry> entries, CancellationToken cancellationToken = default);
 
-    /// <summary>История задачи в хронологическом порядке.</summary>
+    /// <summary>The history of a task in chronological order.</summary>
     Task<IReadOnlyList<TaskHistoryEntry>> GetHistoryAsync(int taskId, CancellationToken cancellationToken = default);
 }

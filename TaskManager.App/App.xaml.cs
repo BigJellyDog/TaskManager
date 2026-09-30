@@ -5,7 +5,7 @@ namespace TaskManager.App;
 
 public partial class App : Application
 {
-    // Окно уже этой ширины (в единицах интерфейса) показывает панель без подписей.
+    // A window narrower than this (in interface units) shows the panel without labels.
     private const double CompactWidth = 1100;
 
     private readonly IServiceProvider _services;
@@ -41,12 +41,12 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // Сначала экран загрузки: пока применяются миграции, интерфейс не должен обращаться к базе.
+        // The loading screen comes first: while migrations are applied, the interface must not touch the database.
         var loading = new LoadingPage();
         var window = new Window(loading) { Title = "TaskManager", TitleBar = CreateTitleBar() };
         _window = window;
 
-        // Узкое окно (около 1024): боковая панель сворачивается до значков, как в макете.
+        // Narrow window (about 1024): the side panel folds into icons, as in the mockup.
         window.SizeChanged += (_, _) =>
         {
             var sidebar = _services.GetRequiredService<ViewModels.SidebarViewModel>();
@@ -68,7 +68,7 @@ public partial class App : Application
         window.Created += async (_, _) =>
         {
 #if WINDOWS
-            // Окно запускается поверх остальных, а не остаётся позади запустившей его программы.
+            // The window opens on top of the others instead of staying behind the program that started it.
             if (window.Handler?.PlatformView is Microsoft.UI.Xaml.Window native)
             {
                 Platforms.Windows.WindowActivator.BringToFront(WinRT.Interop.WindowNative.GetWindowHandle(native));
@@ -81,7 +81,7 @@ public partial class App : Application
         return window;
     }
 
-    /// <summary>Заголовок окна как в макете Signal: галочка, моноширинное название и справа кнопка языка «RU ▾».</summary>
+    /// <summary>The window title bar as in the Signal mockup: a check mark, a monospaced name and the language button "RU ▾" on the right.</summary>
     private TitleBar CreateTitleBar()
     {
         var icon = new Controls.Icon { Kind = "check", Size = 14 };
@@ -94,8 +94,8 @@ public partial class App : Application
         _languageLabel.SetDynamicResource(Label.TextColorProperty, "Ink");
         UpdateLanguageLabel();
 
-        // Обычная кнопка, а не рамка с жестом: заголовок окна считает перетаскиваемой всю свою область, кроме настоящих
-        // кнопок. Нажимаемая прозрачная кнопка лежит сверху на всю площадь; под ней только рисунок, который нажатия не принимает.
+        // A real button, not a border with a gesture: the title bar treats its whole area as draggable except real
+        // buttons. A clickable transparent button covers the whole area; under it there is only a picture that ignores taps.
         static Grid PillButton(View face, Action<VisualElement> open)
         {
             var hit = new Button
@@ -128,7 +128,7 @@ public partial class App : Application
             Children = { _languageFlag, _languageLabel },
         };
 
-        // Кнопка темы: три цветных полоски (фон, поверхность, акцент) текущей темы и стрелка.
+        // Theme button: three coloured stripes (background, surface, accent) of the current theme and an arrow.
         var themeFace = new HorizontalStackLayout
         {
             Spacing = 6,
@@ -206,7 +206,7 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Язык сменили: окно пересобирается, страницы создаются заново на новом языке, и открытый раздел остаётся тем же.
+    /// The language changed: the window is rebuilt, the pages are created again in the new language, and the open section stays the same.
     /// </summary>
     private async Task OnLanguageChangedAsync()
     {
@@ -214,7 +214,7 @@ public partial class App : Application
         await RebuildShellAsync();
     }
 
-    // Тема, с которой собрана текущая оболочка. Настройки зовут ThemeManager.Apply при любом изменении, поэтому сравниваем темы.
+    // The theme the current shell was built with. Settings call ThemeManager.Apply on every change, so we compare themes.
     private ThemeMode? _shellMode;
 
     private void OnThemeModeChanged(object? sender, EventArgs e)
@@ -226,8 +226,8 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Пересобирает оболочку с открытым разделом. Нужна при смене языка и темы: цвета, которые элементы получили через
-    /// триггеры (выбранный пункт, переключатель периода), после смены темы не обновляются сами, а заново созданные берут новые.
+    /// Rebuilds the shell with the open section. Needed on a language or theme change: colours that elements got through
+    /// triggers (selected item, period switch) do not update by themselves after a theme change, while freshly created ones take the new colours.
     /// </summary>
     private async Task RebuildShellAsync()
     {
@@ -272,8 +272,8 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Создаёт по одной запасной странице каждого раздела с паузами: первое создание страницы (JIT, разбор разметки)
-    /// заметно дольше следующих, и без этого первый переход на вкладку подтормаживал бы.
+    /// Creates one spare page of every section, with pauses: the first creation of a page (JIT, markup parsing)
+    /// takes noticeably longer than the next ones, and without this the first switch to a tab would lag.
     /// </summary>
     private async Task WarmUpPagesAsync()
     {
@@ -285,7 +285,7 @@ public partial class App : Application
             {
                 _ = _services.GetRequiredService(type);
             }
-#pragma warning disable CA1031 // Прогрев необязателен.
+#pragma warning disable CA1031 // The warm-up is optional.
             catch (Exception)
 #pragma warning restore CA1031
             {
@@ -308,12 +308,12 @@ public partial class App : Application
 
             if (_services.GetRequiredService<AppInitializer>().StartupNotice is { } notice)
             {
-                // Диалог нельзя показывать, пока оболочка не загрузилась: у окна ещё нет корня XAML, и WinUI падает.
+                // A dialog must not be shown until the shell has loaded: the window has no XAML root yet and WinUI crashes.
                 await WaitUntilLoadedAsync(shell);
                 await _services.GetRequiredService<IDialogService>().AlertAsync(Loc.T("Восстановление данных"), Loc.Message(notice));
             }
         }
-#pragma warning disable CA1031 // Запуск не должен падать молча: показываем причину на экране и пишем в журнал.
+#pragma warning disable CA1031 // A start-up must not fail silently: we show the reason on screen and write it to the log.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

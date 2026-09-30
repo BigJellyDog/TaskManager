@@ -38,7 +38,7 @@ public sealed class MigrationTests : IDisposable
         Assert.Contains("TaskHistory", tables);
     }
 
-    // Если поменяли сущности или конфигурации и забыли добавить миграцию, этот тест упадёт.
+    // If entities or configurations were changed and a migration was forgotten, this test will fail.
     [Fact]
     public async Task Migrations_MatchCurrentModel()
     {

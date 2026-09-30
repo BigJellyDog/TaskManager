@@ -12,7 +12,7 @@ public class TaskItemTests
 
     private TaskItem NewTask() => TaskItem.Create("Написать тесты", Priority.Medium, _clock);
 
-    // ---- Создание ----
+    // ---- Creation ----
 
     [Fact]
     public void Create_ValidData_SetsFields()
@@ -83,7 +83,7 @@ public class TaskItemTests
         Assert.Null(task.Description);
     }
 
-    // ---- Редактирование ----
+    // ---- Editing ----
 
     [Fact]
     public void SetTitle_Empty_Throws()
@@ -118,7 +118,7 @@ public class TaskItemTests
         Assert.Equal(Priority.Critical, task.Priority);
     }
 
-    // ---- Статусы ----
+    // ---- Statuses ----
 
     [Fact]
     public void ChangeStatus_ToDone_SetsCompletedAt()
@@ -173,7 +173,7 @@ public class TaskItemTests
         Assert.Throws<InvalidStatusTransitionException>(() => NewTask().Reopen());
     }
 
-    // ---- Удаление ----
+    // ---- Deletion ----
 
     [Fact]
     public void Delete_ThenRestore_TogglesFlag()
@@ -213,7 +213,7 @@ public class TaskItemTests
         Assert.Throws<DomainValidationException>(task.Reopen);
     }
 
-    // ---- Теги ----
+    // ---- Tags ----
 
     [Fact]
     public void AddTag_SameNameTwice_AddsOnce()
@@ -263,7 +263,7 @@ public class TaskItemTests
         Assert.Throws<DomainValidationException>(() => tag.Rename(""));
     }
 
-    // ---- Правило повторения ----
+    // ---- The recurrence rule ----
 
     [Fact]
     public void RecurrenceRule_IntervalBelowOne_Throws()

@@ -1,6 +1,6 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Дни недели как битовые флаги: удобно хранить набор дней одним числом в БД.</summary>
+/// <summary>Weekdays as bit flags: convenient to store a set of days as one number in the database.</summary>
 [Flags]
 public enum WeekDays
 {

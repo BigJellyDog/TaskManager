@@ -9,9 +9,9 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.App.ViewModels;
 
 /// <summary>
-/// Блок напоминаний в боковой панели, вариант «Главное сейчас»: одно самое срочное напоминание крупно, под ним кнопки
-/// «Выполнить» и «Отложить» и переключатель «1 из 3». Живёт в единственном экземпляре: фоновый сервис добавляет
-/// напоминания, пока приложение открыто, а блок показывает их на любом экране.
+/// The reminders block in the side panel, the "Main one now" variant: one most urgent reminder, large, under it the buttons
+/// "Complete" and "Snooze" and the "1 of 3" switch. It lives as a single instance: the background service adds
+/// reminders while the application is open, and the block shows them on any screen.
 /// </summary>
 public sealed partial class ReminderBannerViewModel : ViewModelBase
 {
@@ -21,7 +21,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
     private readonly UserSettings _settings;
     private readonly ILogger _log;
 
-    // Активные напоминания: по одному на задачу (новое, более срочное, заменяет прежнее).
+    // Active reminders: one per task (a new, more urgent one replaces the previous).
     private readonly List<Reminder> _active = [];
     private int _index;
 
@@ -48,7 +48,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
     [ObservableProperty]
     private bool isVisible;
 
-    /// <summary>Сколько напоминаний активно: показывается значком у колокольчика в узкой панели.</summary>
+    /// <summary>How many reminders are active: shown as a badge at the bell in the narrow panel.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCount))]
     private int count;
@@ -83,7 +83,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
     private string pagerText = string.Empty;
 
     /// <summary>
-    /// Добавляет напоминания. Вызывается из фонового потока, поэтому изменение списка переносится в поток интерфейса.
+    /// Adds reminders. Called from a background thread, so the change of the list is moved to the interface thread.
     /// </summary>
     public Task ShowAsync(IReadOnlyList<Reminder> reminders)
     {
@@ -101,7 +101,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
         });
     }
 
-    /// <summary>Выполняет задачу напоминания: при необходимости сначала берёт её в работу.</summary>
+    /// <summary>Completes the task of a reminder: if needed it first takes the task into work.</summary>
     [RelayCommand]
     private async Task CompleteAsync()
     {
@@ -129,12 +129,12 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
             _active.RemoveAll(r => r.TaskId == reminder.TaskId);
             Refresh();
 
-            // Списки и счётчики на других экранах узнают об изменении.
+            // Lists and counters on other screens learn about the change.
             WeakReferenceMessenger.Default.Send(new TasksChangedMessage());
         }
     }
 
-    /// <summary>Откладывает: показывает следующее напоминание, это остаётся в списке.</summary>
+    /// <summary>Snoozes: shows the next reminder, this one stays in the list.</summary>
     [RelayCommand]
     private void Snooze()
     {
@@ -174,7 +174,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
         {
             await _navigation.GoToAsync($"taskdetails?id={reminder.TaskId}");
         }
-#pragma warning disable CA1031 // Ошибка перехода не должна ронять приложение: пишем в журнал.
+#pragma warning disable CA1031 // A navigation error must not bring the application down: we write it to the log.
         catch (Exception ex)
 #pragma warning restore CA1031
         {
@@ -182,7 +182,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
         }
     }
 
-    // Сначала просроченные, дальше по ближайшему дедлайну.
+    // Overdue first, then by the nearest deadline.
     private List<Reminder> Ordered() => _active.OrderByDescending(r => r.Kind).ThenBy(r => r.Deadline).ToList();
 
     private Reminder? Current => Ordered() is { Count: > 0 } list ? list[Math.Min(_index, list.Count - 1)] : null;
@@ -213,7 +213,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
         var overdue = reminder.Kind == ReminderKind.Overdue;
         var today = deadline.Date == TimeZoneInfo.ConvertTime(now, zone).Date;
 
-        // Цвет по срочности: просрочено красным, сегодня оранжевым, позже синим (как приоритеты).
+        // Colour by urgency: overdue in red, today in orange, later in blue (like the priorities).
         var key = overdue ? "PCrit" : today || reminder.Kind == ReminderKind.DueIn1Hour ? "PHigh" : "PMed";
         var color = Token(key);
 
@@ -228,7 +228,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
         PagerText = Loc.F("{0} из {1}", _index + 1, list.Count);
     }
 
-    // «2 дня», «5 часов»: слова, когда срок прошёл.
+    // "2 days", "5 hours": words, once the deadline has passed.
     private static string Elapsed(TimeSpan span)
     {
         span = span.Duration();
@@ -242,7 +242,7 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
             : Loc.Count(Math.Max((int)span.TotalMinutes, 1), "минута|минуты|минут");
     }
 
-    // «−2 д», «5 ч», «40 мин»: коротко рядом с датой.
+    // "-2 d", "5 h", "40 min": short, next to the date.
     private static string Short(TimeSpan span)
     {
         var sign = span < TimeSpan.Zero ? "−" : string.Empty;
@@ -256,5 +256,5 @@ public sealed partial class ReminderBannerViewModel : ViewModelBase
     }
 }
 
-/// <summary>Задачи изменились не на своём экране (например, выполнена из блока напоминаний): списки и счётчики обновляются.</summary>
+/// <summary>Tasks changed on a screen that is not their own (for example completed from the reminders block): lists and counters are updated.</summary>
 public sealed class TasksChangedMessage;

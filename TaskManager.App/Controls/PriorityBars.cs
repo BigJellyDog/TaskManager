@@ -2,7 +2,7 @@ using Microsoft.Maui.Graphics;
 
 namespace TaskManager.App.Controls;
 
-/// <summary>Значок приоритета: четыре столбика, залиты столько, каков уровень (1 — низкий … 4 — критический).</summary>
+/// <summary>The priority icon: four bars, filled as many as the level (1 - low ... 4 - critical).</summary>
 public sealed class PriorityBars : GraphicsView
 {
     public static readonly BindableProperty LevelProperty =
@@ -43,7 +43,7 @@ public sealed class PriorityBars : GraphicsView
 
     private sealed class BarsDrawable : IDrawable
     {
-        // x, y, высота в сетке 16×16, как в макете.
+        // x, y, height on the 16×16 grid, as in the mockup.
         private static readonly (float X, float Y, float Height)[] Bars = [(1, 11, 4), (5, 8, 7), (9, 5, 10), (13, 2, 13)];
 
         public int Level { get; set; } = 1;

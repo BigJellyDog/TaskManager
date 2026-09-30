@@ -4,8 +4,8 @@ using Microsoft.Maui.Controls.Shapes;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Переключатель Signal 36×20: пустая рамка с кружком слева, во включённом виде заливка акцентом и кружок справа.
-/// Работает как флажок: нажатие меняет <see cref="IsOn"/>, значение можно привязать в обе стороны.
+/// The Signal switch 36×20: an empty border with a dot on the left, when on an accent fill and the dot on the right.
+/// It works like a check box: a tap changes <see cref="IsOn"/>, the value can be bound in both directions.
 /// </summary>
 public sealed class SwitchToggle : Border
 {
@@ -52,7 +52,7 @@ public sealed class SwitchToggle : Border
         set => SetValue(IsOnProperty, value);
     }
 
-    /// <summary>Команда, которую вызывает нажатие; параметр — новое значение.</summary>
+    /// <summary>The command called by a tap; the parameter is the new value.</summary>
     public ICommand? ToggledCommand
     {
         get => (ICommand?)GetValue(ToggledCommandProperty);

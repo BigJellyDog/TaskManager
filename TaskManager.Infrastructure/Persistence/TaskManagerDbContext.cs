@@ -33,16 +33,16 @@ public class TaskManagerDbContext : DbContext
     }
 
     /// <summary>
-    /// SQLite сам не ведёт версию строки (в отличие от SQL Server), поэтому увеличиваем её вручную:
-    /// у каждой изменяемой задачи RowVersion становится на единицу больше прочитанного значения.
+    /// SQLite does not keep a row version itself (unlike SQL Server), so we increase it manually:
+    /// for every changed task RowVersion becomes one more than the value that was read.
     /// </summary>
     private void BumpRowVersions()
     {
         ChangeTracker.DetectChanges();
 
-        // Правило повторения хранится в той же строке, но для EF это отдельный вложенный объект.
-        // Если изменился (добавлен, заменён или удалён) только он, сама задача остаётся Unchanged,
-        // поэтому собираем Id задач-владельцев изменённых правил и поднимаем им версию вручную.
+        // The recurrence rule is stored in the same row, but for EF it is a separate nested object.
+        // If only it changed (was added, replaced or removed), the task itself stays Unchanged,
+        // so we collect the Ids of the owner tasks of the changed rules and raise their version manually.
         var ownersWithChangedRecurrence = ChangeTracker.Entries<RecurrenceRule>()
             .Where(e => e.State != EntityState.Unchanged)
             .Select(e => e.Property(e.Metadata.FindOwnership()!.Properties[0].Name).CurrentValue)
@@ -67,8 +67,8 @@ public class TaskManagerDbContext : DbContext
     {
         ArgumentNullException.ThrowIfNull(configurationBuilder);
 
-        // SQLite не умеет сравнивать и сортировать DateTimeOffset в SQL.
-        // Храним момент времени как число (тики в UTC): сравнения и ORDER BY работают на стороне БД.
+        // SQLite cannot compare and sort DateTimeOffset in SQL.
+        // We store the moment in time as a number (ticks in UTC): comparisons and ORDER BY work on the database side.
         configurationBuilder.Properties<DateTimeOffset>().HaveConversion<DateTimeOffsetToUtcTicksConverter>();
     }
 

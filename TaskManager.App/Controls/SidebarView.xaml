@@ -6,7 +6,7 @@
              x:Class="TaskManager.App.Controls.SidebarView"
              x:DataType="vm:SidebarViewModel">
 
-    <!-- Боковая панель Signal: марка, разделы с горячими клавишами, напоминания внизу. -->
+    <!-- The Signal side panel: the brand, sections with shortcuts, reminders at the bottom. -->
     <Grid BackgroundColor="{DynamicResource Side}" RowDefinitions="Auto,Auto,*,Auto" Padding="8,10,8,10" x:Name="SidebarGrid">
 
         <Label Grid.Row="0" IsVisible="{Binding IsExpanded}" Margin="12,12,0,18" Style="{StaticResource MonoLabel}"
@@ -75,7 +75,7 @@
             <controls:ReminderBanner />
         </Grid>
 
-        <!-- Узкая панель: вместо баннера колокольчик со значком числа напоминаний -->
+        <!-- Narrow panel: instead of the banner a bell with a badge showing the number of reminders -->
         <Grid x:Name="Bell" Grid.Row="3" IsVisible="{Binding IsCompact}" WidthRequest="40" HeightRequest="40" HorizontalOptions="Center"
               BackgroundColor="Transparent">
             <Grid.GestureRecognizers>

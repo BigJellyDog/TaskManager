@@ -5,8 +5,8 @@ using TaskManager.Infrastructure.Persistence;
 namespace TaskManager.Tests;
 
 /// <summary>
-/// SQLite in-memory для тестов. База живёт, пока открыто соединение,
-/// поэтому его держим открытым до Dispose. Каждый тест получает свою чистую БД.
+/// SQLite in-memory for tests. The database lives while the connection is open,
+/// so we keep it open until Dispose. Each test gets its own clean database.
 /// </summary>
 public sealed class SqliteTestDatabase : IDisposable
 {
@@ -26,7 +26,7 @@ public sealed class SqliteTestDatabase : IDisposable
         context.Database.EnsureCreated();
     }
 
-    /// <summary>Новый контекст на ту же БД. Разные контексты помогают проверить, что данные реально записаны, а не лежат в кэше.</summary>
+    /// <summary>A new context on the same database. Different contexts help to check that the data is really written and not sitting in a cache.</summary>
     public TaskManagerDbContext CreateContext() => new(_options);
 
     public void Dispose() => _connection.Dispose();

@@ -9,9 +9,9 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 
 /// <summary>
-/// Календарь под полем даты в стиле Signal: месяц со стрелками, дни недели с понедельника, сетка дней 6×7, сегодняшний день
-/// в рамке акцента, выбранный залит акцентом. Это обычный Flyout со своими элементами, поэтому он в теме приложения
-/// (системный календарь рисует Windows по своей теме).
+/// A calendar under the date field in the Signal style: a month with arrows, weekdays from Monday, a 6×7 grid of days, today
+/// in an accent frame, the selected day filled with the accent. It is an ordinary Flyout with its own elements, so it is in the theme of the application
+/// (the system calendar is drawn by Windows in its own theme).
 /// </summary>
 public static class SignalCalendar
 {
@@ -30,7 +30,7 @@ public static class SignalCalendar
     private static string Capitalize(string text) =>
         text.Length == 0 ? text : char.ToUpper(text[0], CultureInfo.CurrentCulture) + text[1..];
 
-    /// <summary>Открывает календарь под <paramref name="anchor"/>; <paramref name="chosen"/> получает выбранную дату.</summary>
+    /// <summary>Opens the calendar under <paramref name="anchor"/>; <paramref name="chosen"/> receives the selected date.</summary>
     public static void Show(FrameworkElement anchor, DateTime selected, CultureInfo culture, string todayText, Action<DateTime> chosen)
     {
         var style = new Style(typeof(FlyoutPresenter));
@@ -58,7 +58,7 @@ public static class SignalCalendar
         StackPanel root, Flyout flyout, DateTime month, DateTime selected, CultureInfo culture, string todayText,
         Action<DateTime> chosen)
     {
-        // Смена месяца перестраивает содержимое заново: календарь остаётся открытым.
+        // Changing the month rebuilds the content: the calendar stays open.
         root.Children.Clear();
 
         var none = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
@@ -105,7 +105,7 @@ public static class SignalCalendar
         header.Children.Add(next);
         root.Children.Add(header);
 
-        // Дни недели с понедельника.
+        // Weekdays from Monday.
         var week = new Grid();
         for (var i = 0; i < 7; i++)
         {
@@ -126,7 +126,7 @@ public static class SignalCalendar
 
         root.Children.Add(week);
 
-        // Сетка дней: шесть недель, первая начинается с понедельника перед первым числом месяца.
+        // The grid of days: six weeks, the first starts on the Monday before the first day of the month.
         var grid = new Grid { RowSpacing = 2 };
         for (var i = 0; i < 7; i++)
         {
@@ -191,7 +191,7 @@ public static class SignalCalendar
 
         root.Children.Add(grid);
 
-        // Нижняя строка: быстрый переход к сегодняшнему дню.
+        // Bottom row: a quick jump to today.
         var todayLink = new TextBlock
         {
             Text = todayText,

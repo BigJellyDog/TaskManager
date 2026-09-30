@@ -3,15 +3,15 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Core.Services;
 
-/// <summary>Удалённая задача верхнего уровня в корзине.</summary>
-/// <param name="Id">Идентификатор задачи.</param>
-/// <param name="Title">Название.</param>
-/// <param name="Status">Статус, в котором задачу удалили.</param>
-/// <param name="DeletedAt">Когда удалена (по истории); null, если записи нет.</param>
-/// <param name="DeletedSubtasks">Сколько подзадач удалено вместе с ней (любой глубины).</param>
+/// <summary>A deleted top-level task in the trash.</summary>
+/// <param name="Id">The task identifier.</param>
+/// <param name="Title">The title.</param>
+/// <param name="Status">The status in which the task was deleted.</param>
+/// <param name="DeletedAt">When it was deleted (by the history); null if there is no record.</param>
+/// <param name="DeletedSubtasks">How many subtasks were deleted together with it (of any depth).</param>
 public sealed record TrashEntry(int Id, string Title, TaskStatus Status, DateTimeOffset? DeletedAt, int DeletedSubtasks);
 
-/// <summary>Корзина: список, восстановление вместе с подзадачами, окончательное удаление.</summary>
+/// <summary>The trash: a list, restore together with subtasks, delete for good.</summary>
 public class TrashService
 {
     private readonly ITrashRepository _trash;
@@ -28,7 +28,7 @@ public class TrashService
 
     public Task<int> CountAsync(CancellationToken cancellationToken = default) => _trash.CountAsync(cancellationToken);
 
-    /// <summary>Восстанавливает задачи вместе с их удалёнными подзадачами. Возвращает число восстановленных задач.</summary>
+    /// <summary>Restores tasks together with their deleted subtasks. Returns the number of restored tasks.</summary>
     public async Task<int> RestoreAsync(IReadOnlyCollection<int> ids, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(ids);
@@ -36,7 +36,7 @@ public class TrashService
         var restored = 0;
         foreach (var id in ids)
         {
-            // Сначала корень, потом потомки: подзадачу нельзя вернуть, пока удалён её родитель.
+            // The root first, then the descendants: a subtask cannot be returned while its parent is deleted.
             await _tasks.RestoreAsync(id, cancellationToken);
             restored++;
 
@@ -50,11 +50,11 @@ public class TrashService
         return restored;
     }
 
-    /// <summary>Удаляет навсегда выбранные задачи (с подзадачами). Возвращает, сколько задач стёрто.</summary>
+    /// <summary>Deletes the chosen tasks (with subtasks) for good. Returns how many tasks were erased.</summary>
     public Task<int> PurgeAsync(IReadOnlyCollection<int> ids, CancellationToken cancellationToken = default) =>
         _trash.PurgeAsync(ids, cancellationToken);
 
-    /// <summary>Очищает корзину целиком. Возвращает, сколько задач стёрто.</summary>
+    /// <summary>Empties the whole trash. Returns how many tasks were erased.</summary>
     public async Task<int> EmptyAsync(CancellationToken cancellationToken = default)
     {
         var all = await _trash.ListAsync(cancellationToken);

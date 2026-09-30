@@ -8,10 +8,10 @@ using TaskManager.Core.Services;
 namespace TaskManager.Infrastructure.Reminders;
 
 /// <summary>
-/// Фоновый сервис: раз в интервал создаёт пропущенные копии повторяющихся задач и проверяет дедлайны.
-/// Первая проверка выполняется сразу при запуске. Показанные напоминания помнятся только до закрытия приложения:
-/// при каждом запуске всё, что ещё актуально, показывается снова. Останавливается через <see cref="CancellationToken"/>:
-/// текущая проверка прерывается, ничего не теряется (показанные напоминания записываются в БД в конце проверки).
+/// The background service: once per interval it creates the missed copies of recurring tasks and checks deadlines.
+/// The first check runs right at start-up. Shown reminders are remembered only until the application closes:
+/// at every start everything that is still relevant is shown again. It stops through <see cref="CancellationToken"/>:
+/// the current check is interrupted, nothing is lost (shown reminders are written to the database at the end of a check).
 /// </summary>
 public class ReminderService : BackgroundService
 {
@@ -44,7 +44,7 @@ public class ReminderService : BackgroundService
         {
             await ForgetShownAsync(stoppingToken);
 
-            // Интервал читается перед каждой паузой: смена настройки действует со следующей проверки.
+            // The interval is read before every pause: a change of the setting takes effect from the next check.
             do
             {
                 await RunOnceAsync(stoppingToken);
@@ -54,13 +54,13 @@ public class ReminderService : BackgroundService
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
-            // Нормальная остановка (Ctrl+C или закрытие приложения): это не ошибка.
+            // A normal stop (Ctrl+C or closing the application): this is not an error.
         }
 
         _logger.LogInformation("Сервис напоминаний остановлен");
     }
 
-    /// <summary>Новый запуск: напоминания, показанные в прошлый раз, забываются, и актуальные появятся снова.</summary>
+    /// <summary>A new start: the reminders shown last time are forgotten, and the relevant ones will appear again.</summary>
     private async Task ForgetShownAsync(CancellationToken cancellationToken)
     {
         try
@@ -68,7 +68,7 @@ public class ReminderService : BackgroundService
             await using var scope = _scopes.CreateAsyncScope();
             await scope.ServiceProvider.GetRequiredService<IReminderRepository>().ClearSentAsync(cancellationToken);
         }
-#pragma warning disable CA1031 // Не удалось забыть прежние напоминания: сервис всё равно работает, просто часть из них не повторится.
+#pragma warning disable CA1031 // Failed to forget the previous reminders: the service works anyway, only some of them will not repeat.
         catch (Exception ex) when (ex is not OperationCanceledException)
 #pragma warning restore CA1031
         {
@@ -76,12 +76,12 @@ public class ReminderService : BackgroundService
         }
     }
 
-    /// <summary>Одна итерация: догон повторяющихся задач и проверка дедлайнов. Ошибка итерации не останавливает сервис.</summary>
+    /// <summary>One iteration: catching up recurring tasks and checking deadlines. An error in an iteration does not stop the service.</summary>
     public async Task RunOnceAsync(CancellationToken cancellationToken)
     {
         try
         {
-            // Новый scope на каждую итерацию: свой DbContext, без накопления отслеживаемых объектов.
+            // A new scope for every iteration: its own DbContext, without accumulating tracked objects.
             await using var scope = _scopes.CreateAsyncScope();
 
             var created = await scope.ServiceProvider.GetRequiredService<TaskService>()
@@ -107,7 +107,7 @@ public class ReminderService : BackgroundService
         {
             throw;
         }
-#pragma warning disable CA1031 // Фоновый сервис не должен падать из-за одной неудачной проверки, ошибка пишется в лог.
+#pragma warning disable CA1031 // The background service must not crash because of one failed check, the error is written to the log.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

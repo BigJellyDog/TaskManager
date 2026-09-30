@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<!-- Только Windows -->
+		<!-- Windows only -->
 		<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
 
 		<OutputType>Exe</OutputType>
 
-		<!-- MVVMTK0045: поля с [ObservableProperty] не подходят для AOT-публикации WinRT. AOT мы не используем,
-		     а генератор частичных свойств в CommunityToolkit.Mvvm 8.4.0 не работает с текущей версией C#. -->
+		<!-- MVVMTK0045: fields with [ObservableProperty] are not suitable for WinRT AOT publishing. We do not use AOT,
+		     and the partial property generator in CommunityToolkit.Mvvm 8.4.0 does not work with the current C# version. -->
 		<NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
 		<RootNamespace>TaskManager.App</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -62,7 +62,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!-- Настройки приложения вшиваются в сборку и читаются при старте (MauiProgram) -->
+		<!-- The application settings are embedded into the assembly and read at start-up (MauiProgram) -->
 		<EmbeddedResource Include="appsettings.json" LogicalName="appsettings.json" />
 	</ItemGroup>
 

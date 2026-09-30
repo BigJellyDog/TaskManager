@@ -6,9 +6,9 @@ using TaskManager.Core.Services;
 namespace TaskManager.Core.Export;
 
 /// <summary>
-/// Импорт задач из JSON, созданного <see cref="ExportService"/>. Ошибка в файле целиком отклоняет импорт,
-/// ошибка в одной задаче только её саму (и её подзадачи): остальные добавляются, а причины попадают в отчёт.
-/// Всё выполняется одной транзакцией.
+/// Import of tasks from JSON created by <see cref="ExportService"/>. An error in the file rejects the whole import,
+/// an error in one task rejects only that task (and its subtasks): the rest are added, and the reasons go into the report.
+/// Everything runs in one transaction.
 /// </summary>
 public class ImportService
 {
@@ -27,7 +27,7 @@ public class ImportService
         _clock = clock;
     }
 
-    /// <exception cref="DomainValidationException">Файл не читается, версия не поддерживается или нет списка задач.</exception>
+    /// <exception cref="DomainValidationException">The file cannot be read, the version is not supported or there is no list of tasks.</exception>
     public Task<ImportReport> ImportJsonAsync(string json, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(json);
@@ -46,7 +46,7 @@ public class ImportService
         }
         catch (JsonException ex)
         {
-            // В сообщении исключения есть путь к проблемному месту, например $.tasks[2].priority.
+            // The exception message contains the path to the problem place, for example $.tasks[2].priority.
             throw new DomainValidationException($"Файл не похож на экспорт задач: {ex.Message}", ex);
         }
 
@@ -81,7 +81,7 @@ public class ImportService
             }
         }
 
-        // Родители обрабатываются раньше детей: сортируем по глубине. Задачи с битой иерархией отсеиваем сразу.
+        // Parents are processed before children: we sort by depth. Tasks with a broken hierarchy are filtered out at once.
         var ordered = new List<(ExportTask Task, int Depth)>();
         foreach (var task in byId.Values)
         {
@@ -96,7 +96,7 @@ public class ImportService
             }
         }
 
-        // Дубликат: то же название (без учёта регистра) и тот же дедлайн. Сначала то, что уже есть в базе.
+        // A duplicate: the same title (ignoring case) and the same deadline. First what is already in the database.
         var known = new Dictionary<(string Title, DateTimeOffset? Deadline), Outcome>();
         foreach (var existing in await _tasks.GetAllAsync(includeDeleted: false, cancellationToken))
         {
@@ -171,7 +171,7 @@ public class ImportService
 
         if (created.Count > 0)
         {
-            // Первое сохранение: база выдаёт новые Id, они нужны для зависимостей и записей истории.
+            // The first save: the database issues new Ids, they are needed for dependencies and history records.
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             await AddDependenciesAsync(created, results, warnings, cancellationToken);
@@ -207,7 +207,7 @@ public class ImportService
             file.SuccessorCreated,
             rule);
 
-        // Новые теги в репозиторий добавляем только когда задача целиком собрана: иначе при ошибке остался бы лишний тег.
+        // New tags are added to the repository only when the task is fully assembled: otherwise an error would leave an extra tag behind.
         var newTags = new List<Tag>();
         foreach (var name in file.Tags ?? [])
         {
@@ -240,8 +240,8 @@ public class ImportService
     }
 
     /// <summary>
-    /// Зависимости переносятся по новым Id. Те, которые создать нельзя (задача не импортирована, цикл),
-    /// не отменяют задачу, а попадают в предупреждения.
+    /// Dependencies are carried over by the new Ids. Those that cannot be created (the task was not imported, a cycle)
+    /// do not cancel the task, they go to the warnings.
     /// </summary>
     private async Task AddDependenciesAsync(
         List<(ExportTask File, TaskItem Entity)> created,
@@ -264,7 +264,7 @@ public class ImportService
                     continue;
                 }
 
-                // Путь цикла здесь не показываем: в нём были бы Id из базы, а в отчёте все номера из файла.
+                // The path of the cycle is not shown here: it would contain database Ids, while the report uses all numbers from the file.
                 if (DependencyGraph.FindCyclePath(edges, entity.Id, dependencyId.Value) is not null)
                 {
                     warnings.Add(new ImportIssue(file.Id, file.Title,
@@ -281,7 +281,7 @@ public class ImportService
         }
     }
 
-    /// <summary>Уровень задачи в иерархии файла. Ложь, если родитель не найден или иерархия зациклена.</summary>
+    /// <summary>The level of a task in the hierarchy of the file. False if the parent is not found or the hierarchy is circular.</summary>
     private static bool TryGetDepth(ExportTask task, Dictionary<int, ExportTask> byId, out int depth, out string problem)
     {
         depth = 1;
@@ -319,7 +319,7 @@ public class ImportService
         Failed,
     }
 
-    /// <summary>Что стало с задачей из файла: нужно детям (подзадачам) и зависимостям.</summary>
+    /// <summary>What happened to a task from the file: needed by children (subtasks) and dependencies.</summary>
     private sealed class Outcome
     {
         public static Outcome Skipped { get; } = new(OutcomeKind.Skipped, null, null);
@@ -335,13 +335,13 @@ public class ImportService
 
         public OutcomeKind Kind { get; }
 
-        /// <summary>Созданная задача (для Created и для дубликата внутри самого файла).</summary>
+        /// <summary>The created task (for Created and for a duplicate inside the file itself).</summary>
         public TaskItem? Entity { get; }
 
-        /// <summary>Id уже существующей задачи (для дубликата).</summary>
+        /// <summary>The Id of an already existing task (for a duplicate).</summary>
         public int? ExistingId { get; }
 
-        /// <summary>Id задачи в базе, если она есть (создана или уже существовала).</summary>
+        /// <summary>The task Id in the database, if there is one (created or already existing).</summary>
         public int? TaskId => Entity is { Id: not 0 } e ? e.Id : ExistingId;
 
         public static Outcome Created(TaskItem entity) => new(OutcomeKind.Created, entity, null);

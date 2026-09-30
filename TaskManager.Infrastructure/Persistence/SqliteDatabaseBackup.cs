@@ -13,7 +13,7 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
     private static readonly TimeSpan LockWait = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan LockPoll = TimeSpan.FromMilliseconds(250);
 
-    // Миграции, которые знает эта версия программы. Копия с неизвестной миграцией создана более новой версией.
+    // The migrations known to this version of the program. A copy with an unknown migration was made by a newer version.
     private static readonly HashSet<string> KnownMigrations = typeof(TaskManagerDbContext).Assembly
         .GetTypes()
         .Select(t => t.GetCustomAttribute<MigrationAttribute>()?.Id)
@@ -31,7 +31,7 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
         _logger = logger;
     }
 
-    /// <summary>Файл-ожидание: сюда кладётся копия, пока она не будет подставлена при запуске.</summary>
+    /// <summary>The waiting file: the copy is put here until it is swapped in at start-up.</summary>
     private string PendingPath => _databasePath + ".restore";
 
     public async Task CreateBackupAsync(string destinationPath, CancellationToken cancellationToken = default)
@@ -39,11 +39,11 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
         var destination = Path.GetFullPath(destinationPath);
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
 
-        // VACUUM INTO отказывается писать в существующий файл.
+        // VACUUM INTO refuses to write to an existing file.
         File.Delete(destination);
 
-        // VACUUM INTO делает полную согласованную копию через обычное чтение, поэтому работает, пока приложение использует базу.
-        // Простое копирование файла могло бы захватить половину записи или потерять данные из журнала WAL.
+        // VACUUM INTO makes a complete consistent copy through ordinary reading, so it works while the application uses the database.
+        // A plain file copy could catch half of a write or lose data from the WAL journal.
         await using var connection = new SqliteConnection(ConnectionString(_databasePath, SqliteOpenMode.ReadWrite));
         await connection.OpenAsync(cancellationToken);
 
@@ -62,7 +62,7 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
 
         try
         {
-            // Только чтение и без пула соединений: файл не меняется и не остаётся занятым после проверки.
+            // Read-only and without a connection pool: the file does not change and is not left busy after the check.
             await using var connection = new SqliteConnection(ConnectionString(backupPath, SqliteOpenMode.ReadOnly));
             await connection.OpenAsync(cancellationToken);
 
@@ -101,7 +101,7 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
         }
         catch (SqliteException ex)
         {
-            // "file is not a database" и подобное: сообщение SQLite пользователю не показываем, оно техническое.
+            // "file is not a database" and the like: we do not show the SQLite message to the user, it is technical.
             _logger.LogWarning(ex, "Файл не прошёл проверку как резервная копия: {Path}", backupPath);
             throw new DomainValidationException("Файл не является базой данных SQLite или повреждён.", ex);
         }
@@ -123,13 +123,13 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
 
         try
         {
-            // Приложение могло только что закрыться и ещё держать файл базы: ждём, пока он освободится.
+            // The application may have just closed and still hold the database file: we wait until it is released.
             await WaitUntilUnlockedAsync(_databasePath, cancellationToken);
 
             string? safetyCopy = null;
             if (File.Exists(_databasePath))
             {
-                // Сбрасываем журнал WAL в основной файл, иначе недавние изменения потерялись бы в страховочной копии.
+                // We flush the WAL journal into the main file, otherwise recent changes would be lost in the safety copy.
                 await using (var connection = new SqliteConnection(ConnectionString(_databasePath, SqliteOpenMode.ReadWrite)))
                 {
                     await connection.OpenAsync(cancellationToken);
@@ -143,7 +143,7 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
                 File.Copy(_databasePath, safetyCopy, overwrite: true);
             }
 
-            // Остатки журнала старой базы не должны смешаться с новой.
+            // The leftovers of the old database journal must not mix with the new one.
             File.Delete(_databasePath + "-wal");
             File.Delete(_databasePath + "-shm");
             File.Move(PendingPath, _databasePath, overwrite: true);
@@ -153,13 +153,13 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
                 ? "Данные восстановлены из резервной копии."
                 : $"Данные восстановлены из резервной копии. Прежняя база сохранена: {safetyCopy}";
         }
-#pragma warning disable CA1031 // Ошибка восстановления не должна мешать запуску: приложение продолжает работать со старой базой.
+#pragma warning disable CA1031 // A restore error must not prevent start-up: the application keeps working with the old database.
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or SqliteException or TimeoutException)
 #pragma warning restore CA1031
         {
             _logger.LogError(ex, "Не удалось применить восстановление из копии");
 
-            // Откладываем файл в сторону, чтобы не пытаться применить его при каждом запуске.
+            // We put the file aside so as not to try to apply it on every start.
             var failed = PendingPath + ".failed";
             File.Move(PendingPath, failed, overwrite: true);
             return $"Не удалось восстановить данные из копии, приложение работает со старой базой. Файл копии оставлен: {failed}";
@@ -189,7 +189,7 @@ public sealed class SqliteDatabaseBackup : IDatabaseBackup
         {
             try
             {
-                // Эксклюзивное открытие удаётся только когда никто больше файл не использует.
+                // An exclusive open succeeds only when nobody else uses the file.
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                 return;
             }

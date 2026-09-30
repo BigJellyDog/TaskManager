@@ -3,7 +3,7 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Цвета приоритетов и статусов. Значения лежат в Resources/Styles/DarkTheme.xaml и LightTheme.xaml, здесь только выбор по перечислению.</summary>
+/// <summary>Priority and status colours. The values are in Resources/Styles/DarkTheme.xaml and LightTheme.xaml, here is only the choice by enumeration.</summary>
 public static class AppColors
 {
     public static Color For(Priority priority) => Get(priority switch
@@ -25,7 +25,7 @@ public static class AppColors
         _ => "SToDo",
     });
 
-    /// <summary>Ошибка, предупреждение и приглушённый текст в отчётах.</summary>
+    /// <summary>Error, warning and muted text in reports.</summary>
     public static Color Error => Get("SBlock");
 
     public static Color Warning => Get("PHigh");

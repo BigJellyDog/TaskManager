@@ -1,9 +1,9 @@
 namespace TaskManager.App.Services;
 
 /// <summary>
-/// Выполняет операцию в отдельной области (scope) зависимостей. DbContext у нас scoped, а модели представления
-/// живут долго, поэтому каждое действие пользователя получает свой чистый DbContext: данные всегда свежие,
-/// а отслеживаемые объекты не накапливаются.
+/// Runs the operation in a separate dependency scope. Our DbContext is scoped, while view models
+/// live long, so every user action gets its own clean DbContext: the data is always fresh,
+/// and tracked objects do not pile up.
 /// </summary>
 public sealed class ServiceRunner(IServiceScopeFactory scopes)
 {

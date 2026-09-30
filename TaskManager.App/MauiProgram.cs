@@ -17,7 +17,7 @@ public static class MauiProgram
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
-		// Свои шрифты не подключаем: на Windows используется системный (Segoe UI Variable).
+		// We do not bundle our own fonts: Windows uses the system one (Segoe UI Variable).
 		builder
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit();
@@ -49,7 +49,7 @@ public static class MauiProgram
 #endif
 		});
 
-		// Настройки: appsettings.json вшит в сборку, значения читаются через IOptions<T>.
+		// Settings: appsettings.json is embedded into the assembly, values are read through IOptions<T>.
 		using (var settings = typeof(MauiProgram).Assembly.GetManifestResourceStream("appsettings.json")
 			?? throw new InvalidOperationException("В сборку не вшит appsettings.json."))
 		{
@@ -59,12 +59,12 @@ public static class MauiProgram
 		builder.Services.Configure<AppOptions>(builder.Configuration.GetSection(AppOptions.SectionName));
 		builder.Services.Configure<ReminderOptions>(builder.Configuration.GetSection(ReminderOptions.SectionName));
 
-		// Журнал: файл по дням (14 дней) рядом с базой и окно отладки. ILogger везде остаётся стандартным.
+		// Logging: a file per day (14 days) next to the database and the debug window. ILogger stays standard everywhere.
 		Directory.CreateDirectory(AppPaths.LogsDirectory);
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Information()
 			.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-			// MAUI пишет «Error loading font» для имени системного шрифта (он не из пакета, а из Windows): шрифт при этом подставляется верно.
+			// MAUI writes "Error loading font" for the name of a system font (it comes from Windows, not from the package): the font is still substituted correctly.
 			.MinimumLevel.Override("Microsoft.Maui.FontManager", Serilog.Events.LogEventLevel.Fatal)
 			.WriteTo.File(
 				Path.Combine(AppPaths.LogsDirectory, "taskmanager-.log"),
@@ -75,17 +75,17 @@ public static class MauiProgram
 			.CreateLogger();
 		builder.Logging.AddSerilog(Log.Logger, dispose: true);
 
-		// Данные: база в папке данных приложения.
+		// Data: the database in the application data folder.
 		Directory.CreateDirectory(AppPaths.DataDirectory);
 		var databaseFileName = builder.Configuration[$"{AppOptions.SectionName}:{nameof(AppOptions.DatabaseFileName)}"]
 			?? new AppOptions().DatabaseFileName;
-		// Показ напоминаний подставляется до AddInfrastructure: та регистрирует запись в журнал только если другого нет.
+		// The reminder display is registered before AddInfrastructure: that one registers a log writer only if there is no other.
 		builder.Services.AddSingleton<ReminderBannerViewModel>();
 		builder.Services.AddSingleton<SidebarViewModel>();
 		builder.Services.AddSingleton<IReminderNotifier, ReminderNotifier>();
 		builder.Services.AddInfrastructure(Path.Combine(AppPaths.DatabaseDirectory, databaseFileName));
 
-		// Сервисы интерфейса.
+		// Interface services.
 		builder.Services.AddSingleton<UserSettings>();
 		builder.Services.AddSingleton<HotKeyService>();
 		builder.Services.AddSingleton<ServiceRunner>();
@@ -95,7 +95,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IAppRestarter, AppRestarter>();
 		builder.Services.AddSingleton<AppInitializer>();
 
-		// Страницы создаются через DI: так они получают модели представления в конструкторе.
+		// Pages are created through DI: this is how they get their view models in the constructor.
 		builder.Services.AddTransient<TasksViewModel>();
 		builder.Services.AddTransient<TasksPage>();
 		builder.Services.AddTransient<TaskEditViewModel>();

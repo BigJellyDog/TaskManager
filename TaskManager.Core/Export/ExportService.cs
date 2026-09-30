@@ -5,8 +5,8 @@ using TaskManager.Core.Domain;
 namespace TaskManager.Core.Export;
 
 /// <summary>
-/// Экспорт задач в JSON (для обмена и импорта) и Markdown (для чтения). Возвращает текст:
-/// куда его записать, решает интерфейс.
+/// Export of tasks to JSON (for exchange and import) and Markdown (for reading). Returns text:
+/// where to write it is decided by the interface.
 /// </summary>
 public class ExportService
 {
@@ -19,14 +19,14 @@ public class ExportService
         _clock = clock;
     }
 
-    /// <summary>Все задачи в формате JSON. Удалённые по умолчанию не включаются.</summary>
+    /// <summary>All tasks in JSON format. Deleted ones are not included by default.</summary>
     public async Task<string> ExportJsonAsync(bool includeDeleted = false, CancellationToken cancellationToken = default)
     {
         var document = await BuildDocumentAsync(includeDeleted, cancellationToken);
         return JsonSerializer.Serialize(document, ExportFormat.JsonOptions);
     }
 
-    /// <summary>Чек-лист в формате Markdown с вложенными подзадачами.</summary>
+    /// <summary>A checklist in Markdown format with nested subtasks.</summary>
     public async Task<string> ExportMarkdownAsync(bool includeDeleted = false, Func<string, string>? translate = null, CancellationToken cancellationToken = default)
     {
         var document = await BuildDocumentAsync(includeDeleted, cancellationToken);
@@ -38,7 +38,7 @@ public class ExportService
         var tasks = await _tasks.GetAllAsync(includeDeleted, cancellationToken);
         var ids = tasks.Select(t => t.Id).ToHashSet();
 
-        // В графе есть и рёбра удалённых задач, оставляем только те, где обе задачи попали в экспорт.
+        // The graph also has the edges of deleted tasks, we keep only those where both tasks made it into the export.
         var dependsOn = (await _tasks.GetDependencyGraphAsync(cancellationToken))
             .Where(e => ids.Contains(e.TaskId) && ids.Contains(e.DependsOnTaskId))
             .ToLookup(e => e.TaskId, e => e.DependsOnTaskId);

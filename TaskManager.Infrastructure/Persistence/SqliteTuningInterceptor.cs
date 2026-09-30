@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace TaskManager.Infrastructure.Persistence;
 
 /// <summary>
-/// Настройки соединения SQLite, которые не хранятся в файле базы и действуют на каждое новое соединение:
-/// synchronous=NORMAL (в режиме WAL безопасно и заметно быстрее на записи), временные таблицы в памяти.
+/// SQLite connection settings that are not stored in the database file and apply to every new connection:
+/// synchronous=NORMAL (safe in WAL mode and noticeably faster for writing), temporary tables in memory.
 /// </summary>
 public sealed class SqliteTuningInterceptor : DbConnectionInterceptor
 {

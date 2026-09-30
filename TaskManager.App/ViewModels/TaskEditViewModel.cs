@@ -9,8 +9,8 @@ using TaskManager.Core.Services;
 namespace TaskManager.App.ViewModels;
 
 /// <summary>
-/// Форма создания и редактирования задачи. Параметры страницы: <c>id</c> (0 или нет: новая задача)
-/// и <c>parentId</c> (создание подзадачи).
+/// The form to create and edit a task. Page parameters: <c>id</c> (0 or none: a new task)
+/// and <c>parentId</c> (creating a subtask).
 /// </summary>
 public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributable
 {
@@ -21,10 +21,10 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
     private int _taskId;
     private int? _parentId;
 
-    // Версия задачи на момент чтения: уходит в сервис, чтобы тот заметил чужие правки.
+    // The task version at the time of reading: it goes to the service so that the service notices foreign edits.
     private long _loadedRowVersion;
 
-    // Правило, прочитанное из базы: если пользователь его не менял, сохраняем его же (вместе с якорем).
+    // The rule read from the database: if the user has not changed it, we save the same one (together with the anchor).
     private RecurrenceRule? _originalRule;
 
     public TaskEditViewModel(
@@ -68,7 +68,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
 
     public IReadOnlyList<FilterOption<Priority>> PriorityOptions { get; }
 
-    /// <summary>Теги задачи чипами. Источник правды для сохранения остаётся TagsText (через запятую): список его отражает.</summary>
+    /// <summary>The task tags as chips. The source of truth for saving remains TagsText (comma separated): the list reflects it.</summary>
     public ObservableCollection<string> TagList { get; } = [];
 
     [ObservableProperty]
@@ -76,7 +76,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
 
     private bool _syncingTags;
 
-    /// <summary>Время дедлайна текстом «ЧЧ:ММ». Неверный ввод игнорируется, поле возвращается к прежнему значению.</summary>
+    /// <summary>The deadline time as text "HH:MM". Wrong input is ignored, the field returns to the previous value.</summary>
     public string DeadlineTimeText
     {
         get => DeadlineTime.ToString(@"hh\:mm", System.Globalization.CultureInfo.InvariantCulture);
@@ -107,12 +107,12 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
 
     public bool IsModeCalendar => SelectedMode?.Value == RecurrenceMode.ByCalendar;
 
-    /// <summary>Предпросмотр карточки: показывает задачу так, как она будет выглядеть на доске.</summary>
+    /// <summary>The card preview: shows the task the way it will look on the board.</summary>
     public string PreviewTitle => string.IsNullOrWhiteSpace(Title) ? Loc.T("Название задачи") : Title.Trim();
 
     public string PreviewPriorityText => SelectedPriority?.Title ?? string.Empty;
 
-    // Цвет приоритета в предпросмотре берётся из темы при подсчёте: после смены темы на лету считаем заново.
+    // The priority colour in the preview is taken from the theme when calculated: after a live theme change we calculate again.
     private void OnThemeChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(PreviewPriorityColor));
 
     public Color PreviewPriorityColor => AppColors.For(SelectedPriority?.Value ?? Priority.Medium);
@@ -160,7 +160,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
 
     public bool PreviewHasTags => TagList.Count > 0;
 
-    // Любое изменение полей формы обновляет предпросмотр и счётчики: перечислять зависимости у каждого поля незачем.
+    // Any change of the form fields updates the preview and the counters: there is no need to list dependencies for every field.
     protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
@@ -222,7 +222,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         }
     }
 
-    /// <summary>Добавляет тег из поля «+ тег» (по Enter или запятой). Повтор без учёта регистра игнорируется.</summary>
+    /// <summary>Adds a tag from the "+ tag" field (on Enter or a comma). A repeat, ignoring case, is ignored.</summary>
     [RelayCommand]
     private void AddTag()
     {
@@ -250,7 +250,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         OnPropertyChanged(nameof(PreviewHasTags));
     }
 
-    /// <summary>Подсказка из существующих тегов: клик добавляет тег в задачу.</summary>
+    /// <summary>A hint made of the existing tags: a click adds the tag to the task.</summary>
     [RelayCommand]
     private void PickTag(string tag)
     {
@@ -394,7 +394,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         _parentId = ReadInt(query, "parentId");
     }
 
-    /// <summary>Загружает данные формы: список существующих тегов, а при редактировании ещё и саму задачу.</summary>
+    /// <summary>Loads the form data: the list of existing tags and, when editing, the task itself.</summary>
     public Task LoadAsync() => RunAsync(LoadCoreAsync, Loc.T("Не удалось загрузить задачу"));
 
     partial void OnParentTextChanged(string value) => OnPropertyChanged(nameof(HasParent));
@@ -504,7 +504,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         }
         catch (ConcurrencyConflictException)
         {
-            // Задачу изменили, пока форма была открыта. Правки в форме потеряются, поэтому спрашиваем.
+            // The task was changed while the form was open. The edits in the form will be lost, so we ask.
             var reload = await Dialogs.ConfirmAsync(
                 Loc.T("Задача изменена"),
                 Loc.T("Эту задачу уже изменили в другом месте. Загрузить актуальные данные? Несохранённые правки в форме будут потеряны."),
@@ -532,7 +532,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         var zone = _clock.LocalTimeZone;
         var local = DeadlineDate.Date + DeadlineTime;
 
-        // Весеннего перевода часов такого времени не существует: сдвигаем на час вперёд.
+        // Such a time does not exist at the spring clock change: we shift it an hour forward.
         if (zone.IsInvalidTime(local))
         {
             local = local.AddHours(1);
@@ -569,7 +569,7 @@ public sealed partial class TaskEditViewModel : ViewModelBase, IQueryAttributabl
         var mode = SelectedMode?.Value ?? RecurrenceMode.AfterCompletion;
         var interval = (int)IntervalValue;
 
-        // Не менялось: возвращаем прежнее правило вместе с его якорем (иначе после сдвига на 28 февраля забылось бы 31-е).
+        // Not changed: we return the previous rule together with its anchor (otherwise the 31st would be forgotten after a shift to 28 February).
         if (_originalRule is { } original
             && original.Frequency == frequency
             && original.Interval == interval

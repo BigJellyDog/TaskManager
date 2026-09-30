@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Цвета дизайна Signal (тёмная тема). Ключи те же в обеих темах: при смене темы словарь подменяется целиком. -->
+<!-- Colours of the Signal design (dark theme). The keys are the same in both themes: on a theme change the whole dictionary is replaced. -->
 <ResourceDictionary
     x:Class="TaskManager.App.Resources.Styles.DarkTheme"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"

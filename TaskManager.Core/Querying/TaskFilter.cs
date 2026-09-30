@@ -5,8 +5,8 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.Core.Querying;
 
 /// <summary>
-/// Фильтры списка задач в том виде, в котором их задаёт пользователь. Всё, что указано, комбинируется через И;
-/// незаданное фильтром не считается. Собирает из них одну спецификацию.
+/// Task list filters in the form in which the user sets them. Everything that is specified is combined with AND;
+/// what is not set by the filter is not counted. One specification is built from them.
 /// </summary>
 public sealed record TaskFilter(
     IReadOnlyCollection<TaskStatus>? Statuses = null,

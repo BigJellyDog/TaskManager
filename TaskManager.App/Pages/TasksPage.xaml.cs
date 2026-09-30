@@ -15,7 +15,7 @@ public partial class TasksPage : ContentPage
         BindingContext = _viewModel = viewModel;
         _hotKeys = hotKeys;
 
-        // Новая страница или новые фильтры: показываем список с начала, а не с прежней прокрутки.
+        // A new page or new filters: we show the list from the start, not from the previous scroll position.
         _viewModel.TasksReplaced += (_, _) =>
         {
             if (_viewModel.Tasks.Count > 0)
@@ -24,7 +24,7 @@ public partial class TasksPage : ContentPage
             }
         };
 
-        // Переключатель Доска/Список перекрашивается вместе с выбором и с темой.
+        // The Board/List switch is recoloured together with the selection and the theme.
         _viewModel.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(TasksViewModel.IsBoard))
@@ -71,7 +71,7 @@ public partial class TasksPage : ContentPage
         }
     }
 
-    // async void допустим для обработчика события жизненного цикла. Ошибки загрузки обрабатывает сама модель.
+    // async void is acceptable for a life-cycle event handler. Loading errors are handled by the model itself.
     protected override async void OnAppearing()
     {
         base.OnAppearing();

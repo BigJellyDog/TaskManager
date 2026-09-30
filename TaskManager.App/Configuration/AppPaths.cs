@@ -1,11 +1,11 @@
 ﻿namespace TaskManager.App.Configuration;
 
-/// <summary>Где приложение хранит свои файлы.</summary>
+/// <summary>Where the application keeps its files.</summary>
 public static class AppPaths
 {
     /// <summary>
-    /// Папка данных: %LOCALAPPDATA%\TaskManager. Не папка программы: она может быть недоступна для записи,
-    /// а здесь пользователь легко найдёт базу и журналы для резервной копии.
+    /// Data folder: %LOCALAPPDATA%\TaskManager. Not the program folder: it may be read-only,
+    /// and here the user easily finds the database and the logs for a backup.
     /// </summary>
     public static string DataDirectory { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -13,16 +13,16 @@ public static class AppPaths
 
     public static string LogsDirectory { get; } = Path.Combine(DataDirectory, "logs");
 
-    // Куда указывает перенос базы. Лежит в папке данных, потому что искать его надо до того, как известен путь к базе.
+    // Where the database move points to. It lives in the data folder, because it has to be found before the database path is known.
     private static string LocationFile => Path.Combine(DataDirectory, "database-location.txt");
 
     /// <summary>
-    /// Папка с файлом базы: по умолчанию папка данных, после переноса из настроек та, что записана в указателе.
-    /// Если записанной папки больше нет (диск отключён), берётся папка данных.
+    /// The folder with the database file: the data folder by default, after a move from the settings the one written in the pointer.
+    /// If the recorded folder no longer exists (a disk is disconnected), the data folder is used.
     /// </summary>
     public static string DatabaseDirectory { get; } = ReadDatabaseDirectory();
 
-    /// <summary>Запоминает новую папку базы; действует после перезапуска приложения.</summary>
+    /// <summary>Remembers the new database folder; takes effect after the application restarts.</summary>
     public static void SaveDatabaseDirectory(string directory)
     {
         Directory.CreateDirectory(DataDirectory);
@@ -42,7 +42,7 @@ public static class AppPaths
                 }
             }
         }
-#pragma warning disable CA1031 // Нечитаемый указатель не должен мешать запуску: берём папку данных.
+#pragma warning disable CA1031 // An unreadable pointer must not prevent start-up: we use the data folder.
         catch (Exception)
 #pragma warning restore CA1031
         {

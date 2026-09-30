@@ -1,14 +1,14 @@
 namespace TaskManager.Core.Domain;
 
-/// <summary>Вид напоминания о дедлайне. Значения идут по возрастанию срочности.</summary>
+/// <summary>The kind of deadline reminder. The values go in ascending order of urgency.</summary>
 public enum ReminderKind
 {
-    /// <summary>До дедлайна меньше 24 часов.</summary>
+    /// <summary>Less than 24 hours to the deadline.</summary>
     DueIn24Hours = 0,
 
-    /// <summary>До дедлайна меньше часа.</summary>
+    /// <summary>Less than an hour to the deadline.</summary>
     DueIn1Hour = 1,
 
-    /// <summary>Дедлайн уже прошёл.</summary>
+    /// <summary>The deadline has already passed.</summary>
     Overdue = 2,
 }

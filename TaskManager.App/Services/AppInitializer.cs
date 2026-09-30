@@ -5,7 +5,7 @@ using TaskManager.Infrastructure.Reminders;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Запуск и остановка приложения: схема базы данных и фоновый сервис напоминаний.</summary>
+/// <summary>Start-up and shutdown of the application: the database schema and the background reminder service.</summary>
 public sealed class AppInitializer(
     IServiceScopeFactory scopes,
     ReminderService reminders,
@@ -14,13 +14,13 @@ public sealed class AppInitializer(
 {
     private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(5);
 
-    /// <summary>Сообщение для пользователя о том, что произошло при запуске (например, база восстановлена из копии).</summary>
+    /// <summary>A message for the user about what happened at start-up (for example, the database was restored from a backup).</summary>
     public string? StartupNotice { get; private set; }
 
-    /// <summary>Применяет подготовленное восстановление, миграции (создаёт базу при первом запуске) и запускает напоминания.</summary>
+    /// <summary>Applies a staged restore and the migrations (creates the database on the first start) and starts the reminders.</summary>
     public async Task InitializeAsync()
     {
-        // Восстановление из копии подменяет файл базы, поэтому оно выполняется первым, пока база ещё никем не открыта.
+        // A restore from a backup replaces the database file, so it runs first, while nobody has opened the database yet.
         StartupNotice = await backup.ApplyPendingRestoreAsync();
 
         await using (var scope = scopes.CreateAsyncScope())
@@ -29,12 +29,12 @@ public sealed class AppInitializer(
             await database.MigrateAsync();
         }
 
-        // Первая проверка напоминаний выполняется сразу при запуске сервиса.
+        // The first reminder check runs right when the service starts.
         await reminders.StartAsync(CancellationToken.None);
         logger.LogInformation("Приложение запущено");
 
-        // Первый запрос каждого вида медленный (EF строит и компилирует запрос). Прогреваем их в фоне, пока пользователь
-        // смотрит на первый экран, чтобы первый заход на каждую вкладку не подтормаживал.
+        // The first query of each kind is slow (EF builds and compiles the query). We warm them up in the background while the user
+        // looks at the first screen, so that the first visit to every tab does not lag.
         _ = Task.Run(WarmUpAsync);
     }
 
@@ -52,7 +52,7 @@ public sealed class AppInitializer(
             await sp.GetRequiredService<TaskManager.Core.Services.TrashService>().ListAsync();
             await sp.GetRequiredService<TaskManager.Core.Services.TagService>().ListAsync();
         }
-#pragma warning disable CA1031 // Прогрев необязателен: любая ошибка здесь не должна мешать работе.
+#pragma warning disable CA1031 // The warm-up is optional: no error here must get in the way.
         catch (Exception ex)
 #pragma warning restore CA1031
         {
@@ -60,7 +60,7 @@ public sealed class AppInitializer(
         }
     }
 
-    /// <summary>Останавливает фоновый сервис. Вызывается при закрытии окна, поэтому синхронно и с ограничением по времени.</summary>
+    /// <summary>Stops the background service. Called when the window closes, so synchronous and with a time limit.</summary>
     public void Shutdown()
     {
         try
@@ -69,7 +69,7 @@ public sealed class AppInitializer(
             reminders.StopAsync(timeout.Token).GetAwaiter().GetResult();
             logger.LogInformation("Приложение остановлено");
         }
-#pragma warning disable CA1031 // При закрытии приложения любая ошибка остановки не должна мешать выходу.
+#pragma warning disable CA1031 // When the application closes, no error while stopping must get in the way of exiting.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

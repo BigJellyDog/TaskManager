@@ -9,26 +9,26 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Строка горизонтальной гистограммы приоритетов: значок, полоса, число и доля.</summary>
+/// <summary>A row of the horizontal priority histogram: an icon, a bar, a number and a share.</summary>
 public sealed record PriorityBarViewModel(string Title, int Level, int Count, string Percent, double Fraction, Color Color);
 
-/// <summary>Столбец вертикального графика. <see cref="Height"/> уже в пикселях, <see cref="Color"/> — цвет заливки.</summary>
+/// <summary>A column of the vertical chart. <see cref="Height"/> is already in pixels, <see cref="Color"/> is the fill colour.</summary>
 public sealed record ChartColumnViewModel(string Value, string Label, double Height, Color Color, Color ValueColor);
 
-/// <summary>Сегмент полосы статусов; <see cref="Weight"/> — его доля по ширине.</summary>
+/// <summary>A segment of the status bar; <see cref="Weight"/> is its share of the width.</summary>
 public sealed record StatusSegmentViewModel(string Title, string Icon, int Count, double Weight, Color Color);
 
-/// <summary>Строка списка тегов: подпись, длина полосы относительно самого частого тега и число.</summary>
+/// <summary>A row of the tag list: a label, the length of the bar relative to the most frequent tag, and a number.</summary>
 public sealed record TagBarViewModel(string Name, int Count, double Fraction);
 
-/// <summary>Статистика по задачам (FR-11): шесть показателей, переключатель периода и четыре панели.</summary>
+/// <summary>Task statistics (FR-11): six figures, a period switch and four panels.</summary>
 public sealed partial class StatisticsViewModel : ViewModelBase
 {
-    // Высота дорожки столбца на графиках, пиксели. Ненулевое значение всегда видно хотя бы тонкой полоской.
+    // The height of a bar track on the charts, pixels. A non-zero value is always visible as at least a thin stripe.
     private const double TrackHeight = 78;
     private const double MinBarHeight = 3;
 
-    // Названия дней и десятичный разделитель как в макете, независимо от языка системы.
+    // Day names and the decimal separator as in the mockup, regardless of the system language.
     private static CultureInfo Ru => Loc.Culture;
 
     private readonly ServiceRunner _runner;
@@ -66,7 +66,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
     [ObservableProperty]
     private string onTimeNote = string.Empty;
 
-    /// <summary>Сколько из пяти делений индикатора «Вовремя» залито.</summary>
+    /// <summary>How many of the five divisions of the "On time" indicator are filled.</summary>
     [ObservableProperty]
     private int onTimeBlocks;
 
@@ -145,7 +145,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         BlockedCount = stats.BlockedCount;
         OpenCount = stats.OpenCount;
 
-        // Без выполненных задач с дедлайном процент не определён: показываем прочерк, а не 0% или 100%.
+        // Without completed tasks that have a deadline the percentage is undefined: we show a dash, not 0% or 100%.
         OnTimeText = stats.OnTimePercent is { } percent ? percent.ToString("0.#", Ru) + "%" : "—";
         OnTimeBlocks = stats.OnTimePercent is { } share ? (int)Math.Round(share / 20) : 0;
         OnTimeNote = stats.CompletedWithDeadline == 0
@@ -214,8 +214,8 @@ public sealed partial class StatisticsViewModel : ViewModelBase
         {
             var day = days[i];
 
-            // Неделя: подпись и число у каждого столбца. Месяц: столбцы узкие, дата только у каждого седьмого (считая от
-            // сегодняшнего, чтобы последние две подписи не наползали друг на друга), число только над самым высоким.
+            // Week: a label and a number at every bar. Month: the bars are narrow, a date only at every seventh (counting from
+            // today, so that the last two labels do not run into each other), the number only above the highest.
             var label = weekly
                 ? ShortWeekday(day.Day)
                 : ((days.Count - 1 - i) % 7 == 0 ? day.Day.ToString("dd.MM", Ru) : string.Empty);
@@ -297,7 +297,7 @@ public sealed partial class StatisticsViewModel : ViewModelBase
     private static Color ThemeColor(string key) =>
         Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color ? color : Colors.Gray;
 
-    /// <summary>Длительность в виде "2д 12ч", "5ч 30мин" или "15мин": две самые крупные единицы.</summary>
+    /// <summary>A duration as "2d 12h", "5h 30min" or "15min": the two largest units.</summary>
     private static string FormatDuration(TimeSpan value)
     {
         if (value.TotalDays >= 1)

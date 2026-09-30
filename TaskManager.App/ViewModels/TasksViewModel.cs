@@ -14,8 +14,8 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.App.ViewModels;
 
 /// <summary>
-/// Список задач: фильтры, поиск, сортировка и постраничный вывод. Любое изменение фильтра возвращает на первую
-/// страницу и перезагружает список. Поиск по тексту запускается по Enter, а не на каждую букву.
+/// The task list: filters, search, sorting and paging. Any change of a filter returns to the first
+/// page and reloads the list. The text search starts on Enter, not on every letter.
 /// </summary>
 public sealed partial class TasksViewModel : ViewModelBase
 {
@@ -26,13 +26,13 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     private int _pageSize => Math.Clamp(_settings.PageSize, 1, TaskQuery.MaxPageSize);
 
-    // Пока значения фильтров меняются программно (сброс, загрузка тегов), перезагрузку на каждое изменение не запускаем.
+    // While the filter values are changed by the program (reset, loading tags), we do not start a reload on every change.
     private bool _suppressReload;
 
     private bool _isReloading;
     private bool _reloadRequested;
 
-    // Задачу выполнили из блока напоминаний: список перечитывается.
+    // A task was completed from the reminders block: the list is read again.
     private void OnTasksChanged() => MainThread.BeginInvokeOnMainThread(() => _ = ReloadAsync());
 
     public TasksViewModel(
@@ -89,7 +89,7 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     public ObservableCollection<TaskRowViewModel> Tasks { get; } = [];
 
-    /// <summary>Список заменён новыми данными. Страница в ответ прокручивает его к началу.</summary>
+    /// <summary>The list was replaced with new data. The page scrolls it to the top in response.</summary>
     public event EventHandler? TasksReplaced;
 
     [ObservableProperty]
@@ -119,7 +119,7 @@ public sealed partial class TasksViewModel : ViewModelBase
     [ObservableProperty]
     private bool hideClosed;
 
-    /// <summary>Показана доска (колонки по статусам), иначе таблица.</summary>
+    /// <summary>The board is shown (columns by status), otherwise the table.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsList))]
     [NotifyPropertyChangedFor(nameof(SubtitleText))]
@@ -193,7 +193,7 @@ public sealed partial class TasksViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(SummaryText))]
     private int totalCount;
 
-    /// <summary>Подзаголовок страницы: «26 ЗАДАЧ · 2 ПРОСРОЧЕНО · 2 ЗАБЛОКИРОВАНО».</summary>
+    /// <summary>The page subtitle: "26 TASKS · 2 OVERDUE · 2 BLOCKED".</summary>
     public string SubtitleText
     {
         get
@@ -230,7 +230,7 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     public string PageText => Loc.F("Страница {0} из {1}", Page, Math.Max(TotalPages, 1));
 
-    /// <summary>Вызывается при показе страницы: подгружает теги и список (данные могли измениться на других экранах).</summary>
+    /// <summary>Called when the page is shown: loads the tags and the list (the data may have changed on other screens).</summary>
     public async Task LoadAsync()
     {
         ApplyListIntent();
@@ -238,7 +238,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         await ReloadAsync();
     }
 
-    /// <summary>Открыли из статистики: показываем список с нужным фильтром вместо прежнего.</summary>
+    /// <summary>Opened from the statistics: we show the list with the needed filter instead of the previous one.</summary>
     private void ApplyListIntent()
     {
         if (ListIntent.Take() is not { } intent)
@@ -267,7 +267,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         }
     }
 
-    // Изменение любого фильтра перезагружает список с первой страницы.
+    // A change of any filter reloads the list from the first page.
     partial void OnSelectedStatusChanged(FilterOption<TaskStatus?>? value) => FilterChanged();
 
     partial void OnSelectedPriorityChanged(FilterOption<Priority?>? value) => FilterChanged();
@@ -282,7 +282,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         FilterChanged();
     }
 
-    // Заголовки колонок таблицы: стрелка стоит у колонки, по которой сейчас отсортировано.
+    // Table column headers: the arrow stands at the column by which the list is currently sorted.
     public string TitleHeader => Loc.T("Название") + Arrow(2);
 
     public string PriorityHeader => Loc.T("Приоритет") + Arrow(0);
@@ -291,7 +291,7 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     private string Arrow(int sortOptionIndex) => ReferenceEquals(SelectedSort, SortOptions[sortOptionIndex]) ? " ↓" : string.Empty;
 
-    /// <summary>Нажатие на заголовок колонки: сортировка по названию, приоритету (с учётом срочности) или дедлайну.</summary>
+    /// <summary>A click on a column header: sort by title, priority (taking urgency into account) or deadline.</summary>
     [RelayCommand]
     private void SortBy(string column) =>
         SelectedSort = column switch
@@ -325,7 +325,7 @@ public sealed partial class TasksViewModel : ViewModelBase
 
     partial void OnUseDeadlineToChanged(bool value) => FilterChanged();
 
-    // Дату перезагружаем только если она участвует в фильтре, иначе выбор даты в выключенном поле ничего не делает.
+    // We reload on a date only if it takes part in the filter, otherwise choosing a date in a switched-off field does nothing.
     partial void OnDeadlineFromChanged(DateTime value)
     {
         if (UseDeadlineFrom)
@@ -345,7 +345,7 @@ public sealed partial class TasksViewModel : ViewModelBase
     [RelayCommand]
     private Task NewTaskAsync() => _navigation.GoToAsync("taskedit?id=0");
 
-    /// <summary>Открывает карточку задачи.</summary>
+    /// <summary>Opens the task card.</summary>
     public Task OpenTaskAsync(int id) => _navigation.GoToAsync($"taskdetails?id={id}");
 
     [RelayCommand]
@@ -373,7 +373,7 @@ public sealed partial class TasksViewModel : ViewModelBase
     [RelayCommand]
     private void ToggleHideClosed() => HideClosed = !HideClosed;
 
-    /// <summary>Флажок в строке: выполнить задачу или вернуть её в работу. Ошибки (блокировка, подзадачи) показывает RunAsync.</summary>
+    /// <summary>The check box in a row: complete the task or return it to work. Errors (blocking, subtasks) are shown by RunAsync.</summary>
     [RelayCommand]
     private async Task ToggleDoneAsync(TaskRowViewModel row)
     {
@@ -385,7 +385,7 @@ public sealed partial class TasksViewModel : ViewModelBase
                 : sp.GetRequiredService<TaskService>().ChangeStatusAsync(row.Id, TaskStatus.Done, expectedRowVersion: row.RowVersion)),
             Loc.T("Не удалось изменить статус"));
 
-        // При ошибке строка осталась прежней, но список всё равно обновляем: возможно, задачу изменили в другом месте.
+        // On an error the row stayed as it was, but we refresh the list anyway: the task may have been changed elsewhere.
         _ = changed;
         await ReloadAsync();
     }
@@ -467,7 +467,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         var tags = await _runner.RunAsync(sp => sp.GetRequiredService<ITagRepository>().ListAsync());
         var selectedName = SelectedTag?.Value;
 
-        // Список тегов не изменился: выпадающий список не трогаем, иначе он перестраивается при каждом заходе на вкладку.
+        // The tag list did not change: we do not touch the drop-down list, otherwise it is rebuilt on every visit to the tab.
         if (TagOptions.Count == tags.Count + 1 && tags.Select(t => t.Name).SequenceEqual(TagOptions.Skip(1).Select(o => o.Title)))
         {
             return;
@@ -483,7 +483,7 @@ public sealed partial class TasksViewModel : ViewModelBase
                 TagOptions.Add(new FilterOption<string?>(tag.Name, tag.Name));
             }
 
-            // Выбранный тег остаётся выбранным, если он ещё существует (например, его не удалили).
+            // The selected tag stays selected if it still exists (for example it was not deleted).
             SelectedTag = TagOptions.FirstOrDefault(o => o.Value == selectedName) ?? AllTags;
         }
         finally
@@ -493,8 +493,8 @@ public sealed partial class TasksViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Перезагрузка списка. Если во время загрузки фильтр изменился ещё раз, после неё загружаем снова:
-    /// без этого последнее изменение фильтра терялось бы.
+    /// Reloading the list. If the filter changed once more during loading, we load again afterwards:
+    /// without this the last change of the filter would be lost.
     /// </summary>
     private async Task ReloadAsync()
     {
@@ -526,7 +526,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         var zone = _clock.LocalTimeZone;
         var changed = false;
 
-        // Загружаем только то, что видно: на доске колонки, в списке одну страницу.
+        // We load only what is visible: the columns on the board, one page in the list.
         if (IsBoard)
         {
             changed |= await LoadBoardAsync(now, zone);
@@ -535,7 +535,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         {
             var result = await FetchAsync(Page);
 
-            // Страниц стало меньше (например, задачи удалили на другом экране): переходим на последнюю.
+            // There are fewer pages now (for example tasks were deleted on another screen): we go to the last one.
             if (result.Items.Count == 0 && result.TotalCount > 0 && Page > result.TotalPages)
             {
                 Page = result.TotalPages;
@@ -555,7 +555,7 @@ public sealed partial class TasksViewModel : ViewModelBase
         }
     }
 
-    /// <summary>Заменяет содержимое списка, только если оно изменилось. Возвращает, менялось ли оно.</summary>
+    /// <summary>Replaces the content of the list only if it changed. Returns whether it changed.</summary>
     private static bool Sync(ObservableCollection<TaskRowViewModel> target, List<TaskRowViewModel> fresh)
     {
         if (target.Count == fresh.Count && target.Zip(fresh).All(pair => pair.First.Signature == pair.Second.Signature))
@@ -573,8 +573,8 @@ public sealed partial class TasksViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Доска: четыре колонки по статусам. Поиск, теги и быстрые фильтры действуют и здесь, а фильтр по статусу нет:
-    /// статус задаёт сама колонка. Отменённые на доске не показываются. Колонки читаются одновременно.
+    /// The board: four columns by status. The search, tags and quick filters work here too, but the status filter does not:
+    /// the status is set by the column itself. Cancelled tasks are not shown on the board. The columns are read at the same time.
     /// </summary>
     private async Task<bool> LoadBoardAsync(DateTimeOffset now, TimeZoneInfo zone)
     {
@@ -606,10 +606,10 @@ public sealed partial class TasksViewModel : ViewModelBase
         return changed;
     }
 
-    /// <summary>Счётчики чипов и подзаголовка. Считаются без учёта остальных фильтров: это размер выборки, а не её видимой части.</summary>
+    /// <summary>The counters of the chips and the subtitle. Counted without the other filters: this is the size of the selection, not of its visible part.</summary>
     private async Task LoadCountsAsync()
     {
-        // Все пять счётчиков в одной области зависимостей: одна база, один контекст, без пяти пересозданий.
+        // All five counters in one dependency scope: one database, one context, without five re-creations.
         var counts = await _runner.RunAsync(async sp =>
         {
             var service = sp.GetRequiredService<TaskService>();
@@ -646,7 +646,7 @@ public sealed partial class TasksViewModel : ViewModelBase
 
         DateTimeOffset StartOfDay(DateTime date) => new(date.Date, zone.GetUtcOffset(date.Date));
 
-        // Диапазон включительный: дата "по" охватывает весь день до последнего тика.
+        // The range is inclusive: the "to" date covers the whole day up to the last tick.
         DateTimeOffset? from = UseDeadlineFrom ? StartOfDay(DeadlineFrom) : null;
         DateTimeOffset? to = UseDeadlineTo ? StartOfDay(DeadlineTo.AddDays(1)).AddTicks(-1) : null;
 

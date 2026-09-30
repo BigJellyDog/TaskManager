@@ -46,7 +46,7 @@
                                     </DataTrigger>
                                 </Grid.Triggers>
 
-                                <!-- Обычный вид -->
+                                <!-- Normal view -->
                                 <Label Grid.Column="0" Text="{Binding DisplayName}" IsVisible="{Binding IsNotEditing}"
                                        FontFamily="{StaticResource MonoFont}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
                                 <HorizontalStackLayout Grid.Column="1" Spacing="10" IsVisible="{Binding IsNotEditing}" VerticalOptions="Center">
@@ -69,7 +69,7 @@
                                     </controls:SignalButton>
                                 </HorizontalStackLayout>
 
-                                <!-- Правка -->
+                                <!-- Edit -->
                                 <controls:InputBox Grid.Column="0" IsVisible="{Binding IsEditing}" HeightRequest="30">
                                     <Entry Text="{Binding EditName}" FontFamily="{StaticResource MonoFont}" FontSize="13" FontAttributes="Bold"
                                            VerticalOptions="Center" MinimumHeightRequest="0" BackgroundColor="Transparent"

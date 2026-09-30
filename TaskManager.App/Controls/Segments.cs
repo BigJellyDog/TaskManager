@@ -2,7 +2,7 @@ using Microsoft.Maui.Controls.Shapes;
 
 namespace TaskManager.App.Controls;
 
-/// <summary>Ряд из <see cref="Count"/> коротких делений, первые <see cref="Filled"/> залиты акцентом (индикатор «Вовремя»).</summary>
+/// <summary>A row of <see cref="Count"/> short divisions, the first <see cref="Filled"/> filled with the accent (the "On time" indicator).</summary>
 public sealed class Segments : Grid
 {
     public static readonly BindableProperty CountProperty =

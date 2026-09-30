@@ -3,8 +3,8 @@ using TaskManager.App.Services;
 namespace TaskManager.App.Controls;
 
 /// <summary>
-/// Поле даты внутри <see cref="InputBox"/>: значок календаря и дата «дд.мм.гггг». Нажатие открывает календарь Signal
-/// под полем. Вместо системного DatePicker, который рисует Windows по своей теме.
+/// The date field inside <see cref="InputBox"/>: a calendar icon and the date "dd.mm.yyyy". A tap opens the Signal calendar
+/// under the field. Instead of the system DatePicker, which Windows draws in its own theme.
 /// </summary>
 public sealed class DateField : HorizontalStackLayout
 {
@@ -42,7 +42,7 @@ public sealed class DateField : HorizontalStackLayout
         set => SetValue(DateProperty, value);
     }
 
-    // Подпись уже построенного поля не перекрашивалась при смене темы на лету: цвета берутся заново.
+    // The label of an already built field was not recoloured on a live theme change: the colours are taken again.
     private void OnThemeChanged(object? sender, EventArgs e)
     {
         _label.SetDynamicResource(Label.TextColorProperty, "Ink");
@@ -53,7 +53,7 @@ public sealed class DateField : HorizontalStackLayout
 
     private void Open()
     {
-        // Нажатие по всему полю: календарь раскрывается под рамкой, в которую вложено это поле.
+        // A tap anywhere on the field: the calendar opens under the border that contains this field.
         var anchor = Parent as VisualElement ?? this;
         if (!anchor.IsEnabled)
         {
@@ -64,7 +64,7 @@ public sealed class DateField : HorizontalStackLayout
     }
 }
 
-/// <summary>Открывает календарь Signal под элементом. Сейчас только Windows.</summary>
+/// <summary>Opens the Signal calendar under an element. Windows only for now.</summary>
 public static class CalendarPopup
 {
     public static void Show(VisualElement anchor, DateTime selected, Action<DateTime> chosen, string todayText)

@@ -6,16 +6,16 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 namespace TaskManager.Core.Services;
 
 /// <summary>
-/// Демо-данные для знакомства с программой и для скриншотов. Всё создаётся обычными сервисами (поэтому история,
-/// автоблокировки и повторения настоящие), а время сдвигается подставными часами: "20 дней назад" создаётся задача,
-/// "15 дней назад" она завершается. Все демо-задачи отмечены тегом <see cref="DemoTag"/>.
-/// Тексты написаны по-русски; чтобы создать набор на другом языке, в <see cref="SeedAsync"/> передаётся функция перевода.
+/// Demo data to get to know the program and for screenshots. Everything is created by the ordinary services (so the history,
+/// auto-blocking and recurrence are real), and the time is shifted by a substitute clock: a task is created "20 days ago",
+/// "15 days ago" it is completed. All demo tasks are tagged <see cref="DemoTag"/>.
+/// The texts are written in Russian; to create a set in another language, a translation function is passed to <see cref="SeedAsync"/>.
 /// </summary>
 public class DemoDataService
 {
     public const string DemoTag = "демо";
 
-    /// <summary>Названия демо-тега на всех языках приложения: набор, созданный на одном языке, находится и удаляется на другом.</summary>
+    /// <summary>The names of the demo tag in all languages of the application: a set created in one language is found and deleted in another.</summary>
     public static readonly string[] KnownDemoTags = [DemoTag, "demo"];
 
     private readonly ITaskRepository _tasks;
@@ -31,7 +31,7 @@ public class DemoDataService
         _clock = clock;
     }
 
-    /// <summary>Есть ли уже (не удалённые) демо-задачи.</summary>
+    /// <summary>Whether there are already (not deleted) demo tasks.</summary>
     public async Task<bool> HasDemoDataAsync(CancellationToken cancellationToken = default)
     {
         foreach (var tag in KnownDemoTags)
@@ -46,7 +46,7 @@ public class DemoDataService
         return false;
     }
 
-    /// <summary>Удаляет (в корзину) все демо-задачи. Возвращает, сколько задач удалено.</summary>
+    /// <summary>Deletes (to the trash) all demo tasks. Returns how many tasks were deleted.</summary>
     public async Task<int> RemoveDemoDataAsync(CancellationToken cancellationToken = default)
     {
         var service = RealService();
@@ -65,7 +65,7 @@ public class DemoDataService
         {
             try
             {
-                // Удаление родителя удаляет и его подзадачи: к тому моменту, когда очередь дойдёт до них, они уже удалены.
+                // Deleting a parent deletes its subtasks too: by the time their turn comes, they are already deleted.
                 await service.DeleteAsync(task.Id, cancellationToken: cancellationToken);
                 removed++;
             }
@@ -79,8 +79,8 @@ public class DemoDataService
     }
 
     /// <summary>
-    /// Создаёт демо-набор. <paramref name="translate"/> переводит русский текст (название, описание, тег) на язык
-    /// интерфейса; без неё набор получается русским. Возвращает, сколько задач создано (повторы и копии не считаются).
+    /// Creates the demo set. <paramref name="translate"/> translates the Russian text (title, description, tag) into the language of the
+    /// interface; without it the set is Russian. Returns how many tasks were created (repeats and copies are not counted).
     /// </summary>
     public async Task<int> SeedAsync(Func<string, string>? translate = null, CancellationToken cancellationToken = default)
     {
@@ -94,7 +94,7 @@ public class DemoDataService
         var ids = new Dictionary<string, int>();
         var steps = new List<(DateTimeOffset At, int Order, Func<Task> Run)>();
 
-        // Момент "через days дней в hour:minute по местному времени" (отрицательные дни означают прошлое).
+        // The moment "in days days at hour:minute local time" (negative days mean the past).
         DateTimeOffset At(int days, int hour, int minute = 0)
         {
             var local = TimeZoneInfo.ConvertTime(now, zone).Date.AddDays(days).AddHours(hour).AddMinutes(minute);
@@ -137,7 +137,7 @@ public class DemoDataService
         void Depend(DateTimeOffset at, string task, string on) =>
             Step(at, async () => await service.AddDependencyAsync(ids[task], ids[on], cancellationToken));
 
-        // ---- Прошлое: выполненные, отменённая и просроченные задачи, чтобы статистика и история были живыми ----
+        // ---- The past: completed, cancelled and overdue tasks, so that statistics and history are alive ----
         Create(At(-20, 9), "ci", "Настроить CI", Priority.Medium, At(-14, 18), ["работа", "разработка"]);
         Move(At(-19, 10), "ci", TaskStatus.InProgress);
         Move(At(-15, 16), "ci", TaskStatus.Done);
@@ -158,7 +158,7 @@ public class DemoDataService
         Move(At(-5, 19), "gym", TaskStatus.InProgress);
         Move(At(-5, 20), "gym", TaskStatus.Done);
 
-        // Повторяющаяся: завершили вчера, и сервис сам создал следующую копию на сегодняшний вечер.
+        // Recurring: completed yesterday, and the service created the next copy for this evening by itself.
         Create(At(-3, 9), "flowers", "Полить цветы", Priority.Low, At(-1, 20), ["дом"], rule: new RecurrenceRule(RecurrenceFrequency.Daily, 1, RecurrenceMode.AfterCompletion));
         Move(At(-1, 19), "flowers", TaskStatus.InProgress);
         Move(At(-1, 19, 30), "flowers", TaskStatus.Done);
@@ -171,7 +171,7 @@ public class DemoDataService
         Create(At(-2, 12), "idea", "Идея: приложение для рецептов", Priority.Low, null, ["идеи"]);
         Move(At(-1, 9), "idea", TaskStatus.Cancelled);
 
-        // ---- Сейчас: проект с подзадачами трёх уровней и зависимостями, ближайшие дедлайны, повторения ----
+        // ---- Now: a project with subtasks of three levels and dependencies, the nearest deadlines, recurrences ----
         Create(now, "release", "Подготовить релиз 1.0", Priority.Critical, At(2, 18), ["работа", "релиз"], "Финальная сборка, проверка и публикация");
         Create(now, "tests", "Написать тесты", Priority.High, At(1, 12), ["работа", "разработка"], parent: "release");
         Create(now, "tests-services", "Тесты сервисов", Priority.Medium, null, ["разработка"], parent: "tests");
@@ -190,7 +190,7 @@ public class DemoDataService
         Create(now, "groceries", "Купить продукты", Priority.Low, now.AddHours(3), ["дом", "покупки"], "Молоко, хлеб, яйца, овощи");
         Create(now, "doctor", "Записаться к врачу", Priority.Medium, now.AddHours(20), ["здоровье"]);
 
-        // Планёрка: следующий понедельник 10:00, повтор по календарю каждую неделю.
+        // Team meeting: next Monday 10:00, repeating by calendar every week.
         var daysToMonday = (((int)DayOfWeek.Monday - (int)TimeZoneInfo.ConvertTime(now, zone).DayOfWeek) + 7) % 7;
         daysToMonday = daysToMonday == 0 ? 7 : daysToMonday;
         Create(now, "standup", "Планёрка команды", Priority.Medium, At(daysToMonday, 10), ["работа"], rule: new RecurrenceRule(RecurrenceFrequency.Weekly, 1, RecurrenceMode.ByCalendar, WeekDays.Monday));
@@ -215,7 +215,7 @@ public class DemoDataService
 
     private TaskService RealService() => new(_tasks, _tags, _unitOfWork, _clock);
 
-    /// <summary>Часы, которые можно переставлять: нужны, чтобы создавать задачи "в прошлом" через обычный сервис.</summary>
+    /// <summary>A clock that can be moved: needed to create tasks "in the past" through the ordinary service.</summary>
     private sealed class SimulatedClock : TimeProvider
     {
         private readonly TimeProvider _real;

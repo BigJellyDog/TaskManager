@@ -23,7 +23,7 @@ public sealed class RepositoryTests : IDisposable
     private static (TaskRepository Tasks, TagRepository Tags, UnitOfWork Uow) Create(TaskManagerDbContext context) =>
         (new TaskRepository(context), new TagRepository(context), new UnitOfWork(context));
 
-    // ---- Задачи ----
+    // ---- Tasks ----
 
     [Fact]
     public async Task AddAndGetById_ReturnsTask()
@@ -105,7 +105,7 @@ public sealed class RepositoryTests : IDisposable
         Assert.Equal("блокер", Assert.Single(loaded.Dependencies).DependsOnTask?.Title);
     }
 
-    // ---- Зависимости ----
+    // ---- Dependencies ----
 
     [Fact]
     public async Task Dependency_AddFindRemove()
@@ -150,7 +150,7 @@ public sealed class RepositoryTests : IDisposable
         Assert.Null(await tasks.GetDependencyAsync(a.Id, b.Id));
     }
 
-    // ---- История ----
+    // ---- History ----
 
     [Fact]
     public async Task History_IsReturnedInChronologicalOrder_PerTask()
@@ -176,7 +176,7 @@ public sealed class RepositoryTests : IDisposable
         Assert.Equal(["Title", "Priority"], history.Select(h => h.FieldName));
     }
 
-    // ---- Теги ----
+    // ---- Tags ----
 
     [Fact]
     public async Task Tag_FindByName_IgnoresCaseIncludingCyrillic()

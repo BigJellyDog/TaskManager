@@ -6,7 +6,7 @@ using TaskStatus = TaskManager.Core.Domain.TaskStatus;
 
 namespace TaskManager.Tests;
 
-/// <summary>Статистика: окна «7 дней», «30 дней», «всё время» и график «выполнено по дням».</summary>
+/// <summary>Statistics: the windows "7 days", "30 days", "all time" and the "done by day" chart.</summary>
 public sealed class StatisticsTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 12, 0, 0, TimeSpan.Zero);
@@ -16,7 +16,7 @@ public sealed class StatisticsTests : IDisposable
 
     public StatisticsTests()
     {
-        // Время у FakeTimeProvider идёт только вперёд: 20 дней назад, 8 дней назад, вчера, час назад и сейчас.
+        // The time of FakeTimeProvider only moves forward: 20 days ago, 8 days ago, yesterday, an hour ago and now.
         FinishAt(Now.AddDays(-20), "20 дней назад").GetAwaiter().GetResult();
         FinishAt(Now.AddDays(-8), "8 дней назад").GetAwaiter().GetResult();
         FinishAt(Now.AddDays(-1), "вчера").GetAwaiter().GetResult();

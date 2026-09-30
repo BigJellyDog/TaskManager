@@ -18,7 +18,7 @@ public sealed class TaskServiceTests : IDisposable
 
     public void Dispose() => _db.Dispose();
 
-    /// <summary>Сервис на новом контексте. Новый контекст на каждую операцию имитирует отдельный запрос пользователя.</summary>
+    /// <summary>A service on a new context. A new context for every operation imitates a separate user request.</summary>
     private TaskService NewService(TaskManagerDbContext context) =>
         new(new TaskRepository(context), new TagRepository(context), new UnitOfWork(context), _clock);
 
@@ -45,7 +45,7 @@ public sealed class TaskServiceTests : IDisposable
             tags ?? task.Tags.Select(t => t.Name).ToArray(),
             task.Recurrence);
 
-    // ---- Создание ----
+    // ---- Creation ----
 
     [Fact]
     public async Task Create_SavesTask_TagsAndHistory()
@@ -126,7 +126,7 @@ public sealed class TaskServiceTests : IDisposable
             () => NewService(context).CreateAsync(new CreateTaskRequest("t", Deadline: Now.AddHours(-1))));
     }
 
-    // ---- Редактирование ----
+    // ---- Editing ----
 
     [Fact]
     public async Task Edit_RecordsOnlyChangedFields_WithOldAndNewValues()
@@ -241,7 +241,7 @@ public sealed class TaskServiceTests : IDisposable
         Assert.Equal(999, ex.TaskId);
     }
 
-    // ---- Статусы ----
+    // ---- Statuses ----
 
     [Fact]
     public async Task ChangeStatus_AllowedTransition_IsSavedAndRecorded()
@@ -321,7 +321,7 @@ public sealed class TaskServiceTests : IDisposable
         await Assert.ThrowsAsync<InvalidStatusTransitionException>(() => NewService(context).ReopenAsync(task.Id));
     }
 
-    // ---- Удаление и восстановление ----
+    // ---- Deleting and restoring ----
 
     [Fact]
     public async Task Delete_HidesTask_AndRecordsHistory()
@@ -402,7 +402,7 @@ public sealed class TaskServiceTests : IDisposable
             () => service.EditAsync(new EditTaskRequest(task.Id, "x", Priority.Low, null, null, [], null)));
     }
 
-    // ---- Конкурентность ----
+    // ---- Concurrency ----
 
     [Fact]
     public async Task ConcurrentEdit_IsRejected_AndSecondHistoryIsNotWritten()
@@ -414,19 +414,19 @@ public sealed class TaskServiceTests : IDisposable
         var firstService = NewService(first);
         var secondService = NewService(second);
 
-        // Второй пользователь прочитал задачу и держит её в памяти.
+        // The second user has read the task and keeps it in memory.
         var staleCopy = await secondService.GetAsync(task.Id);
         Assert.NotNull(staleCopy);
 
-        // Первый успел изменить и сохранить.
+        // The first one managed to change and save.
         var loaded = await firstService.GetAsync(task.Id);
         await firstService.EditAsync(EditOf(loaded, title: "первый"));
 
-        // Второй сохраняет поверх устаревших данных.
+        // The second one saves over stale data.
         await Assert.ThrowsAsync<ConcurrencyConflictException>(
             () => secondService.ChangeStatusAsync(task.Id, TaskStatus.InProgress));
 
-        // Запись истории второго не появилась: задача и история сохраняются одной транзакцией.
+        // The second one's history record did not appear: the task and the history are saved in one transaction.
         var history = await HistoryAsync(task.Id);
         Assert.DoesNotContain(history, h => h.Command == TaskService.ChangeStatusCommand);
         await using var read = _db.CreateContext();

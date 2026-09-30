@@ -12,8 +12,8 @@ public enum ButtonVariant
 }
 
 /// <summary>
-/// Кнопка Signal: иконка, подпись и необязательная подсказка горячей клавиши. Основная (лайм) со свечением,
-/// обычная с рамкой, прозрачная и опасная (красный текст). Недоступная кнопка остаётся на месте, но серая.
+/// The Signal button: an icon, a label and an optional shortcut hint. The primary one (lime) with a glow,
+/// the normal one with a border, the transparent one and the dangerous one (red text). A disabled button stays in place but grey.
 /// </summary>
 public sealed class SignalButton : Border
 {
@@ -71,7 +71,7 @@ public sealed class SignalButton : Border
         _row.Children.Add(_hintBox);
         Content = _row;
 
-        // Подписи внутри кнопки красим сами: общий стиль Label перекрашивает отключённую подпись в серый поверх любого цвета.
+        // We colour the labels inside the button ourselves: the general Label style recolours a disabled label grey on top of any colour.
         _label.Style = new Style(typeof(Label));
         _hint.Style = new Style(typeof(Label));
 
@@ -85,8 +85,8 @@ public sealed class SignalButton : Border
         };
         GestureRecognizers.Add(tap);
 
-        // Под указателем: обычная и опасная кнопки светлеют до «приподнятой» поверхности, прозрачная получает такой же
-        // фон и яркий текст, основная становится чуть ярче.
+        // Under the pointer: the normal and dangerous buttons lighten to the "raised" surface, the transparent one gets the same
+        // background and bright text, the primary one becomes slightly brighter.
         var pointer = new PointerGestureRecognizer();
         pointer.PointerEntered += (_, _) => SetHover(true);
         pointer.PointerExited += (_, _) => SetHover(false);
@@ -131,14 +131,14 @@ public sealed class SignalButton : Border
         set => SetValue(CommandParameterProperty, value);
     }
 
-    /// <summary>Иконка стоит справа от подписи.</summary>
+    /// <summary>The icon is on the right of the label.</summary>
     public bool IconAfter
     {
         get => (bool)GetValue(IconAfterProperty);
         set => SetValue(IconAfterProperty, value);
     }
 
-    /// <summary>Малая кнопка (высота 28, подпись обычной жирности).</summary>
+    /// <summary>A small button (height 28, a label of normal weight).</summary>
     public bool Compact
     {
         get => (bool)GetValue(CompactProperty);
@@ -198,7 +198,7 @@ public sealed class SignalButton : Border
 
         _row.Children.Add(_hintBox);
 
-        // Привязка к ещё не заполненной модели может вернуть null: тогда считаем текст пустым.
+        // A binding to a model that is not filled yet may return null: then we treat the text as empty.
         var text = Text ?? string.Empty;
         var icon = Icon ?? string.Empty;
         var hint = Hint ?? string.Empty;
@@ -209,7 +209,7 @@ public sealed class SignalButton : Border
         _icon.IsVisible = icon.Length > 0;
         _hint.Text = hint;
         _hintBox.IsVisible = hint.Length > 0;
-        // Высоту, заданную в XAML (например, 42 у главной кнопки карточки), не затираем: стандартные 28/32 подставляем сами.
+        // A height set in XAML (for example 42 on the main card button) is not overwritten: we apply the standard 28/32 ourselves.
         if (HeightRequest is -1 or 28 or 32 or 36)
         {
             HeightRequest = Compact ? 28 : 36;
@@ -221,7 +221,7 @@ public sealed class SignalButton : Border
         string background, foreground, stroke;
         if (!enabled && Variant == ButtonVariant.Primary)
         {
-            // Недоступная основная кнопка остаётся узнаваемой: тот же градиент с тем же тёмным (или белым) текстом, но бледнее.
+            // An unavailable primary button stays recognisable: the same gradient with the same dark (or white) text, but paler.
             (background, foreground, stroke) = ("Accent", "OnAccent", string.Empty);
         }
         else if (!enabled)
@@ -239,9 +239,9 @@ public sealed class SignalButton : Border
             };
         }
 
-        // Прежний фон мешал бы новому. Градиент основной кнопки лежит в Background, обычные цвета в BackgroundColor, и ресурс
-        // одного свойства не снимается очисткой другого: недоступная кнопка оставалась бы залитой градиентом (с серым
-        // текстом на светлой заливке).
+        // The previous background would interfere with the new one. The primary button gradient lives in Background, ordinary colours in BackgroundColor, and the resource
+        // of one property is not removed by clearing the other: an unavailable button would stay filled with the gradient (with grey
+        // text on a light fill).
         RemoveDynamicResource(BackgroundProperty);
         RemoveDynamicResource(BackgroundColorProperty);
         ClearValue(BackgroundProperty);
@@ -257,7 +257,7 @@ public sealed class SignalButton : Border
             }
         }
 
-        // Основная кнопка Aurora: градиент от акцента ко второму цвету темы; под указателем чуть светлее.
+        // The Aurora primary button: a gradient from the accent to the second colour of the theme; slightly lighter under the pointer.
         Opacity = 1;
         if (Variant == ButtonVariant.Primary)
         {
@@ -287,7 +287,7 @@ public sealed class SignalButton : Border
         _hint.SetDynamicResource(Label.TextColorProperty, foreground);
         _hintBox.SetDynamicResource(StrokeProperty, enabled && Variant == ButtonVariant.Primary ? "OnAccentBrush" : "LineBrush");
 
-        // Свечение только у доступной основной кнопки.
+        // A glow only on an available primary button.
         if (enabled && Variant == ButtonVariant.Primary)
         {
             var shadow = new Shadow { Radius = 22, Opacity = 0.35f, Offset = new Point(0, 0) };

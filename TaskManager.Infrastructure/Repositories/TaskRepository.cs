@@ -41,7 +41,7 @@ public class TaskRepository : ITaskRepository
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        // Список только для показа: отслеживание изменений не нужно, без него загрузка заметно быстрее.
+        // A list for display only: change tracking is not needed, loading is noticeably faster without it.
         var filtered = _context.Tasks.AsNoTracking().Where(query.Filter.ToExpression());
         var total = await filtered.CountAsync(cancellationToken);
 
@@ -95,8 +95,8 @@ public class TaskRepository : ITaskRepository
             .ToListAsync(cancellationToken);
 
     /// <summary>
-    /// Строит ORDER BY из списка правил: первое правило через OrderBy, остальные через ThenBy.
-    /// В конце всегда добавляется Id: без однозначного порядка страницы могли бы пересекаться или терять записи.
+    /// Builds ORDER BY from the list of rules: the first rule through OrderBy, the rest through ThenBy.
+    /// Id is always added at the end: without an unambiguous order pages could overlap or lose records.
     /// </summary>
     private static IOrderedQueryable<TaskItem> ApplySort(IQueryable<TaskItem> source, IReadOnlyList<TaskSort> sorts)
     {
@@ -110,12 +110,12 @@ public class TaskRepository : ITaskRepository
                 TaskSortField.CreatedAt => Order(source, ordered, t => t.CreatedAt, sort.Descending),
                 TaskSortField.Status => Order(source, ordered, t => t.Status, sort.Descending),
 
-                // SearchText начинается с названия в верхнем регистре, а SQLite не умеет сортировать кириллицу
-                // без учёта регистра, поэтому сортируем по нему. Перевод строки в тексте идёт раньше любой буквы,
-                // так что "АБ" по-прежнему раньше "АБВ".
+                // SearchText starts with the title in upper case, and SQLite cannot sort Cyrillic
+                // ignoring case, so we sort by it. A line break in the text comes before any letter,
+                // so "АБ" is still before "АБВ".
                 TaskSortField.Title => Order(source, ordered, t => t.SearchText, sort.Descending),
 
-                // Задачи без дедлайна в конце при любом направлении: сначала ключ "дедлайна нет" (false раньше true).
+                // Tasks without a deadline at the end in any direction: first the key "no deadline" (false before true).
                 TaskSortField.Deadline => Order(source, Order(source, ordered, t => t.Deadline == null, false), t => t.Deadline, sort.Descending),
                 _ => throw new ArgumentOutOfRangeException(nameof(sorts), sort.Field, "Неизвестное поле сортировки."),
             };

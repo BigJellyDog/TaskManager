@@ -4,7 +4,7 @@ using TaskManager.Infrastructure.Reminders;
 
 namespace TaskManager.App.Services;
 
-/// <summary>Выбор темы: «Системная» следует за темой Windows. Числа сохраняются в settings.json, новые темы только в конец.</summary>
+/// <summary>The choice of theme: "System" follows the Windows theme. The numbers are saved in settings.json, new themes only at the end.</summary>
 public enum ThemeChoice
 {
     System,
@@ -20,8 +20,8 @@ public enum ThemeChoice
 }
 
 /// <summary>
-/// Настройки пользователя: хранятся в settings.json рядом с базой и применяются сразу, без перезапуска.
-/// Недоступный или повреждённый файл не мешает запуску: берутся значения по умолчанию.
+/// User settings: stored in settings.json next to the database and applied at once, without a restart.
+/// An unavailable or damaged file does not prevent start-up: the default values are used.
 /// </summary>
 public sealed class UserSettings
 {
@@ -41,13 +41,13 @@ public sealed class UserSettings
         ApplyReminderInterval();
     }
 
-    /// <summary>Что-то изменилось: подписчики (страницы, тема, баннер) перечитывают значения.</summary>
+    /// <summary>Something changed: subscribers (pages, theme, banner) read the values again.</summary>
     public event EventHandler? Changed;
 
-    /// <summary>Допустимые размеры страницы списка.</summary>
+    /// <summary>Allowed page sizes of the list.</summary>
     public static IReadOnlyList<int> PageSizes { get; } = [10, 20, 50];
 
-    /// <summary>Допустимые интервалы проверки напоминаний, минуты. 0 означает «никогда»: напоминания не показываются.</summary>
+    /// <summary>Allowed intervals of the reminder check, minutes. 0 means "never": reminders are not shown.</summary>
     public static IReadOnlyList<int> ReminderMinutesOptions { get; } = [1, 5, 15, 30, 0];
 
     public int PageSize
@@ -56,7 +56,7 @@ public sealed class UserSettings
         set => Set(ref _data.PageSize, value);
     }
 
-    /// <summary>Скрывать выполненные и отменённые задачи по умолчанию.</summary>
+    /// <summary>Hide done and cancelled tasks by default.</summary>
     public bool HideClosed
     {
         get => _data.HideClosed;
@@ -69,7 +69,7 @@ public sealed class UserSettings
         set => Set(ref _data.Theme, value);
     }
 
-    /// <summary>Что открывается на экране «Задачи»: доска (true) или список.</summary>
+    /// <summary>What opens on the "Tasks" screen: the board (true) or the list.</summary>
     public bool DefaultBoard
     {
         get => _data.DefaultBoard;
@@ -86,7 +86,7 @@ public sealed class UserSettings
         }
     }
 
-    /// <summary>Язык интерфейса: «ru», «en», «de» или «ua».</summary>
+    /// <summary>The interface language: "ru", "en", "de" or "ua".</summary>
     public string Language
     {
         get => _data.Language;
@@ -99,7 +99,7 @@ public sealed class UserSettings
         set => Set(ref _data.ShowReminderBanner, value);
     }
 
-    /// <summary>Показывать напоминания ещё и системным уведомлением Windows.</summary>
+    /// <summary>Also show reminders as a Windows system notification.</summary>
     public bool ShowWindowsToast
     {
         get => _data.ShowWindowsToast;
@@ -108,7 +108,7 @@ public sealed class UserSettings
 
     private void ApplyReminderInterval()
     {
-        // «Никогда» выключает показ напоминаний, а цикл фонового сервиса (повторяющиеся задачи) остаётся с шагом в минуту.
+        // "Never" switches off showing reminders, while the loop of the background service (recurring tasks) keeps running every minute.
         _reminderOptions.Enabled = _data.ReminderMinutes > 0;
         _reminderOptions.IntervalSeconds = Math.Max(1, _data.ReminderMinutes) * 60;
     }
@@ -134,7 +134,7 @@ public sealed class UserSettings
                 _data = JsonSerializer.Deserialize<Data>(File.ReadAllText(_path), JsonOptions) ?? new Data();
             }
         }
-#pragma warning disable CA1031 // Повреждённый файл настроек не должен мешать запуску.
+#pragma warning disable CA1031 // A damaged settings file must not prevent start-up.
         catch (Exception ex)
 #pragma warning restore CA1031
         {
@@ -160,7 +160,7 @@ public sealed class UserSettings
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
             File.WriteAllText(_path, JsonSerializer.Serialize(_data, JsonOptions));
         }
-#pragma warning disable CA1031 // Не удалось сохранить: настройка действует до закрытия, ошибку пишем в журнал.
+#pragma warning disable CA1031 // Saving failed: the setting stays in effect until closing, the error is written to the log.
         catch (Exception ex)
 #pragma warning restore CA1031
         {

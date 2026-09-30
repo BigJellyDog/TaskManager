@@ -6,7 +6,7 @@ using TaskManager.Core.Services;
 
 namespace TaskManager.App.ViewModels;
 
-/// <summary>Строка списка тегов; в режиме правки вместо названия показано поле ввода.</summary>
+/// <summary>A row of the tag list; in edit mode an input field is shown instead of the name.</summary>
 public sealed partial class TagRowViewModel : ObservableObject
 {
     public TagRowViewModel(TagUsage usage, double fraction)
@@ -29,7 +29,7 @@ public sealed partial class TagRowViewModel : ObservableObject
 
     public bool CanDelete { get; }
 
-    /// <summary>Длина полосы относительно самого частого тега (0–1).</summary>
+    /// <summary>The length of the bar relative to the most frequent tag (0-1).</summary>
     public double Fraction { get; }
 
     public string EditHint => TaskCount == 0 ? Loc.T("Не используется") : Loc.F("Изменит {0} {1}", TaskCount, Loc.Plural(TaskCount, "задачу|задачи|задач"));
@@ -44,7 +44,7 @@ public sealed partial class TagRowViewModel : ObservableObject
     private string editName;
 }
 
-/// <summary>Теги: список с числом задач, переименование во всех задачах и удаление неиспользуемых.</summary>
+/// <summary>Tags: a list with the number of tasks, renaming in all tasks and deleting the unused ones.</summary>
 public sealed partial class TagsViewModel : ViewModelBase
 {
     private readonly ServiceRunner _runner;

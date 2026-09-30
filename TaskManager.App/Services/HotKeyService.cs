@@ -1,40 +1,40 @@
 ﻿namespace TaskManager.App.Services;
 
-/// <summary>Действие, которое страница выполняет по горячей клавише (общие переходы сервис делает сам).</summary>
+/// <summary>An action the page performs on a shortcut key (the general navigation is done by the service itself).</summary>
 public enum HotKeyAction
 {
-    /// <summary>Ctrl+K: перейти в строку поиска.</summary>
+    /// <summary>Ctrl+K: go to the search field.</summary>
     Search,
 
-    /// <summary>Ctrl+Enter: сохранить форму.</summary>
+    /// <summary>Ctrl+Enter: save the form.</summary>
     Save,
 
-    /// <summary>Esc: отменить и вернуться.</summary>
+    /// <summary>Esc: cancel and go back.</summary>
     Cancel,
 
-    /// <summary>Ctrl+D: выполнить задачу на карточке.</summary>
+    /// <summary>Ctrl+D: complete the task on the card.</summary>
     Complete,
 }
 
 /// <summary>
-/// Горячие клавиши окна (как в макете Signal): Ctrl+1…6 переходят по разделам, Ctrl+N открывает новую задачу,
-/// Alt+← возвращает назад. Остальные (Ctrl+K, Ctrl+Enter, Esc, Ctrl+D) сервис передаёт открытой странице событием
-/// <see cref="Pressed"/>: у неё есть нужные команды.
+/// Window shortcuts (as in the Signal mockup): Ctrl+1…6 go to the sections, Ctrl+N opens a new task,
+/// Alt+← goes back. The others (Ctrl+K, Ctrl+Enter, Esc, Ctrl+D) the service passes to the open page with the event
+/// <see cref="Pressed"/>: it has the commands needed.
 /// </summary>
 public sealed class HotKeyService(INavigationService navigation)
 {
     private static readonly string[] Sections = ["tasks", "statistics", "data", "trash", "tags", "settings"];
 
-    /// <summary>Нажата клавиша, которую обрабатывает страница.</summary>
+    /// <summary>A key handled by the page was pressed.</summary>
     public event Action<HotKeyAction>? Pressed;
 
-    /// <summary>Подключается к окну и слушает клавиши, даже когда фокус в поле ввода.</summary>
+    /// <summary>Attaches to the window and listens to keys even when the focus is in an input field.</summary>
     public void Attach(Window window)
     {
 #if WINDOWS
         if (window.Handler?.PlatformView is Microsoft.UI.Xaml.Window native && native.Content is { } root)
         {
-            // Перехватываем до поля ввода (PreviewKeyDown): иначе Ctrl+N вписал бы «n» в строку поиска, а Ctrl+Enter и Esc не дошли бы до нас.
+            // We intercept before the input field (PreviewKeyDown): otherwise Ctrl+N would type "n" into the search box, and Ctrl+Enter and Esc would not reach us.
             root.AddHandler(
                 Microsoft.UI.Xaml.UIElement.PreviewKeyDownEvent,
                 new Microsoft.UI.Xaml.Input.KeyEventHandler((_, e) => OnKeyDown(e)),

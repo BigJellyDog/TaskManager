@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace TaskManager.App.Controls;
 
-/// <summary>Колонка доски задач (один статус): заголовок, счётчик и карточки.</summary>
+/// <summary>A column of the task board (one status): header, counter and cards.</summary>
 public partial class BoardColumn : ContentView
 {
     public static readonly BindableProperty ColumnTitleProperty =

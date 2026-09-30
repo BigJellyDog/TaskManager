@@ -10,7 +10,7 @@ using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Tests;
 
-/// <summary>Фоновая проверка напоминаний: показ, повтор и режим «никогда» (<see cref="ReminderOptions.Enabled"/> выключен).</summary>
+/// <summary>The background reminder check: showing, repeating and the "never" mode (<see cref="ReminderOptions.Enabled"/> off).</summary>
 public sealed class ReminderServiceTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);
@@ -73,7 +73,7 @@ public sealed class ReminderServiceTests : IDisposable
 
         Assert.Empty(_notifier.Batches);
 
-        // Включили обратно: напоминание не потеряно, оно показывается сейчас.
+        // Switched back on: the reminder is not lost, it is shown now.
         await NewService(enabled: true).RunOnceAsync(CancellationToken.None);
         Assert.Single(_notifier.Batches);
     }

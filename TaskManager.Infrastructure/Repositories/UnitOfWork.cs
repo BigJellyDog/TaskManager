@@ -17,7 +17,7 @@ public class UnitOfWork : IUnitOfWork
     {
         try
         {
-            // Один SaveChanges это одна транзакция: задача и записи истории сохраняются вместе.
+            // One SaveChanges is one transaction: the task and the history records are saved together.
             return await _context.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateConcurrencyException ex)
@@ -32,7 +32,7 @@ public class UnitOfWork : IUnitOfWork
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        // Уже внутри транзакции: просто выполняем, коммитом займётся внешний вызов.
+        // Already inside a transaction: we just run, the outer call will take care of the commit.
         if (_context.Database.CurrentTransaction is not null)
         {
             return await action(cancellationToken);
@@ -42,7 +42,7 @@ public class UnitOfWork : IUnitOfWork
         var result = await action(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return result;
-        // Если action бросил исключение, до CommitAsync не дойдём и Dispose откатит транзакцию.
+        // If the action throws an exception, we do not reach CommitAsync and Dispose rolls the transaction back.
     }
 
     public Task ExecuteInTransactionAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken = default)

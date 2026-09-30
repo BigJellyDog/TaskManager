@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TaskManager.Infrastructure.Persistence;
 
-/// <summary>DateTimeOffset хранится как тики UTC (long). Смещение не сохраняется: важен момент времени.</summary>
+/// <summary>DateTimeOffset is stored as UTC ticks (long). The offset is not saved: the moment in time matters.</summary>
 public class DateTimeOffsetToUtcTicksConverter : ValueConverter<DateTimeOffset, long>
 {
     public DateTimeOffsetToUtcTicksConverter()

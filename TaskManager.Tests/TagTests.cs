@@ -6,7 +6,7 @@ using TaskManager.Infrastructure.Repositories;
 
 namespace TaskManager.Tests;
 
-/// <summary>Теги: список с числом задач, переименование и удаление неиспользуемых.</summary>
+/// <summary>Tags: a list with the number of tasks, renaming and deleting the unused ones.</summary>
 public sealed class TagTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 26, 10, 0, 0, TimeSpan.Zero);
@@ -81,7 +81,7 @@ public sealed class TagTests : IDisposable
             await Assert.ThrowsAsync<DomainValidationException>(() => Tags(context).DeleteAsync(id));
         }
 
-        // Тег освобождается, когда задачу стёрли навсегда (в корзине он ещё считается занятым).
+        // A tag is freed when the task was erased for good (in the trash it still counts as used).
         await using (var context = _db.CreateContext())
         {
             await Tasks(context).DeleteAsync(task);
