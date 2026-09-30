@@ -122,9 +122,9 @@ public static class Loc
     /// </summary>
     public static string Message(string? ru)
     {
-        if (string.IsNullOrEmpty(ru) || IsRussian)
+        if (string.IsNullOrEmpty(ru))
         {
-            return ru ?? string.Empty;
+            return string.Empty;
         }
 
         if (Table.ContainsKey(ru))
@@ -140,11 +140,25 @@ public static class Loc
                 continue;
             }
 
-            var args = match.Groups.Cast<Group>().Skip(1).Select(g => (object?)g.Value).ToArray();
+            // The core inserts raw enum names ("Todo", "Done") and nested Russian reasons: show both in the interface language.
+            var args = match.Groups.Cast<Group>().Skip(1).Select(g => (object?)LocalizeArgument(g.Value)).ToArray();
             return string.Format(Culture, T(key), args);
         }
 
         return ru;
+    }
+
+    private static string LocalizeArgument(string value)
+    {
+        // A letter first: "1" would otherwise parse as a numeric enum value.
+        if (value.Length > 0 && char.IsLetter(value[0])
+            && Enum.TryParse<TaskManager.Core.Domain.TaskStatus>(value, out var status) && Enum.IsDefined(status))
+        {
+            return DisplayNames.StatusName(status);
+        }
+
+        // Nested reasons are whole Russian sentences that end with a full stop.
+        return value.EndsWith('.') && Table.ContainsKey(value) ? T(value) : value;
     }
 
     private static Dictionary<string, string[]> BuildTable()
