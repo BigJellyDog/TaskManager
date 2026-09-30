@@ -40,12 +40,8 @@ All data stays in a local SQLite file: no account, no server, no cloud.
 | ![Statistics](docs/images/en/statistics-month.png) | ![Trash](docs/images/en/trash.png) |
 | ![Data](docs/images/en/data.png) | ![Settings](docs/images/en/settings.png) |
 
-### Themes
-
-| | | |
-|---|---|---|
-| ![Aurora Light](docs/images/themes/aurora-light-en.png) | ![Dracula](docs/images/themes/dracula-en.png) | ![Narrow window](docs/images/compact/sidebar-en.png) |
-| Aurora Light | Dracula | Narrow window: the side panel folds into icons |
+The screenshots show the default Aurora theme. All nine themes, including the light ones, switch at runtime from
+the menu in the title bar, and in a narrow window the side panel folds into icons.
 
 ## Documentation
 

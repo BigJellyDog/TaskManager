@@ -41,12 +41,9 @@ Alle Daten liegen in einer lokalen SQLite-Datei: kein Konto, kein Server, keine 
 | ![Statistik](docs/images/de/statistics-month.png) | ![Papierkorb](docs/images/de/trash.png) |
 | ![Daten](docs/images/de/data.png) | ![Einstellungen](docs/images/de/settings.png) |
 
-### Designs
-
-| | | |
-|---|---|---|
-| ![Aurora Hell](docs/images/themes/aurora-light-de.png) | ![Dracula](docs/images/themes/dracula-de.png) | ![Schmales Fenster](docs/images/compact/sidebar-de.png) |
-| Aurora Hell | Dracula | Schmales Fenster: die Seitenleiste klappt zu Symbolen zusammen |
+Die Bildschirmfotos zeigen das Standarddesign Aurora. Alle neun Designs, auch die hellen, lassen sich zur Laufzeit
+über das Menü in der Titelleiste umschalten, und in einem schmalen Fenster klappt die Seitenleiste zu Symbolen
+zusammen.
 
 ## Dokumentation
 
